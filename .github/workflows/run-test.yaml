@@ -23,10 +23,19 @@ jobs:
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: $'Nu version info:(char nl)'; version
-    - run: $'Current env:(char nl)'; $env
-    - run: $'Nu path:(which nu)(char nl)'
-    - run: $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - name: You can run bash commands, too
+      run: pwd && ls -la
+      shell: bash
+    - name: Default shell will be `nu`
+      run: |
+        $'Nu version info:(char nl)'; version
+        $'Current env:(char nl)'; $env
+        $'Nu path:(which nu)(char nl)'
+        $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+        def greeting [name: string] {
+          print $'Hello ($name)'
+        }
+        greeting hustcer
 
   test-ver:
     strategy:
