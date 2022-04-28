@@ -30,6 +30,8 @@ export interface Tool {
   owner: string;
   /** The GitHub repo name. */
   name: string;
+  /** Set this option to `true` if you want to check for the latest version. */
+  checkLatest: boolean;
   /** A valid semantic version specifier for the tool. */
   versionSpec?: string;
   /** The name of the tool binary (defaults to the repo name) */
@@ -63,6 +65,58 @@ interface Release {
 }
 
 /**
+ * Filter the matching release for the given tool with the specified versionSpec.
+ *
+ * @param response the response to filter a release from with the given versionSpec.
+ *
+ * @returns {Release[]} a single GitHub release.
+ */
+function filterMatch(response: any, versionSpec: string | undefined): Release[] {
+  const targets = getTargets();
+  return response.data
+    .map((rel: { assets: any[]; tag_name: string }) => {
+      const asset = rel.assets.find((ass: { name: string | string[] }) =>
+        targets.some((target) => ass.name.includes(target))
+      );
+      if (asset) {
+        return {
+          version: rel.tag_name.replace(/^v/, ''),
+          downloadUrl: asset.browser_download_url,
+        };
+      }
+    })
+    .filter((rel: { version: string | semver.SemVer }) =>
+      rel && versionSpec ? semver.satisfies(rel.version, versionSpec) : true
+    );
+}
+
+/**
+ * Filter the latest matching release for the given tool.
+ *
+ * @param response the response to filter a latest release from.
+ *
+ * @returns {Release[]} a single GitHub release.
+ */
+function filterLatest(response: any): Release[] {
+  const targets = getTargets();
+  const versions = response.data.map((r: { tag_name: string }) => r.tag_name);
+  const latest = semver.rsort(versions)[0];
+  return response.data
+    .filter((rel: { tag_name: string | semver.SemVer | undefined }) => rel && rel.tag_name === latest)
+    .map((rel: { assets: any[]; tag_name: string }) => {
+      const asset = rel.assets.find((ass: { name: string | string[] }) =>
+        targets.some((target) => ass.name.includes(target))
+      );
+      if (rel.assets) {
+        return {
+          version: rel.tag_name.replace(/^v/, ''),
+          downloadUrl: asset.browser_download_url,
+        };
+      }
+    });
+}
+
+/**
  * Fetch the latest matching release for the given tool.
  *
  * @param tool the tool to fetch a release for.
@@ -70,22 +124,12 @@ interface Release {
  * @returns {Promise<Release>} a single GitHub release.
  */
 async function getRelease(tool: Tool): Promise<Release> {
-  const targets = getTargets();
-  const { owner, name, versionSpec } = tool;
+  const { owner, name, versionSpec, checkLatest = false } = tool;
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
-      const releases = response.data
-        .map((rel) => {
-          const asset = rel.assets.find((ass) => targets.some((target) => ass.name.includes(target)));
-          if (asset) {
-            return {
-              version: rel.tag_name.replace(/^v/, ''),
-              downloadUrl: asset.browser_download_url,
-            };
-          }
-        })
-        .filter((rel) => (rel && versionSpec ? semver.satisfies(rel.version, versionSpec) : true));
+      const releases = checkLatest ? filterLatest(response) : filterMatch(response, versionSpec);
+
       if (releases) {
         done();
       }

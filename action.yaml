@@ -4,6 +4,8 @@
 # REF:
 #   1. https://docs.github.com/cn/actions/creating-actions/about-custom-actions
 #   2. https://docs.github.com/cn/actions/creating-actions/metadata-syntax-for-github-actions
+#   3. All available versions: https://api.github.com/repos/nushell/nushell/tags
+#   4. All nushell release: https://api.github.com/repos/nushell/nushell/releases
 
 name: 'Setup Nu'
 author: 'hustcer'
@@ -15,9 +17,11 @@ branding:
 
 inputs:
   version:
-    default: 'latest'
     required: false
-    description: 'A valid semver specifier of nushell version to install'
+    description: 'A valid semver specifier of nushell version to install.'
+  check-latest:
+    default: false
+    description: 'Set this option if you want the action to check for the latest available version.'
   plugins:  # TODO: Not support yet
     required: false
     description: 'Specify the plugins you want to register'

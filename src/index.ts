@@ -5,8 +5,10 @@ import * as setup from './setup';
 async function main() {
   try {
     const versionSpec = core.getInput('version');
+    const checkLatest = (core.getInput('check-latest') || 'false').toUpperCase() === 'TRUE';
     const tool = await setup.checkOrInstallTool({
       versionSpec,
+      checkLatest,
       bin: 'nu',
       name: 'nushell',
       owner: 'nushell',
