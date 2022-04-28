@@ -1,0 +1,50 @@
+name: run-test
+
+on:
+  push
+defaults:
+  run:
+    shell: nu {0}
+
+jobs:
+  test-latest:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, nu@latest)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup nu@latest
+      uses: hustcer/setup-nu@main
+      with:
+        check-latest: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: $'Nu version info:(char nl)'; version
+    - run: $'Current env:(char nl)'; $env
+    - run: $'Nu path:(which nu)(char nl)'
+    - run: $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+
+  test-ver:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, nu@v0.60.0)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup nu@v0.60.0
+      uses: hustcer/setup-nu@main
+      with:
+        version: 0.60.0
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: $'Nu version info:(char nl)'; version
+    - run: $'Current env:(char nl)'; $env
+    - run: $'Nu path:(which nu)(char nl)'
+    - run: $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
