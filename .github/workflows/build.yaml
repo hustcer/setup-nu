@@ -6,8 +6,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
       with:
         node-version: '16'
     - run: npm ci
@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, ${{ matrix.crate.owner }}/${{ matrix.crate.name }})
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup ${{ matrix.crate.owner }}/${{ matrix.crate.name }}
       uses: ./
       with:
