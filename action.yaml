@@ -1,0 +1,27 @@
+# Setup-nu Action
+#   @author: hustcer
+#   @created: 2022/05/01
+# REF:
+#   1. https://docs.github.com/cn/actions/creating-actions/about-custom-actions
+#   2. https://docs.github.com/cn/actions/creating-actions/metadata-syntax-for-github-actions
+
+name: 'Setup Nu'
+author: 'hustcer'
+description: 'Setup a Nushell Env to Run Nushell Scripts or Commands'
+
+branding:
+  icon: 'terminal'
+  color: 'purple'
+
+inputs:
+  version:
+    default: 'latest'
+    required: false
+    description: 'A valid semver specifier of nushell version to install'
+  plugins:  # TODO: Not support yet
+    required: false
+    description: 'Specify the plugins you want to register'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
