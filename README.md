@@ -29,8 +29,34 @@ to make the commands be execute by `nu`:
     greeting hustcer
 ```
 
-Of cause, You can also set the default shell to `nu` by setting the `defaults.run.shell` config,
-check the following examples:
+Of cause, You can also set the default shell to `nu` by setting the `defaults.run.shell` config:
+
+```yaml
+name: basic
+
+on: push
+defaults:
+  run:
+    shell: nu {0}
+
+jobs:
+  basic-usage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: hustcer/setup-nu@main
+      with:
+        version: '*'
+    - run: version; $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - run: |
+        $'Current env:(char nl)'
+        $env
+    - name: You can run bash commands, too
+      run: pwd && ls -la
+      shell: bash
+```
+
+Or, check the following examples:
 
 1. [run-test.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml)
 2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-matrix.yaml)
