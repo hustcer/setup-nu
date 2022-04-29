@@ -47,7 +47,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup nu@v0.60.0
-      uses: hustcer/setup-nu@main
+      uses: hustcer/setup-nu@v1-beta1
       with:
         version: 0.60.0
       env:

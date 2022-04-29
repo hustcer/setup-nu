@@ -11,7 +11,7 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 In most cases you need to specify the `version` of Nushell to be used in your workflow.
 For example the following installs the `v0.61.0` version of [Nushell](https://github.com/nushell/nushell).
 Then you can set the command you want to run in the following steps, and don't forget to set `shell: nu {0}`
-to make the commands be execute by `nu`
+to make the commands be execute by `nu`:
 
 ```yaml
 - uses: hustcer/setup-nu@v1-beta1
@@ -29,10 +29,11 @@ to make the commands be execute by `nu`
     greeting hustcer
 ```
 
-Of cause, You can also set the default shell to `nu` check the following examples:
+Of cause, You can also set the default shell to `nu` by setting the `defaults.run.shell` config,
+check the following examples:
 
-1. https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml
-2. https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-matrix.yaml
+1. [run-test.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml)
+2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-matrix.yaml)
 
 If you want to use the latest version of nushell you can specify this by set
 `check-latest` to `true`. For example the following installs the latest version:
@@ -44,7 +45,7 @@ If you want to use the latest version of nushell you can specify this by set
 - run: $'Nu version info:(char nl)'; version
 ```
 
-**Note**: Before nushell reaches 1.0, each version may change a lot, it is recommend
+**Note**: Before Nushell reaches 1.0, each version may change a lot, it is recommend
 that you use a specified version instead.
 
 In rare circumstances you might get rate limiting errors, this is because this
@@ -63,17 +64,11 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 
 | Name           | Required | Description                                          | Type   | Default |
 | -------------- | -------- | ---------------------------------------------------- | ------ | ------- |
-| `version`      | no       | A valid NPM-style semver specification.              | string | *       |
-| `check-latest` | no       | Set to `true` if you want to use the latest version  | bool   |         |
+| `version`      | no       | A valid NPM-style semver specification.              | string |         |
+| `check-latest` | no       | Set to `true` if you want to use the latest version  | bool   | false   |
 
 The semver specification is passed directly to NPM's [semver package](https://www.npmjs.com/package/semver).
-This GitHub Action will install the latest matching release. Examples include:
-
-- `version: '*'` latest version (default).
-- `version: '0.1'` equivalent to `>=0.1.0 <0.2.0`.
-- `version: '0.1.x'` equivalent to `>=0.1.0 <0.2.0`.
-- `version: '0.1.0'` equivalent to `=0.1.0`.
-- `version: '^0.1.0'` equivalent to `>=0.1.0 <0.2.0`.
+This GitHub Action will install the latest matching release.
 
 ## License
 
