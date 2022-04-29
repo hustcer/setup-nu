@@ -1,6 +1,6 @@
 # Setup-nu Action
 #   @author: hustcer
-#   @created: 2022/05/01
+#   @created: 2022/04/28 18:50:20
 # REF:
 #   1. https://docs.github.com/cn/actions/creating-actions/about-custom-actions
 #   2. https://docs.github.com/cn/actions/creating-actions/metadata-syntax-for-github-actions
@@ -9,7 +9,7 @@
 
 name: 'Setup Nu'
 author: 'hustcer'
-description: 'Setup a Nushell Env to Run Nushell Scripts or Commands'
+description: 'Setup a Nushell Environment to Run Nu Scripts or Commands'
 
 branding:
   icon: 'terminal'
@@ -17,10 +17,12 @@ branding:
 
 inputs:
   version:
+    default: '*'
     required: false
     description: 'A valid semver specifier of nushell version to install.'
   check-latest:
     default: false
+    required: false
     description: 'Set this option if you want the action to check for the latest available version.'
   plugins:  # TODO: Not support yet
     required: false

@@ -90,7 +90,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 
 | Name           | Required | Description                                          | Type   | Default |
 | -------------- | -------- | ---------------------------------------------------- | ------ | ------- |
-| `version`      | no       | A valid NPM-style semver specification.              | string |         |
+| `version`      | no       | A valid NPM-style semver specification.              | string |   *     |
 | `check-latest` | no       | Set to `true` if you want to use the latest version  | bool   | false   |
 
 The semver specification is passed directly to NPM's [semver package](https://www.npmjs.com/package/semver).
