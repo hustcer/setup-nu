@@ -61,8 +61,9 @@ Or, check the following examples:
 1. [run-test.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml)
 2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-matrix.yaml)
 
-If you want to use the latest version of nushell you can specify this by set
-`check-latest` to `true`. For example the following installs the latest version:
+If you want to use the latest version of nushell you can specify this by set `check-latest` to
+`true`(it's the same as `version: '*'`, but more readable). For example the following installs
+the latest version:
 
 ```yaml
 - uses: hustcer/setup-nu@v1-beta1
