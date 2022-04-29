@@ -1,7 +1,13 @@
 name: run-matrix
 
 on:
-  push
+  push:
+    branches:
+      - main
+      - releases/*
+    paths-ignore:
+      - '**.md'
+
 defaults:
   run:
     shell: nu {0}

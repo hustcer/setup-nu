@@ -1,6 +1,13 @@
 name: basic
 
-on: push
+on:
+  push:
+    branches:
+      - main
+      - releases/*
+    paths-ignore:
+      - '**.md'
+
 defaults:
   run:
     shell: nu {0}
