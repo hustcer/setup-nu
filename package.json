@@ -1,7 +1,7 @@
 {
   "name": "setup-nu",
   "version": "1.0.0",
-  "actionVer": "v1",
+  "actionVer": "v1.0.0",
   "description": "Install nushell",
   "main": "dist/index.js",
   "private": true,
