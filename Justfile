@@ -45,11 +45,13 @@ lint:
 
 # Build dist/index.js
 build:
-  rm -rfq dist/*
+  cd {{SETUP_NU_PATH}}; \
+  rm -rfq dist/*; \
   npx ncc build src/index.ts --minify
 
 # Test action locally
 run: build
+  cd {{SETUP_NU_PATH}}; \
   let-env RUNNER_TEMP = './runner/temp'; \
   let-env RUNNER_TOOL_CACHE = './runner/cache'; \
   node dist/index.js
