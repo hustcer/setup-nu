@@ -2,13 +2,14 @@
 # Author: hustcer
 # Created: 2022/04/29 10:06:56
 # Description: Script to release setup-nu
+#
 # TODO:
-# [√] 确保新版本对应 Tag 不存在
-# [√] 确保没有未提交的变更
-# [√] 自动生成 Tag, 并推送远程
-# [√] 更新 Change Log
+#   [√] Make sure the release tag does not exist;
+#   [√] Make sure there are no uncommit changes;
+#   [√] Update change log if required;
+#   [√] Create a release tag and push it to the remote repo;
 # Usage:
-# 	just release
+#   Change `actionVer` in package.json and then run:	`just release` OR `just release true`
 
 def 'release' [
   --update-log: any      # Set to `true` do enable updating CHANGELOG.md, defined as `any` acutually `bool`
