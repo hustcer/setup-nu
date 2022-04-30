@@ -35,22 +35,36 @@ _query_plugin := if os_family() == 'windows' { 'nu_plugin_query.exe' } else { 'n
 default:
   @just --list --list-prefix "··· "
 
+# Run lint, fmt and build task all in one time
+all: lint fmt build
+  @$'(ansi pb)All done!(ansi reset)'
+
 # Format code
 fmt:
-  npx prettier --write **/*.ts
+  @$'(ansi g)Start `fmt` task...(ansi reset)'; \
+  $'(ansi p)───────────────────────────────────────(ansi reset)'; \
+  npx prettier --write **/*.ts; \
+  $'(ansi g)The `fmt` task finished!(ansi reset)(char nl)';
 
 # Code linting
 lint:
-  npx eslint src/**/*.ts
+  @$'(ansi g)Start `lint` task...(ansi reset)'; \
+  $'(ansi p)───────────────────────────────────────(ansi reset)'; \
+  npx eslint src/**/*.ts; \
+  $'(ansi g)The `lint` task finished!(ansi reset)(char nl)';
 
 # Build dist/index.js
 build:
+  @$'(ansi g)Start `build` task...(ansi reset)'; \
+  $'(ansi p)───────────────────────────────────────(ansi reset)'; \
   cd {{SETUP_NU_PATH}}; \
   rm -rfq dist/*; \
-  npx ncc build src/index.ts --minify
+  npx ncc build src/index.ts --minify; \
+  $'(ansi g)The `build` task finished!(ansi reset)(char nl)';
 
 # Test action locally
 run: build
+  @$'(ansi g)Start `run` task...(ansi reset)'; \
   cd {{SETUP_NU_PATH}}; \
   let-env RUNNER_TEMP = './runner/temp'; \
   let-env RUNNER_TOOL_CACHE = './runner/cache'; \
