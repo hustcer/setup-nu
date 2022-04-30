@@ -5,16 +5,16 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- Fix workflows, disable some branches' push event handler
+- Fix workflows, disable some branches' push event actions
 
 ### Features
 
 - Bump version to v1.0
-- Add basic workflow example
-- Add build action for pull request
+- Add basic workflow examples
 - Add just file for all available tasks
-- Add cliff.toml
+- Add cliff.toml for updating CHANGELOG.md
 - Add just tasks for setup-nu
+- Add build action for pull request
 - Add run-test and run-matrix examples
 - Add get latest `nu` version support
 - Initial commit for `setup-nu`

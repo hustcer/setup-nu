@@ -9,21 +9,21 @@
 #   [√] Update change log if required;
 #   [√] Create a release tag and push it to the remote repo;
 # Usage:
-#   Change `actionVer` in package.json and then run:	`just release` OR `just release true`
+#   Change `actionVer` in package.json and then run: `just release` OR `just release true`
 
 def 'release' [
-  --update-log: any      # Set to `true` do enable updating CHANGELOG.md, defined as `any` acutually `bool`
+  --update-log: any  # Set to `true` do enable updating CHANGELOG.md, defined as `any` acutually `bool`
 ] {
 
   cd $env.SETUP_NU_PATH
-  let releaseVer = (open ./package.json | get actionVer)
+  let releaseVer = (open package.json | get actionVer)
 
   if (has-ref $releaseVer) {
   	$'The version ($releaseVer) already exists, Please choose another version.(char nl)'
   	exit --now
   }
   let statusCheck = (git status --porcelain)
-  if ($statusCheck | empty?) == false {
+  if not ($statusCheck | empty?) {
   	$'You have uncommit changes, please commit them and try `release` again!(char nl)'
   	exit --now
   }
