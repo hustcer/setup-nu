@@ -2,7 +2,7 @@
   "name": "setup-nu",
   "version": "1.0.0",
   "actionVer": "v1.0.0",
-  "description": "Install nushell",
+  "description": "A Github Action to Setup a Nushell Environment to Run Nu Scripts or Commands",
   "main": "dist/index.js",
   "private": true,
   "scripts": {
@@ -27,7 +27,7 @@
     "@octokit/rest": "^18.12.0"
   },
   "devDependencies": {
-    "@types/node": "^17.0.29",
+    "@types/node": "^17.0.30",
     "@types/semver": "^7.3.9",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.21.0",
