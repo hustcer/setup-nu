@@ -23,7 +23,7 @@ set positional-arguments := true
 # Use `just --evaluate` to show env vars
 
 # Used to handle the path seperator issue
-JUST_FILE_PATH := justfile()
+SETUP_NU_PATH := parent_directory(justfile())
 NU_DIR := parent_directory(`(which nu).path.0`)
 _query_plugin := if os_family() == 'windows' { 'nu_plugin_query.exe' } else { 'nu_plugin_query' }
 
@@ -54,6 +54,13 @@ run: build
   let-env RUNNER_TOOL_CACHE = './runner/cache'; \
   node dist/index.js
 
-# 从 Nu v0.61.0 开始插件只需注册一次即可
+# Release a new version for `setup-nu`
+release updateLog=('false'):
+  @source {{ join(SETUP_NU_PATH, 'nu', 'common.nu') }}; \
+    source {{ join(SETUP_NU_PATH, 'nu', 'release.nu') }}; \
+    git-check --check-repo=1 {{SETUP_NU_PATH}}; \
+    release --update-log={{updateLog}}
+
+# Plugins need to be registered only once after nu v0.61
 _setup:
   @register -e json {{ join(NU_DIR, _query_plugin) }}
