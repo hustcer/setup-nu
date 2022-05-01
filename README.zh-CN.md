@@ -67,9 +67,9 @@ jobs:
 - run: $'Nu version info:(char nl)'; version
 ```
 
-**备注**: 在 Nushell 1.0 发布之前，每个版本可能会有较大的变化，建议您使用指定的 Nushell 版本。
+**备注**: 在 Nushell 1.0 发布之前，每个版本可能会有较大的变化，所以建议您使用指定的 Nushell 版本。
 
-在极少数情况下，你可能会看到速率限制之类的错误，这是因为这个工作流程必须向 GitHub API 发出请求，以便查询可用的版本。如果发生这种情况，你可以通过设置 `GITHUB_TOKEN` 环境变量来避免该问题：
+在极少数情况下，你可能会看到速率限制之类的错误，这是因为这个工作流程必须向 GitHub API 发出请求，以便查询可用的 Nushell 版本。如果发生这种情况，你可以通过设置 `GITHUB_TOKEN` 环境变量来避免该问题：
 
 ```yaml
 - uses: hustcer/setup-nu@v1
