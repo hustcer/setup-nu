@@ -1,5 +1,7 @@
 # setup-nu
 
+[中文说明](README.zh-CN.md)
+
 ![build](https://img.shields.io/github/workflow/status/hustcer/setup-nu/build)
 
 This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) environment for you.
