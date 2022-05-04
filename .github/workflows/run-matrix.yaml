@@ -16,8 +16,8 @@ jobs:
   test-matrix:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        ver: [0.60.0, 0.61.0]
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        ver: [0.62.0, 0.61.0, 0.60.0]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
