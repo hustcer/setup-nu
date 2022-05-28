@@ -1,4 +1,4 @@
-name: basic
+name: Nu Release Pkg Check
 
 on:
   push:
@@ -12,42 +12,33 @@ defaults:
     shell: bash
 
 jobs:
-  aarch64_linux:
+  nu_release_check:
     runs-on: ubuntu-latest
-    name: Test nu on aarch64
-    steps:
-      - uses: uraimo/run-on-arch-action@v2
-        name: Run commands
-        id: run_nu_aarch64
-        with:
-          arch: aarch64
-          distro: ubuntu_latest
-          githubToken: ${{ github.token }}
-          run: |
-            uname -a
-            apt-get update; apt-get install aria2 -y
-            cd /usr/lib
-            aria2c https://github.com/hustcer/nu-release/releases/download/v0.63.1/nu-0.63.1-aarch64-unknown-linux-gnu.tar.gz
-            mkdir nu-0.63
-            tar xvf nu-0.63.1-*-gnu.tar.gz --directory=nu-0.63
-            cd nu-0.63; ls -l; ./nu -c 'version'
+    name: Running NU on ${{ matrix.distro }} ${{ matrix.arch }}
+    # Run steps on a matrix of 3 arch/distro combinations
+    strategy:
+      matrix:
+        include:
+          - arch: armv7
+            distro: ubuntu_latest
+            uri: https://github.com/hustcer/nu-release/releases/download/v0.63.1/nu-0.63.1-armv7-unknown-linux-gnueabihf.tar.gz
+          - arch: aarch64
+            distro: ubuntu_latest
+            uri: https://github.com/hustcer/nu-release/releases/download/v0.63.1/nu-0.63.1-aarch64-unknown-linux-gnu.tar.gz
 
-  armv7_linux:
-    runs-on: ubuntu-latest
-    name: Test nu on armv7
     steps:
       - uses: uraimo/run-on-arch-action@v2
-        name: Run commands
-        id: run_nu_armv7
+        name: Nu Release Check
+        id: run_nu
         with:
-          arch: armv7
-          distro: ubuntu_latest
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
           githubToken: ${{ github.token }}
           run: |
-            uname -a
-            apt-get update; apt-get install aria2 -y
-            cd /usr/lib
-            aria2c https://github.com/hustcer/nu-release/releases/download/v0.63.1/nu-0.63.1-armv7-unknown-linux-gnueabihf.tar.gz
-            mkdir nu-0.63
+            apt-get update; apt-get install aria2 -y; echo;
+            echo '--------------------------------------------------------------------'
+            uname -a;
+            echo '--------------------------------------------------------------------'
+            cd /usr/lib; aria2c ${{ matrix.uri }}; mkdir nu-0.63
             tar xvf nu-0.63.1-*.tar.gz --directory=nu-0.63
-            cd nu-0.63; ls -l; ./nu -c 'version'
+            cd nu-0.63; ./nu -c 'version; ls; char nl'
