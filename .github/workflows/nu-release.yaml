@@ -1,0 +1,53 @@
+name: basic
+
+on:
+  push:
+    branches:
+      - feature/nu-release
+    paths-ignore:
+      - '**.md'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  aarch64_linux:
+    runs-on: ubuntu-latest
+    name: Test nu on aarch64
+    steps:
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: run_nu_aarch64
+        with:
+          arch: aarch64
+          distro: ubuntu_latest
+          githubToken: ${{ github.token }}
+          run: |
+            uname -a
+            apt-get update; apt-get install aria2 -y
+            cd /usr/lib
+            aria2c https://github.com/hustcer/nu-release/releases/download/v0.63.1/nu-0.63.1-aarch64-unknown-linux-gnu.tar.gz
+            mkdir nu-0.63
+            tar xvf nu-0.63.1-*-gnu.tar.gz --directory=nu-0.63
+            cd nu-0.63; ls -l; ./nu -c 'version'
+
+  armv7_linux:
+    runs-on: ubuntu-latest
+    name: Test nu on armv7
+    steps:
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: run_nu_armv7
+        with:
+          arch: armv7
+          distro: ubuntu_latest
+          githubToken: ${{ github.token }}
+          run: |
+            uname -a
+            apt-get update; apt-get install aria2 -y
+            cd /usr/lib
+            aria2c https://github.com/hustcer/nu-release/releases/download/v0.63.1/nu-0.63.1-armv7-unknown-linux-gnueabihf.tar.gz
+            mkdir nu-0.63
+            tar xvf nu-0.63.1-*.tar.gz --directory=nu-0.63
+            cd nu-0.63; ls -l; ./nu -c 'version'
