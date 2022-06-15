@@ -6,14 +6,17 @@
 
 ## 使用说明
 
+如果你希望使用 `Nu` **v0.64** 及其以后的版本，请使用 `setup-nu@v2`, 该版本也支持 `Nu` v0.63 及以前的版本。
+而 `setup-nu@v1` 只支持 `Nu` v0.63 及以前的版本。
+
 ### 例子
 
-在大多数情况下，你只需要在工作流程中通过 `version` 字段指定要使用的 Nushell 的版本即可。比如下面的例子将会安装 [Nushell](https://github.com/nushell/nushell) 的`v0.63.0`版本。然后你可以在后续步骤中配置你想运行的命令，最后别忘了设置`shell: nu {0}`以使命令被`nu`执行：
+在大多数情况下，你只需要在工作流程中通过 `version` 字段指定要使用的 Nushell 的版本即可。比如下面的例子将会安装 [Nushell](https://github.com/nushell/nushell) 的`v0.64.0`版本。然后你可以在后续步骤中配置你想运行的命令，最后别忘了设置`shell: nu {0}`以使命令被`nu`执行：
 
 ```yaml
-- uses: hustcer/setup-nu@v1
+- uses: hustcer/setup-nu@v2
   with:
-    version: 0.63.0
+    version: 0.64.0
 - run: $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -57,11 +60,12 @@ jobs:
 
 1. [run-test.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml)
 2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-matrix.yaml)
+3. 进阶使用: 看看 Nushell 是如何发版的吧 [工作流](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [脚本](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
 如果你想使用最新版本的 Nushell，你可以通过设置 `check-latest` 为 `true` 来做到（它与`version: '*'`配置的效果相同，但更易读）。例如，以下将会安装最新版本的 Nushell：
 
 ```yaml
-- uses: hustcer/setup-nu@v1
+- uses: hustcer/setup-nu@v2
   with:
     check-latest: true
 - run: $'Nu version info:(char nl)'; version
@@ -72,9 +76,9 @@ jobs:
 在极少数情况下，你可能会看到速率限制之类的错误，这是因为这个工作流程必须向 GitHub API 发出请求，以便查询可用的 Nushell 版本。如果发生这种情况，你可以通过设置 `GITHUB_TOKEN` 环境变量来避免该问题：
 
 ```yaml
-- uses: hustcer/setup-nu@v1
+- uses: hustcer/setup-nu@v2
   with:
-    version: 0.63.0
+    version: 0.64.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
