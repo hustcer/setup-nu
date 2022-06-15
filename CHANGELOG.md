@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2] - 2022-06-15
+
+### Features
+
+- Add README.zh-CN.md, close #3 (#7)
+- Add nushell v0.63 to workflow matrix
+
+### Miscellaneous Tasks
+
+- Improve Justfile for some tasks
+- Upgrade some node modules
+- Update some node deps, try to add nu v0.64 to workflow
+- Update README and bump v2
+
 ## [1.0.0] - 2022-04-30
 
 ### Bug Fixes
