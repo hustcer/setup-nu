@@ -58,7 +58,7 @@ build:
   @$'(ansi g)Start `build` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
   cd {{SETUP_NU_PATH}}; \
-  rm -rfq dist/*; \
+  rm -rf dist/*; \
   npx ncc build src/index.ts --minify; \
   $'(ansi g)The `build` task finished!(ansi reset)(char nl)';
 

@@ -21,7 +21,7 @@ function getTargets(): string[] {
     } else if (platform == 'darwin') {
       return ['x86_64-apple-darwin', 'macOS.zip'];
     } else if (platform == 'win32') {
-      return ['x86_64-pc-windows-msvc', 'windows.zip'];
+      return ['x86_64-pc-windows-msvc.zip', 'windows.zip'];
     }
   }
   throw new Error(`failed to determine any valid targets; arch = ${arch}, platform = ${platform}`);
