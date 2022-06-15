@@ -9,7 +9,7 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 ## Usage
 
 For those who want to use `Nu` equal to or greater than **v0.64**, please use `setup-nu@v2`, it's also compatible with v0.63 or earlier versions.
-And `setup-nu@v1` support `Nu` v0.63 or before.
+And `setup-nu@v1` supports `Nu` v0.63 or before.
 
 ### Examples
 
