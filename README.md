@@ -8,20 +8,20 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 
 ## Usage
 
-For those who want to use `Nu` equal to or greater than **v0.64**, please use `setup-nu@v2`, it's also compatible with v0.63 or earlier versions.
+For those who want to use `Nu` equal to or greater than **v0.64.0**, please use `setup-nu@v2`, it's also compatible with v0.63 or earlier versions.
 And `setup-nu@v1` supports `Nu` v0.63 or before.
 
 ### Examples
 
 In most cases you just need to specify the `version` of Nushell to be used in your workflow.
-For example the following installs the `v0.64.0` version of [Nushell](https://github.com/nushell/nushell).
+For example the following installs the `v0.65.0` version of [Nushell](https://github.com/nushell/nushell).
 Then you can set the command you want to run in the following steps, and don't forget to set `shell: nu {0}`
 to make the commands be executed by `nu`:
 
 ```yaml
 - uses: hustcer/setup-nu@v2
   with:
-    version: 0.64.0
+    version: 0.65.0
 - run: $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -88,7 +88,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 ```yaml
 - uses: hustcer/setup-nu@v2
   with:
-    version: 0.64.0
+    version: 0.65.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
