@@ -9,12 +9,10 @@ All notable changes to this project will be documented in this file.
 
 ### Miscellaneous Tasks
 
-- Add nu v0.65 check
-- Upgrade node deps, add nu v0.67 to test matrix
+- Upgrade node deps: eslint, prettier, typescript, etc. add nu v0.67 to test matrix
 - Bump @actions/core from 1.8.2 to 1.9.1 (#9)
-- Upgrade deps
-- Merge from develop (#10)
-- Test latest release
+- Upgrade some node deps
+- Add tests for latest nushell release
 
 ## [2.0.0] - 2022-06-15
 
