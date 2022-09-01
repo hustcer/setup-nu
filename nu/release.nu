@@ -27,7 +27,7 @@ def 'release' [
   	$'You have uncommit changes, please commit them and try `release` again!(char nl)'
   	exit --now
   }
-  if ($update-log) {
+  if ($update_log) {
     git cliff --unreleased --tag $releaseVer --prepend CHANGELOG.md;
     git commit CHANGELOG.md -m $'update CHANGELOG.md for ($releaseVer)'
   }
