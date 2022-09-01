@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1] - 2022-09-01
+
+### Bug Fixes
+
+- Fix nushell scripts for nu v0.67+
+
+### Miscellaneous Tasks
+
+- Add nu v0.65 check
+- Upgrade node deps, add nu v0.67 to test matrix
+- Bump @actions/core from 1.8.2 to 1.9.1 (#9)
+- Upgrade deps
+- Merge from develop (#10)
+- Test latest release
+
 ## [2.0.0] - 2022-06-15
 
 ### Features
