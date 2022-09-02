@@ -19,7 +19,7 @@ Then you can set the command you want to run in the following steps, and don't f
 to make the commands be executed by `nu`:
 
 ```yaml
-- uses: hustcer/setup-nu@v2
+- uses: hustcer/setup-nu@v2.1
   with:
     version: 0.67.0
 - run: $'Nu version info:(char nl)'; version
@@ -72,7 +72,7 @@ If you want to use the latest version of nushell you can specify this by set `ch
 the latest version:
 
 ```yaml
-- uses: hustcer/setup-nu@v2
+- uses: hustcer/setup-nu@v2.1
   with:
     check-latest: true
 - run: $'Nu version info:(char nl)'; version
@@ -86,7 +86,7 @@ workflow has to make requests to GitHub API in order to list available releases.
 If this happens you can set the `GITHUB_TOKEN` environment variable.
 
 ```yaml
-- uses: hustcer/setup-nu@v2
+- uses: hustcer/setup-nu@v2.1
   with:
     version: 0.67.0
   env:
