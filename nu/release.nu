@@ -11,7 +11,7 @@
 # Usage:
 #   Change `actionVer` in package.json and then run: `just release` OR `just release true`
 
-def 'release' [
+export def 'release' [
   --update-log: any  # Set to `true` do enable updating CHANGELOG.md, defined as `any` acutually `bool`
 ] {
 
@@ -23,7 +23,7 @@ def 'release' [
   	exit --now
   }
   let statusCheck = (git status --porcelain)
-  if not ($statusCheck | empty?) {
+  if not ($statusCheck | is-empty) {
   	$'You have uncommit changes, please commit them and try `release` again!(char nl)'
   	exit --now
   }

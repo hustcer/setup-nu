@@ -4,18 +4,14 @@
 # Usage:
 #   use source command to load it
 
-# Global date format
-let _DATE_FMT = '%Y.%m.%d'
-let _TIME_FMT = '%Y-%m-%d %H:%M:%S'
-
 # If current host is Windows
-def windows? [] {
+export def windows? [] {
   # Windows / Darwin
   (sys).host.name == 'Windows'
 }
 
 # Get the specified env key's value or ''
-def 'get-env' [
+export def 'get-env' [
   key: string       # The key to get it's env value
   default?: string  # The default value for an empty env
 ] {
@@ -24,15 +20,15 @@ def 'get-env' [
 }
 
 # Check if a git repo has the specified ref: could be a branch or tag, etc.
-def 'has-ref' [
+export def 'has-ref' [
   ref: string   # The git ref to check
 ] {
   let parse = (git rev-parse --verify -q $ref)
-  if ($parse | empty?) { false } else { true }
+  if ($parse | is-empty) { false } else { true }
 }
 
 # Compare two version number, return true if first one is lower then second one
-def 'is-lower-ver' [
+export def 'is-lower-ver' [
   from: string,
   to: string,
 ] {
@@ -47,7 +43,7 @@ def 'is-lower-ver' [
 }
 
 # Check if git was installed and if current directory is a git repo
-def 'git-check' [
+export def 'git-check' [
   dest: string        # The dest dir to check
   --check-repo: int   # Check if current directory is a git repo
 ] {
@@ -68,7 +64,7 @@ def 'git-check' [
 }
 
 # Log some variables
-def 'log' [
+export def 'log' [
   name: string
   var: any
 ] {
@@ -77,11 +73,11 @@ def 'log' [
   $'(ansi g)------------------->  Debug End <---------------------(char nl)(ansi reset)'
 }
 
-def 'hr-line' [
+export def 'hr-line' [
   --blank-line(-b): bool
 ] {
   print $'(ansi g)---------------------------------------------------------------------------->(ansi reset)'
   if $blank_line { char nl }
 }
 
-def ! [b: expr] { if ($b) { false } else { true } }
+export def ! [b: expr] { if ($b) { false } else { true } }
