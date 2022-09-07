@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        ver: [0.67, 0.66.2, 0.65, 0.64, 0.63, 0.62, 0.61, 0.60.0]
+        ver: [0.68, 0.67, 0.66.2, 0.65, 0.64, 0.63, 0.62, 0.61, 0.60.0]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
@@ -31,7 +31,11 @@ jobs:
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: $'Nu version info:(char nl)'; version
-    - run: $'Current env:(char nl)'; $env
-    - run: $'Nu path:(which nu)(char nl)'
-    - run: $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - name: Show Nu Version
+      run: $'Nu version info:(char nl)'; version
+    - name: Show env Variables
+      run: $'Current env:(char nl)'; $env
+    - name: Show Nu Binary Path
+      run: $'Nu path:(which nu)(char nl)'
+    - name: Show Nu Package Contents
+      run: $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)

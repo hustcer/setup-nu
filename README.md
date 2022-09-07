@@ -21,7 +21,7 @@ to make the commands be executed by `nu`:
 ```yaml
 - uses: hustcer/setup-nu@v2.1
   with:
-    version: 0.67.0
+    version: 0.68.0
 - run: $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -88,7 +88,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 ```yaml
 - uses: hustcer/setup-nu@v2.1
   with:
-    version: 0.67.0
+    version: 0.68.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
