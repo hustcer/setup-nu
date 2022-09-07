@@ -24,7 +24,7 @@ export def 'has-ref' [
   ref: string   # The git ref to check
 ] {
   let parse = (git rev-parse --verify -q $ref)
-  if ($parse | empty?) { false } else { true }
+  if ($parse | is-empty) { false } else { true }
 }
 
 # Compare two version number, return true if first one is lower then second one
