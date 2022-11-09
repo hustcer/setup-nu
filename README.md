@@ -8,20 +8,21 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 
 ## Usage
 
-For those who want to use `Nu` equal to or greater than **v0.64.0**, please use `setup-nu@v2`, it's also compatible with v0.63 or earlier versions.
-And `setup-nu@v1` supports `Nu` v0.63 or before.
+`setup-nu@v3` support `Nu` **v0.60.0 ~ latest**;
+`setup-nu@v2` support `Nu` **v0.60.0 ~ 0.70.0**;
+`setup-nu@v1` support `Nu` **v0.60.0 ~ 0.63.0**;
 
 ### Examples
 
 In most cases you just need to specify the `version` of Nushell to be used in your workflow.
-For example the following installs the `v0.70.0` version of [Nushell](https://github.com/nushell/nushell).
+For example the following installs the `v0.71.0` version of [Nushell](https://github.com/nushell/nushell).
 Then you can set the command you want to run in the following steps, and don't forget to set `shell: nu {0}`
 to make the commands be executed by `nu`:
 
 ```yaml
-- uses: hustcer/setup-nu@v2.1
+- uses: hustcer/setup-nu@v3
   with:
-    version: 0.70.0
+    version: 0.71.0
 - run: $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -72,7 +73,7 @@ If you want to use the latest version of nushell you can specify this by set `ch
 the latest version:
 
 ```yaml
-- uses: hustcer/setup-nu@v2.1
+- uses: hustcer/setup-nu@v3
   with:
     check-latest: true
 - run: $'Nu version info:(char nl)'; version
@@ -86,9 +87,9 @@ workflow has to make requests to GitHub API in order to list available releases.
 If this happens you can set the `GITHUB_TOKEN` environment variable.
 
 ```yaml
-- uses: hustcer/setup-nu@v2.1
+- uses: hustcer/setup-nu@v3
   with:
-    version: 0.70.0
+    version: 0.71.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

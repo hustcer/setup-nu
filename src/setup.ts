@@ -4,6 +4,7 @@
  */
 
 import * as path from 'path';
+import { globby } from 'globby';
 import * as semver from 'semver';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
@@ -201,20 +202,19 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
     }
     core.debug(`Successfully extracted archive for ${name} v${version}`);
 
-    // handle the case where there is a single directory extracted
-    const folder = await fs.readdir(extractDir);
-    if (folder.length == 1) {
-      const wrapperDir = path.join(extractDir, folder[0]);
-      const files = await fs.readdir(wrapperDir);
-      if (files.length == 1) {
-        const maybeDir = path.join(wrapperDir, files[0]);
-        if ((await fs.lstat(maybeDir)).isDirectory()) {
-          extractDir = maybeDir;
-        }
+    const paths = await globby(
+      [
+        `${extractDir}/nu_plugin_*`,
+        `${extractDir}/**/nu_plugin_*`,
+        // For nu v0.61~0.63 on Windows OS
+        path.join(extractDir, '**', 'nu_plugin_*').replace(/\\/g, '/'),
+      ],
+      {
+        unique: true,
+        absolute: true,
       }
-    }
-
-    dir = await tc.cacheDir(extractDir, name, version);
+    );
+    dir = await tc.cacheDir(path.dirname(paths[0]), name, version);
 
     // handle bad binary permissions, the binary needs to be executable!
     await handleBadBinaryPermissions(tool, dir);
