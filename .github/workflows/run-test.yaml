@@ -53,9 +53,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup nu@v0.60.0
-      uses: hustcer/setup-nu@v1
+      uses: hustcer/setup-nu@v3
       with:
-        version: 0.60.0
+        version: 0.70.0
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

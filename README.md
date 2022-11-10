@@ -8,11 +8,11 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 
 ## Usage
 
-### Which Version Should I Use?
+### Which Version Should I Choose?
 
-1. `setup-nu@v3` support `Nu` **v0.60.0 ~ latest**;
-2. `setup-nu@v2` support `Nu` **v0.60.0 ~ 0.70.0**;
-3. `setup-nu@v1` support `Nu` **v0.60.0 ~ 0.63.0**;
+1. `setup-nu@v3` supports `Nu` **v0.60.0 ~ latest**;
+2. `setup-nu@v2` supports `Nu` **v0.60.0 ~ 0.70.0**;
+3. `setup-nu@v1` supports `Nu` **v0.60.0 ~ 0.63.0**;
 
 ### Examples
 
