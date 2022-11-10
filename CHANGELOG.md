@@ -9,11 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### Miscellaneous Tasks
 
-- Update change log
 - Update setup-nu version for README and workflow
-- Try to use nu v0.68
 - Adapted to nu v0.68 for all tasks
-- Adapted to nu v0.68 for all tasks (#11)
 - Update deps add more nu version to run-matrix workflow
 - Update workflow
 
