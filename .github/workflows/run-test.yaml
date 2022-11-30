@@ -49,13 +49,13 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
-    name: test (${{matrix.os}}, nu@v0.70.0)
+    name: test (${{matrix.os}}, nu@v0.72.0)
     steps:
     - uses: actions/checkout@v3
-    - name: Setup nu@v0.70.0
+    - name: Setup nu@v0.72.0
       uses: hustcer/setup-nu@v3
       with:
-        version: 0.70.0
+        version: 0.72.0
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
