@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
       - release/*
     paths-ignore:
       - '**.md'
@@ -16,7 +17,7 @@ jobs:
   test-latest:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-22.04, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@latest)
@@ -46,7 +47,7 @@ jobs:
   test-ver:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-22.04, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@v0.72.0)

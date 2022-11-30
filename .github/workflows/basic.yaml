@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
       - release/*
     paths-ignore:
       - '**.md'
@@ -14,7 +15,7 @@ defaults:
 
 jobs:
   basic-usage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
     - uses: hustcer/setup-nu@main
