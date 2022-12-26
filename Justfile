@@ -22,7 +22,7 @@ set positional-arguments := true
 
 # Use `just --evaluate` to show env vars
 
-# Used to handle the path seperator issue
+# Used to handle the path separator issue
 SETUP_NU_PATH := parent_directory(justfile())
 NU_DIR := parent_directory(`(which nu).path.0`)
 _query_plugin := if os_family() == 'windows' { 'nu_plugin_query.exe' } else { 'nu_plugin_query' }
