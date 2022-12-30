@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2] - 2022-12-30
+
+### Bug Fixes
+
+- Fix plugin register for windows
+
+### Miscellaneous Tasks
+
+- Bump to v3.2 to fix plugin register for windows
+
 ## [3.1] - 2022-12-30
 
 ### Bug Fixes
