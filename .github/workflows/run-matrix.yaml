@@ -25,10 +25,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup nu@${{matrix.ver}}
-      uses: hustcer/setup-nu@v3
+      uses: hustcer/setup-nu@v3.1
       # uses: hustcer/setup-nu@main
       with:
         version: ${{matrix.ver}}
+        enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
