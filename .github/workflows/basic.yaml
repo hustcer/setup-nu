@@ -6,7 +6,7 @@ on:
       - main
       - develop
       - release/*
-      - feature/plugin
+
     paths-ignore:
       - '**.md'
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
-    - uses: hustcer/setup-nu@feature/plugin
+    - uses: hustcer/setup-nu@develop
       with:
         version: '*'
         enable-plugins: true
