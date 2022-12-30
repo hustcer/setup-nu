@@ -26,7 +26,7 @@ async function main() {
 
     if (enablePlugins) {
       console.log('Running ./nu/register-plugins.nu to register plugins...');
-      shell.exec('./nu/register-plugins.nu');
+      shell.exec('nu ./nu/register-plugins.nu');
     }
   } catch (err) {
     core.setFailed(err.message);

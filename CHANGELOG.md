@@ -13,7 +13,6 @@ All notable changes to this project will be documented in this file.
 
 ### Miscellaneous Tasks
 
-- Update readme
 - Update workflow
 - Try nu v0.73
 - Update deps: globby, @vercel/ncc and typescript etc.

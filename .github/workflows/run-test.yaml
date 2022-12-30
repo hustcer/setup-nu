@@ -24,7 +24,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup nu@latest
-      uses: hustcer/setup-nu@main
+      uses: hustcer/setup-nu@develop
       with:
         check-latest: true
         enable-plugins: true
