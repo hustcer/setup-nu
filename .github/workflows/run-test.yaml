@@ -58,6 +58,7 @@ jobs:
       uses: hustcer/setup-nu@v3.2
       with:
         version: 0.73.0
+        enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

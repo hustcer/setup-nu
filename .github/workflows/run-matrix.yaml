@@ -29,7 +29,6 @@ jobs:
       # uses: hustcer/setup-nu@main
       with:
         version: ${{matrix.ver}}
-        enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

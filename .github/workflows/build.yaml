@@ -39,6 +39,7 @@ jobs:
       uses: ./
       with:
         version: 0.71.0
+        enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
