@@ -24,9 +24,10 @@ inputs:
     default: false
     required: false
     description: 'Set this option if you want the action to check for the latest available version.'
-  plugins:  # TODO: Not support yet
+  enable-plugins:
+    default: false
     required: false
-    description: 'Specify the plugins you want to register'
+    description: 'Enable registering of plugins'
 
 runs:
   using: 'node16'

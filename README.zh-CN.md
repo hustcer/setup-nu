@@ -88,10 +88,11 @@ jobs:
 
 ### 输入
 
-| 名称           | 必填     | 描述                                                 | 类型   | 默认值  |
-| -------------- | -------- | ---------------------------------------------------- | ------ | ------- |
-| `version`      | 否       | 合法的 NPM 风格的 semver 版本                        | string |   *     |
-| `check-latest` | 否       | 可以设置为 `true` 如果你想使用最新的 Nushell 版本    | bool   | false   |
+| 名称             | 必填     | 描述                                                 | 类型   | 默认值  |
+| ---------------- | -------- | ---------------------------------------------------- | ------ | ------- |
+| `version`        | 否       | 合法的 NPM 风格的 semver 版本                        | string |   *     |
+| `check-latest`   | 否       | 可以设置为 `true` 如果你想使用最新的 Nushell 版本    | bool   | false   |
+| `enable-plugins` | 否       | 可以设置为 `true` 如果你需要注册二进制包内的插件     | bool   | false   |
 
 您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
 

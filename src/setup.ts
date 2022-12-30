@@ -16,12 +16,12 @@ import { promises as fs, constants as fs_constants } from 'fs';
  */
 function getTargets(): string[] {
   const { arch, platform } = process;
-  if (arch == 'x64') {
-    if (platform == 'linux') {
+  if (arch === 'x64') {
+    if (platform === 'linux') {
       return ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'];
-    } else if (platform == 'darwin') {
+    } else if (platform === 'darwin') {
       return ['x86_64-apple-darwin', 'macOS.zip'];
-    } else if (platform == 'win32') {
+    } else if (platform === 'win32') {
       return ['x86_64-pc-windows-msvc.zip', 'windows.zip'];
     }
   }
@@ -38,6 +38,8 @@ export interface Tool {
   name: string;
   /** Set this option to `true` if you want to check for the latest version. */
   checkLatest: boolean;
+  /** Set this option to `true` if you want to register plugins. */
+  enablePlugins: boolean;
   /** A valid semantic version specifier for the tool. */
   versionSpec?: string;
   /** The name of the tool binary (defaults to the repo name) */
@@ -156,7 +158,7 @@ async function handleBadBinaryPermissions(tool: Tool, dir: string): Promise<void
     const findBin = async () => {
       const files = await fs.readdir(dir);
       for await (const file of files) {
-        if (file.toLowerCase() == name.toLowerCase()) {
+        if (file.toLowerCase() === name.toLowerCase()) {
           return file;
         }
       }

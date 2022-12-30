@@ -6,6 +6,7 @@ on:
       - main
       - develop
       - release/*
+      - feature/plugin
     paths-ignore:
       - '**.md'
 
@@ -18,9 +19,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
-    - uses: hustcer/setup-nu@main
+    - uses: hustcer/setup-nu@feature/plugin
       with:
         version: '*'
+        enable-plugins: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: version; $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
     - run: |
         $'Current env:(char nl)'
