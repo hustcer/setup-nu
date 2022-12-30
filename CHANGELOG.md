@@ -1,6 +1,27 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.1] - 2022-12-30
+
+### Bug Fixes
+
+- Fix some nu scripts
+
+### Features
+
+- Add nu plugin registering support, bump to v3.1
+
+### Miscellaneous Tasks
+
+- Update readme
+- Update workflow
+- Try nu v0.73
+- Update deps: globby, @vercel/ncc and typescript etc.
+
+### Refactor
+
+- Simplify binary filter strategy
+
 ## [3] - 2022-11-09
 
 ### Features
