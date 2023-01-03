@@ -43,7 +43,7 @@ all: lint fmt build
 fmt:
   @$'(ansi g)Start `fmt` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  npx prettier --write **/*.ts; \
+  npx rome format . --write; \
   $'(ansi g)The `fmt` task finished!(ansi reset)(char nl)';
 
 # Code linting
