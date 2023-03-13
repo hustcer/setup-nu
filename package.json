@@ -29,7 +29,7 @@
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@types/node": "^18.14.2",
+    "@types/node": "^18.15.2",
     "@types/semver": "^7.3.13",
     "@types/shelljs": "^0.8.11",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
