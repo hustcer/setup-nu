@@ -38,7 +38,7 @@ jobs:
     - name: Setup ${{ matrix.crate.owner }}/${{ matrix.crate.name }}
       uses: ./
       with:
-        version: 0.71.0
+        version: 0.77.1
         enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
@@ -53,5 +53,5 @@ jobs:
     - name: Use Nu as Default Shell
       shell: nu {0}
       run: |
-        $'Current env:(char nl)'
-        $env
+        print $'Current env:(char nl)'
+        print $env

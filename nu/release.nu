@@ -19,12 +19,12 @@ export def 'release' [
   let releaseVer = (open package.json | get actionVer)
 
   if (has-ref $releaseVer) {
-  	$'The version ($releaseVer) already exists, Please choose another version.(char nl)'
+  	print $'The version ($releaseVer) already exists, Please choose another version.(char nl)'
   	exit --now
   }
   let statusCheck = (git status --porcelain)
   if not ($statusCheck | is-empty) {
-  	$'You have uncommit changes, please commit them and try `release` again!(char nl)'
+  	print $'You have uncommit changes, please commit them and try `release` again!(char nl)'
   	exit --now
   }
   if ($update_log) {

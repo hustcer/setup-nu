@@ -17,20 +17,20 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 ### Examples
 
 In most cases you just need to specify the `version` of Nushell to be used in your workflow.
-For example the following installs the `v0.75.0` version of [Nushell](https://github.com/nushell/nushell).
+For example the following installs the `v0.77.1` version of [Nushell](https://github.com/nushell/nushell).
 Then you can set the command you want to run in the following steps, and don't forget to set `shell: nu {0}`
 to make the commands be executed by `nu`:
 
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: 0.75.0
-- run: $'Nu version info:(char nl)'; version
+    version: 0.77.1
+- run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
   shell: nu {0}
   run: |
-    $'Nu path:(which nu)(char nl)'
+    print $'Nu path:(which nu)(char nl)'
     def greeting [name: string] {
         print $'Hello ($name)'
     }
@@ -57,8 +57,8 @@ jobs:
         version: '*'
     - run: version; $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
     - run: |
-        $'Current env:(char nl)'
-        $env
+        print $'Current env:(char nl)'
+        print $env
     - name: You can run bash commands, too
       run: pwd && ls -la
       shell: bash
@@ -78,7 +78,7 @@ the latest version:
 - uses: hustcer/setup-nu@v3
   with:
     check-latest: true
-- run: $'Nu version info:(char nl)'; version
+- run: print $'Nu version info:(char nl)'; version
 ```
 
 **Note**: Before Nushell reaches 1.0, each version may change a lot, it is recommend
@@ -91,7 +91,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: 0.75.0
+    version: 0.77.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

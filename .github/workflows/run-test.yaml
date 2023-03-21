@@ -36,10 +36,10 @@ jobs:
       shell: bash
     - name: Default shell will be `nu`
       run: |
-        $'Nu version info:(char nl)'; version
-        $'Current env:(char nl)'; $env
-        $'Nu path:(which nu)(char nl)'
-        $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+        print $'Nu version info:(char nl)'; version
+        print $'Current env:(char nl)'; $env
+        print $'Nu path:(which nu)(char nl)'
+        print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
         def greeting [name: string] {
           print $'Hello ($name)'
         }
@@ -57,12 +57,12 @@ jobs:
     - name: Setup nu@latest
       uses: hustcer/setup-nu@v3.2
       with:
-        version: 0.75.0
+        version: 0.77.1
         enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: $'Nu version info:(char nl)'; version
-    - run: $'Current env:(char nl)'; $env
-    - run: $'Nu path:(which nu)(char nl)'
-    - run: $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - run: print $'Nu version info:(char nl)'; version
+    - run: print $'Current env:(char nl)'; $env
+    - run: print $'Nu path:(which nu)(char nl)'
+    - run: print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
