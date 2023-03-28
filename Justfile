@@ -43,14 +43,14 @@ all: lint fmt build
 fmt:
   @$'(ansi g)Start `fmt` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  npx rome format . --write; \
+  pnpx rome format . --write; \
   $'(ansi g)The `fmt` task finished!(ansi reset)(char nl)';
 
 # Code linting
 lint:
   @$'(ansi g)Start `lint` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  npx eslint src/**/*.ts; \
+  pnpx eslint src/**/*.ts; \
   $'(ansi g)The `lint` task finished!(ansi reset)(char nl)';
 
 # Build dist/index.js
