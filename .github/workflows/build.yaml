@@ -20,9 +20,9 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '16'
-    - run: pnpm ci
-    - run: pnpm run lint
-    - run: pnpm run build
+    - run: npm i
+    - run: npm run lint
+    - run: npm run build
 
   test:
     strategy:
