@@ -3,10 +3,7 @@
     "indentSize": 2,
     "lineWidth": 120,
     "indentStyle": "space",
-    "ignore": [
-      "dist",
-      "node_modules"
-    ]
+    "ignore": ["dist", "node_modules"]
   },
   "linter": {
     "enabled": false
