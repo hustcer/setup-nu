@@ -35,6 +35,10 @@ _query_plugin := if os_family() == 'windows' { 'nu_plugin_query.exe' } else { 'n
 default:
   @just --list --list-prefix "··· "
 
+# 安装 Node 依赖, 包管理器 pnpm
+i:
+  pnpm install
+
 # Run lint, fmt and build task all in one time
 all: lint fmt build
   @$'(ansi pb)All done!(ansi reset)'
