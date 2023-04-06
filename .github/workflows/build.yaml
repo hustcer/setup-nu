@@ -38,7 +38,7 @@ jobs:
     - name: Setup ${{ matrix.crate.owner }}/${{ matrix.crate.name }}
       uses: ./
       with:
-        version: 0.77.1
+        version: 0.78
         enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
