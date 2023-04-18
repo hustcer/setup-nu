@@ -26,19 +26,34 @@ export def 'has-ref' [
   if ($parse | is-empty) { false } else { true }
 }
 
+# Compare two version number, return `true` if first one is higher than second one,
+# Return `null` if they are equal, otherwise return `false`
+export def 'compare-ver' [
+  from: string,
+  to: string,
+] {
+  let dest = ($to | str downcase | str trim -c 'v' | str trim)
+  let source = ($from | str downcase | str trim -c 'v' | str trim)
+  let v1 = ($source | split row '.' | each {|it| ($it | into int)})
+  let v2 = ($dest | split row '.' | each {|it| ($it | into int)})
+  for $v in $v1 -n {
+    let c1 = ($v1 | get -i $v.index | default 0)
+    let c2 = ($v2 | get -i $v.index | default 0)
+    if $c1 > $c2 {
+      return true
+    } else if ($c1 < $c2) {
+      return false
+    }
+  }
+  return null
+}
+
 # Compare two version number, return true if first one is lower then second one
 export def 'is-lower-ver' [
   from: string,
   to: string,
 ] {
-  let dest = ($to | str trim -c 'v' | str trim)
-  let source = ($from | str trim -c 'v' | str trim)
-  # 将三段式版本号转换成一个整数，每段最大值999，三段拼接一起进行比较
-  let t = ($dest | split row '.' | each { |it| $it | str lpad -l 3 -c '0' })
-  let f = ($source | split row '.' | each { |it| $it | str lpad -l 3 -c '0' })
-  let toVer = ($t | str join | into int)
-  let fromVer = ($f | str join | into int)
-  ($fromVer < $toVer)
+  (compare-ver $from $to) == false
 }
 
 # Check if git was installed and if current directory is a git repo
