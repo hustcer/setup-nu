@@ -1,0 +1,52 @@
+name: nu-module-test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - release/*
+      - feature/nu-lib
+    paths-ignore:
+      - '**.md'
+
+defaults:
+  run:
+    shell: nu {0}
+
+jobs:
+  test-latest:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, setup-nu@latest-dev)
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup nu@latest
+      uses: hustcer/setup-nu@develop
+      with:
+        version: '*'
+        enable-plugins: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Show NU_LIB_DIRS
+      run: |
+        print 'Current NU_LIB_DIRS: '
+        print $env.NU_LIB_DIRS
+    - name: Cp Your Modules to NU_LIB_DIRS
+      run: |
+        let LIB_DIR = ($nu.config-path | path dirname | path join 'scripts')
+        mkdir $LIB_DIR
+        cp nu/common.nu $LIB_DIR
+        print 'Available Nu Modules:'
+        print (ls ($env.NU_LIB_DIRS | get 0))
+    - name: Use Your Nu Modules In the Following Steps
+      run: |
+        use common.nu [get-env]
+        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
+
+
+
