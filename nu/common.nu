@@ -70,7 +70,7 @@ export def 'git-check' [
   # If we don't need repo check just quit now
   if ($check_repo != 0) {
     let checkRepo = (do -i { git rev-parse --is-inside-work-tree } | complete)
-    if ! ($checkRepo.stdout =~ 'true') {
+    if not ($checkRepo.stdout =~ 'true') {
       print $'Current directory is (ansi r)NOT(ansi reset) a git repo, bye...(char nl)'
       exit --now
     }
@@ -93,5 +93,3 @@ export def 'hr-line' [
   print $'(ansi g)---------------------------------------------------------------------------->(ansi reset)'
   if $blank_line { char nl }
 }
-
-export def ! [b: expr] { if ($b) { false } else { true } }
