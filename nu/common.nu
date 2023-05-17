@@ -65,14 +65,14 @@ export def 'git-check' [
   let isGitInstalled = ((which git | length) > 0)
   if (not $isGitInstalled) {
     print $'You should (ansi r)INSTALL git(ansi reset) first to run this command, bye...'
-    exit --now
+    exit 2
   }
   # If we don't need repo check just quit now
   if ($check_repo != 0) {
     let checkRepo = (do -i { git rev-parse --is-inside-work-tree } | complete)
     if not ($checkRepo.stdout =~ 'true') {
       print $'Current directory is (ansi r)NOT(ansi reset) a git repo, bye...(char nl)'
-      exit --now
+      exit 3
     }
   }
 }

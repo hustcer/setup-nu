@@ -20,12 +20,12 @@ export def 'release' [
 
   if (has-ref $releaseVer) {
   	print $'The version ($releaseVer) already exists, Please choose another version.(char nl)'
-  	exit --now
+  	exit 5
   }
   let statusCheck = (git status --porcelain)
   if not ($statusCheck | is-empty) {
   	print $'You have uncommit changes, please commit them and try `release` again!(char nl)'
-  	exit --now
+  	exit 5
   }
   if ($update_log) {
     git cliff --unreleased --tag $releaseVer --prepend CHANGELOG.md;
