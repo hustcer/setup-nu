@@ -12,7 +12,7 @@ skip_output:
   - summary           # Skips summary block (successful and failed steps) printing
   - success           # Skips successful steps printing
   - failure           # Skips failed steps printing
-  - execution         # Skips printing successfully executed commands
+  # - execution       # Skips printing successfully executed commands
   # - execution_out   # Skips printing successfully executed commands' output (but still prints failed executions)
 pre-push:
   # follow: true      # need to use follow to get stdin from git push
