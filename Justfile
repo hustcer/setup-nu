@@ -83,7 +83,7 @@ release updateLog=('false'):
   @overlay use {{ join(SETUP_NU_PATH, 'nu', 'common.nu') }}; \
     overlay use {{ join(SETUP_NU_PATH, 'nu', 'release.nu') }}; \
     git-check --check-repo=1 {{SETUP_NU_PATH}}; \
-    release --update-log={{updateLog}}
+    make-release --update-log={{updateLog}}
 
 # Plugins need to be registered only once after nu v0.61
 _setup:
