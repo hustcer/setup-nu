@@ -57,7 +57,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup nu@latest
-      uses: hustcer/setup-nu@v3.2
+      uses: hustcer/setup-nu@v3.3
       with:
         version: 0.80
         enable-plugins: true

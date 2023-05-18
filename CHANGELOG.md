@@ -5,52 +5,19 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 
-- Fix dependabot.yaml conf, move it to .github/ (#15)
-- Use npm instead of pnpm in build workflow
 - Fix release task
 
 ### Features
 
 - Try to add dependabot
-- Add nu v0.75 for test (#14)
-- Add an example to use nu modules
 - Add version specific like `0.80` or `v0.80` support
 
 ### Miscellaneous Tasks
 
-- Improve plugin register script
 - Use rome instead of prettier to format ts codes
-- Update some node deps
-- Bump @typescript-eslint/eslint-plugin (#16)
-- Bump eslint from 8.31.0 to 8.33.0 (#17)
-- Bump @typescript-eslint/parser from 5.48.0 to 5.50.0 (#18)
-- Upgrade typescript,@vercel/ncc,@octokit/rest (#19)
-- Bump @typescript-eslint/parser from 5.50.0 to 5.51.0 (#20)
-- Bump @typescript-eslint/eslint-plugin (#21)
-- Bump eslint from 8.33.0 to 8.34.0 (#23)
-- Bump @typescript-eslint/eslint-plugin (#22)
-- Bump @types/node from 18.11.18 to 18.13.0 (#25)
-- Bump @typescript-eslint/parser from 5.51.0 to 5.52.0 (#24)
-- Bump @typescript-eslint/parser from 5.52.0 to 5.53.0 (#27)
-- Bump @typescript-eslint/eslint-plugin (#28)
-- Bump @types/node from 18.13.0 to 18.14.0 (#26)
-- Update node modules: eslint and related
-- Update node deps
-- Add v0.77.1 to test matrix and prepare for nushell v0.78
 - Try to use pnpm instead of npm
-- Update node modeuls: rome, typescript and eslint etc.
-- Fomat json by rome
-- Try to add nushell v0.78
 - Optimize semver comparing algorithm
 - Upgrade some node modules
-- Fix workflows
-- Upgrade some node modules
-- Add nu v0.80 to test workflows
-
-### Deps
-
-- Update node modules: typescript and eslint etc.
-- Upgrade some node dependencies
 
 ## [3.2] - 2022-12-30
 
