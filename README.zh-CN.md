@@ -19,7 +19,7 @@
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: 0.80
+    version: '0.80'   # 不要使用 0.80, 它会被认为是一个浮点数并转换为 0.8, 你可以使用 v0.80/0.80.0 或者 '0.80'(加了引号变成字符串)
 - run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -81,7 +81,7 @@ jobs:
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: 0.80
+    version: '0.80'
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

@@ -25,7 +25,7 @@ jobs:
         enable-plugins: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - run: version; print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - run: print (version); print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
     - run: |
         print $'Current env:(char nl)'
         print $env

@@ -20,6 +20,10 @@ set dotenv-load := true
 
 set positional-arguments := true
 
+# Just commands aliases
+alias r := run
+alias b := build
+
 # Use `just --evaluate` to show env vars
 
 # Used to handle the path separator issue

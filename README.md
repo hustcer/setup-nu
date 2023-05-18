@@ -24,7 +24,7 @@ to make the commands be executed by `nu`:
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: 0.80
+    version: '0.80'   # Don't use 0.80 here, as it was a float number and will be convert to 0.8, you can use v0.80/0.80.0 or '0.80'
 - run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -91,7 +91,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: 0.80
+    version: '0.80'
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

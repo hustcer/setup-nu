@@ -1,7 +1,7 @@
 {
   "name": "setup-nu",
-  "version": "3.2.0",
-  "actionVer": "v3.2",
+  "version": "3.3.0",
+  "actionVer": "v3.3",
   "description": "A Github Action to Setup a Nushell Environment to Run Nu Scripts or Commands",
   "main": "dist/index.js",
   "private": true,
@@ -29,14 +29,15 @@
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@types/node": "^20.1.7",
+    "@types/node": "^20.2.0",
     "@types/semver": "^7.5.0",
     "@types/shelljs": "^0.8.12",
     "@typescript-eslint/eslint-plugin": "^5.59.6",
     "@typescript-eslint/parser": "^5.59.6",
     "@vercel/ncc": "^0.36.1",
     "eslint": "^8.40.0",
-    "rome": "^12.1.0",
+    "rome": "^12.1.1",
+    "semver": "^7.5.1",
     "typescript": "^5.0.4"
   }
 }
