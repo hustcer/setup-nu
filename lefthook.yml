@@ -1,0 +1,22 @@
+# EXAMPLE USAGE
+# Refer for explanation to following link:
+# https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
+#
+
+min_version: 1.3.13
+color: false
+no_tty: false
+skip_output:
+  - meta              # Skips lefthook version printing
+  - skips             # Skips "skip" printing (i.e. no files matched)
+  - summary           # Skips summary block (successful and failed steps) printing
+  - success           # Skips successful steps printing
+  - failure           # Skips failed steps printing
+  - execution         # Skips printing successfully executed commands
+  # - execution_out   # Skips printing successfully executed commands' output (but still prints failed executions)
+pre-push:
+  # follow: true      # need to use follow to get stdin from git push
+  interactive: false
+  scripts:
+    'sync.sh':
+      runner: sh
