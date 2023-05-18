@@ -47,7 +47,7 @@ jobs:
       run: which $(printf nu | tr '[:upper:]' '[:lower:]') && echo "Dir contents --->:" && ls -la "$(dirname `which nu`)"
       shell: bash
     - name: Spawn a Nu Session and Display Version Info
-      run: nu -c 'version; $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)'
+      run: nu -c 'print (version); print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)'
       shell: bash
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#custom-shell
     - name: Use Nu as Default Shell
