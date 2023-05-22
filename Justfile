@@ -78,6 +78,10 @@ run: build
   let-env RUNNER_TOOL_CACHE = './runner/cache'; \
   node dist/index.js
 
+# 检查过期依赖, 需全局安装 `npm-check-updates`
+outdated:
+  ncu
+
 # Release a new version for `setup-nu`
 release updateLog=('false'):
   @overlay use {{ join(SETUP_NU_PATH, 'nu', 'common.nu') }}; \
