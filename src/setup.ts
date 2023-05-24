@@ -76,7 +76,6 @@ interface Release {
  * Filter the matching release for the given tool with the specified versionSpec.
  *
  * @param response the response to filter a release from with the given versionSpec.
- *
  * @returns {Release[]} a single GitHub release.
  */
 function filterMatch(response: any, versionSpec: string | undefined): Release[] {
@@ -102,7 +101,6 @@ function filterMatch(response: any, versionSpec: string | undefined): Release[] 
  * Filter the latest matching release for the given tool.
  *
  * @param response the response to filter a latest release from.
- *
  * @returns {Release[]} a single GitHub release.
  */
 function filterLatest(response: any): Release[] {

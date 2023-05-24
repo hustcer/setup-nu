@@ -12,6 +12,7 @@ specifiers:
   '@vercel/ncc': ^0.36.1
   eslint: ^8.41.0
   globby: ^13.1.4
+  lefthook: ^1.4.1
   rome: ^12.1.2
   semver: ^7.5.1
   shelljs: ^0.8.5
@@ -32,6 +33,7 @@ devDependencies:
   '@typescript-eslint/parser': 5.59.7_opaykosi7ysrbskpnffskmbrki
   '@vercel/ncc': 0.36.1
   eslint: 8.41.0
+  lefthook: 1.4.1
   rome: 12.1.2
   semver: 7.5.1
   typescript: 5.0.4
@@ -151,7 +153,7 @@ packages:
     resolution: {integrity: sha512-/aFM2M4HVDBT/jjDBa84sJniv1t9Gm/rLkalaz9htOm+L+8JMj1k9w0CkUdcxNyNxZPlTxKPVko+m1VlM58ZVA==}
     engines: {node: '>= 14'}
     dependencies:
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.2.2
     dev: false
 
   /@octokit/core/4.2.1:
@@ -183,7 +185,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       '@octokit/request': 6.2.3
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.2.2
       universal-user-agent: 6.0.0
     transitivePeerDependencies:
       - encoding
@@ -238,7 +240,7 @@ packages:
     dependencies:
       '@octokit/endpoint': 7.0.5
       '@octokit/request-error': 3.0.3
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.2.2
       is-plain-object: 5.0.0
       node-fetch: 2.6.9
       universal-user-agent: 6.0.0
@@ -949,6 +951,85 @@ packages:
 
   /json-stable-stringify-without-jsonify/1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
+    dev: true
+
+  /lefthook-darwin-arm64/1.4.1:
+    resolution: {integrity: sha512-j3Egr/oNu8JKZDtwtKZrU+34c4DDNy8sKuagZrfFpmwhZEqSFUMxjxUC/J8QnX0Bc60Wo+UAUfv/Oe6g+s4QSA==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook-darwin-x64/1.4.1:
+    resolution: {integrity: sha512-gGzltha7Fo3CDavDUF9l8VVcrMCb8Dm3x/Bax4+Pjs3ZUTTgIxZZe89ORYqVlet0egh9GUx/L20r8+kwdTDwAg==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook-freebsd-arm64/1.4.1:
+    resolution: {integrity: sha512-OzpkXzOeRjTjXT+f+AjZxxBhaSA6QTqWMlrkgnFJuNZOVKT6bfgkusvpyC1KAYlKxlRGHnvfTRPAv3Ouub/vaw==}
+    cpu: [arm64]
+    os: [freebsd]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook-freebsd-x64/1.4.1:
+    resolution: {integrity: sha512-6befhXE64XOyt1XLg5Wf1/rVMvwzOf0BaEvQoBXX8fn6/3q1e+86fcejUi4doMngeagpm03XWMqNiy592NqfZw==}
+    cpu: [x64]
+    os: [freebsd]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook-linux-arm64/1.4.1:
+    resolution: {integrity: sha512-j8p2BukrsFAC4fGQVqCFVE6CfwE7d21nh3WUMWqISk8qMO5+OTkdohZViPeOPk9sxxC05aXvFDgWDKW0VXs1og==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook-linux-x64/1.4.1:
+    resolution: {integrity: sha512-0cYddhIjT8FtrFB47rKLYi7FLmYRi3NRexpyj6FRiTWkN8Joz10MpCqFPnZOfZRPgUm4sg5HqoTdxiDmaYV2kQ==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook-windows-arm64/1.4.1:
+    resolution: {integrity: sha512-jgY/m6+g9ofr+ePx0tUoo63ItunVBYamCY16wLnXVI6xyYmP5wEy83u0lnBS4wQ8zcH22YUCDrL8KtrQFfLsjg==}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook-windows-x64/1.4.1:
+    resolution: {integrity: sha512-lvTpayQkBmOp5czolntESM2uWRG0I5r0HkOnFfhGEaqEFm45sUjKZsxNj/EPQLAXlWlXqLe363UNcSnmUf/g3g==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /lefthook/1.4.1:
+    resolution: {integrity: sha512-05jULu8iGCOfUnONImG3MJOtmMG9W1ihlnWWDJ6vmmC6eZqtb4yFBw5Dt/fD0H3ZFeYa9Yb2quvaU3y88W5GCw==}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      lefthook-darwin-arm64: 1.4.1
+      lefthook-darwin-x64: 1.4.1
+      lefthook-freebsd-arm64: 1.4.1
+      lefthook-freebsd-x64: 1.4.1
+      lefthook-linux-arm64: 1.4.1
+      lefthook-linux-x64: 1.4.1
+      lefthook-windows-arm64: 1.4.1
+      lefthook-windows-x64: 1.4.1
     dev: true
 
   /levn/0.4.1:
