@@ -20,9 +20,12 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '16'
-    - run: npm i
-    - run: npm run lint
-    - run: npm run build
+    - name: Build Setup Script
+      run: |
+        npm i -g pnpm@7
+        pnpm i --registry=https://registry.npmmirror.com
+        pnpm run lint
+        pnpm run build
 
   test:
     strategy:
