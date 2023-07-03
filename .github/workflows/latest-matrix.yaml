@@ -1,0 +1,41 @@
+name: run-matrix
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - release/*
+    paths-ignore:
+      - '**.md'
+
+defaults:
+  run:
+    shell: nu {0}
+
+jobs:
+  test-matrix:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-22.04, macos-latest]
+        ver: [0.82, '0.80', 0.79, 0.78, 0.77.1, 0.75, 0.73, 0.72, 0.71, '0.70', 0.69.1, 0.68, 0.67, 0.66.2, 0.65, 0.63, '0.60']
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, nu@${{matrix.ver}})
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup nu@${{matrix.ver}}
+      uses: hustcer/setup-nu@main
+      with:
+        version: ${{matrix.ver}}
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Show Nu Version
+      run: print $'Nu version info:(char nl)'; print (version)
+    - name: Show env Variables
+      run: print $'Current env:(char nl)'; print $env
+    - name: Show Nu Binary Path
+      run: print $'Nu path:(which nu)(char nl)'
+    - name: Show Nu Package Contents
+      run: print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
