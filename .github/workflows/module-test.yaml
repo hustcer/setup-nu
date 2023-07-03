@@ -1,4 +1,4 @@
-name: nu-module-test
+name: Nu Module Test
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: run-matrix
+name: Latest Main Check
 
 on:
   push:

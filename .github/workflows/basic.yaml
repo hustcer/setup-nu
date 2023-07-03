@@ -1,4 +1,4 @@
-name: basic
+name: Basic Develop Test
 
 on:
   push:
