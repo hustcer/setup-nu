@@ -67,7 +67,7 @@ build:
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
   cd {{SETUP_NU_PATH}}; \
   rm -rf dist/*; \
-  npx ncc build src/index.ts --minify; \
+  npx ncc build src/index.ts --minify --no-cache; \
   $'(ansi g)The `build` task finished!(ansi reset)(char nl)';
 
 # Test action locally
