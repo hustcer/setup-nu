@@ -40,13 +40,15 @@ jobs:
       run: |
         let LIB_DIR = ($nu.config-path | path dirname | path join 'scripts')
         mkdir $LIB_DIR
-        cp nu/common.nu $LIB_DIR
+        cp ./nu/common.nu $LIB_DIR
         print 'Available Nu Modules:'
-        print (ls ($env.NU_LIB_DIRS | get 0))
+        # FIXME: Show available modules
+        print $env.NU_LIB_DIRS
     - name: Use Your Nu Modules In the Following Steps
       run: |
-        use common.nu [get-env]
-        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
+        # use ./nu/common.nu [get-env]
+        print $env.PWD
+        # print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
 
 
 
