@@ -22,7 +22,7 @@ jobs:
         node-version: '16'
     - name: Build Setup Script
       run: |
-        npm i -g pnpm@7
+        npm i -g pnpm
         pnpm i --registry=https://registry.npmmirror.com
         pnpm run lint
         pnpm run build
