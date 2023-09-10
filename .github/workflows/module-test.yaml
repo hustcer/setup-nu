@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-latest]
-        ver: [0.84.1, 0.83, 0.82, '0.80', 0.79, 0.78, 0.77.1, 0.75, 0.73, 0.72, 0.71, '0.70', 0.69.1, 0.68, 0.67, 0.66.2, 0.65, 0.63]
+        ver: [0.84, 0.83.1, 0.82, '0.80', 0.79, 0.78, 0.77.1, 0.76]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
@@ -38,4 +38,4 @@ jobs:
       run: print $'Nu version info:(char nl)'; print (version)
     - name: Use Your Nu Modules
       run: |
-        nu -n -c "use nu/common.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+        nu -c "use nu/common.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
