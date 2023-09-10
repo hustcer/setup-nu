@@ -28,6 +28,8 @@ async function main() {
       versionSpec: ver,
     });
     core.addPath(tool.dir);
+    core.info('Reset NuShell config...');
+    shell.exec("nu -c 'config reset --without-backup'");
     core.info(`Successfully setup ${tool.name} v${tool.version}`);
 
     if (enablePlugins) {

@@ -17,6 +17,7 @@ defaults:
 jobs:
   test-latest:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-latest]
 
@@ -32,23 +33,6 @@ jobs:
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Show NU_LIB_DIRS
+    - name: Use Your Nu Modules
       run: |
-        print 'Current NU_LIB_DIRS: '
-        print $env.NU_LIB_DIRS
-    - name: Cp Your Modules to NU_LIB_DIRS
-      run: |
-        let LIB_DIR = ($nu.config-path | path dirname | path join 'scripts')
-        mkdir $LIB_DIR
-        cp ./nu/common.nu $LIB_DIR
-        print 'Available Nu Modules:'
-        # FIXME: Show available modules
-        print $env.NU_LIB_DIRS
-    - name: Use Your Nu Modules In the Following Steps
-      run: |
-        # use ./nu/common.nu [get-env]
-        print $env.PWD
-        # print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
-
-
-
+        nu -n -c "use nu/common.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
