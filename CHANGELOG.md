@@ -5,44 +5,28 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
-- Add `just outdated` task
 - Add module test workflow
+- Add Nu module usage example
+- Use `config reset --without-backup` to Reset Nushell config to default
 
 ### Miscellaneous Tasks
 
-- Use setup-nu v3.3 instead of v3.2 for workflows
-- Fix workflows
-- Upgrade rome, eslint and octokit/rest
-- Add lefthook for code formatting and linting
+- Use `lefthook` instead of `lint-stage` and `husky` for code formatting and linting
 - Fix build workflow
-- Fix build workflow
-- Upgrade lots of node modules
-- Build assets after upgrading node modules
-- Add nu v0.82 to test matrix
 - Add new workflow to test latest main
-- Update workflow names
-- Update workflow names
-- Update pnpm version for build workflow
-- Remove Nu v0.60 from test matrix and module-test workflow need to be fixed
-- Try to upgrade to node 18
-- Try to upgrade to node 20
-- Uglify dist/index.js
+- Update `pnpm` version for build workflow
+- Try to upgrade to `node` 20
 - Add more nu versions to modules test
-- Update README
 - Update module test workflow and README
-- Update README.md
-- Bump to v3.5
+- Add `just outdated` task to check outdated node modules
 
 ### Deps
 
-- Upgrade @typescript-eslint related modules
-- Upgrade rome, typescript-eslint/eslint-plugin and typescript-eslint/parser
-- Upgrade eslint and typescript
-- Upgrade dependencies
-- Upgrade globby,eslint,semver, and lefthook
-- Upgrade eslint,lefthook and typescript
-- Upgrade eslint and @vercel/ncc
-- Upgrade actions/checkout to v4
+- Upgrade `rome`, `typescript-eslint/eslint-plugin` and `typescript-eslint/parser`
+- Upgrade `globby`, `eslint`, `semver`, and `lefthook`
+- Upgrade `eslint`, `lefthook` and `typescript`
+- Upgrade `eslint` and `@vercel/ncc`
+- Upgrade `actions/checkout` to v4
 
 ## [3.3] - 2023-05-18
 
@@ -57,8 +41,8 @@ All notable changes to this project will be documented in this file.
 
 ### Miscellaneous Tasks
 
-- Use rome instead of prettier to format ts codes
-- Try to use pnpm instead of npm
+- Use `rome` instead of `prettier` to format ts codes
+- Try to use `pnpm` instead of `npm`
 - Optimize semver comparing algorithm
 - Upgrade some node modules
 
