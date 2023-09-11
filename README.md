@@ -73,13 +73,11 @@ jobs:
 To use modules in `Nu`, you can follow this example:
 
 ```yaml
-    - name: Setup nu@latest
-      uses: hustcer/setup-nu@develop
+    - name: Setup nu
+      uses: hustcer/setup-nu@v3.5
       with:
-        version: ${{matrix.ver}}
-        enable-plugins: true
+        version: 0.83
       env:
-        ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Use Your Nu Modules
       shell: nu {0}
@@ -87,7 +85,7 @@ To use modules in `Nu`, you can follow this example:
         nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
 ```
 
-You have to wrap the `nu` code in `nu -c ""`, and the nu version should above `0.65`, it's not perfect yet, However, this is the only way I found works. Please tell me if you find a better way and PRs are welcomed.
+You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal or above `0.65`, it's not perfect yet, However, this is the only way I found works. Please tell me if you found a better way and PRs are always welcomed.
 
 #### Others
 

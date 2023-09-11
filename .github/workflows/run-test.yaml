@@ -53,11 +53,11 @@ jobs:
         os: [ubuntu-22.04, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
-    name: test (${{matrix.os}}, setup-nu@v3.3)
+    name: test (${{matrix.os}}, setup-nu@v3.5)
     steps:
     - uses: actions/checkout@v4.0.0
     - name: Setup nu@latest
-      uses: hustcer/setup-nu@v3.3
+      uses: hustcer/setup-nu@v3.5
       with:
         version: v0.80
         enable-plugins: true

@@ -68,13 +68,11 @@ jobs:
 若想在 `Nu` 中使用模块, 可以参考如下示例：
 
 ```yaml
-    - name: Setup nu@latest
-      uses: hustcer/setup-nu@develop
+    - name: Setup nu
+      uses: hustcer/setup-nu@v3.5
       with:
-        version: ${{matrix.ver}}
-        enable-plugins: true
+        version: 0.83
       env:
-        ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Use Your Nu Modules
       shell: nu {0}
