@@ -1,6 +1,49 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5] - 2023-09-11
+
+### Features
+
+- Add `just outdated` task
+- Add module test workflow
+
+### Miscellaneous Tasks
+
+- Use setup-nu v3.3 instead of v3.2 for workflows
+- Fix workflows
+- Upgrade rome, eslint and octokit/rest
+- Add lefthook for code formatting and linting
+- Fix build workflow
+- Fix build workflow
+- Upgrade lots of node modules
+- Build assets after upgrading node modules
+- Add nu v0.82 to test matrix
+- Add new workflow to test latest main
+- Update workflow names
+- Update workflow names
+- Update pnpm version for build workflow
+- Remove Nu v0.60 from test matrix and module-test workflow need to be fixed
+- Try to upgrade to node 18
+- Try to upgrade to node 20
+- Uglify dist/index.js
+- Add more nu versions to modules test
+- Update README
+- Update module test workflow and README
+- Update README.md
+- Bump to v3.5
+
+### Deps
+
+- Upgrade @typescript-eslint related modules
+- Upgrade rome, typescript-eslint/eslint-plugin and typescript-eslint/parser
+- Upgrade eslint and typescript
+- Upgrade dependencies
+- Upgrade globby,eslint,semver, and lefthook
+- Upgrade eslint,lefthook and typescript
+- Upgrade eslint and @vercel/ncc
+- Upgrade actions/checkout to v4
+
 ## [3.3] - 2023-05-18
 
 ### Bug Fixes
