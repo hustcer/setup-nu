@@ -67,7 +67,7 @@ jobs:
 Or, check the following examples:
 
 1. [run-test.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml)
-2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-matrix.yaml)
+2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/latest-matrix.yaml)
 3. Advanced example: How Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
 If you want to use the latest version of nushell you can specify this by set `check-latest` to
@@ -81,10 +81,9 @@ the latest version:
 - run: print $'Nu version info:(char nl)'; version
 ```
 
-**Note**: Before Nushell reaches 1.0, each version may change a lot, it is recommend
-that you use a specified version instead.
+**Note**:  **Before Nushell reaches 1.0, each version may change a lot, it is recommend that you use a specified version instead**.
 
-In rare circumstances you might get rate limiting errors, this is because this
+In rare circumstances you might get rate limiting errors, this is caused by the
 workflow has to make requests to GitHub API in order to list available releases.
 If this happens you can set the `GITHUB_TOKEN` environment variable.
 
