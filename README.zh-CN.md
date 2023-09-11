@@ -1,6 +1,6 @@
 # setup-nu
 
-[![使用测试](https://github.com/hustcer/setup-nu/actions/workflows/run-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/run-matrix.yaml)
+[![`main`分支测试](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml)
 
 此 GitHub Action 将为您配置 [Nushell](https://github.com/nushell/nushell) 运行环境。
 
@@ -92,7 +92,7 @@ jobs:
 | ---------------- | -------- | ---------------------------------------------------- | ------ | ------- |
 | `version`        | 否       | 合法的 NPM 风格的 semver 版本                        | string |   *     |
 | `check-latest`   | 否       | 可以设置为 `true` 如果你想使用最新的 Nushell 版本    | bool   | false   |
-| `enable-plugins` | 否       | 可以设置为 `true` 如果你需要注册二进制包内的插件     | bool   | false   |
+| `enable-plugins` | 否       | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.68     | bool   | false   |
 
 您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
 

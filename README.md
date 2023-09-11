@@ -2,7 +2,7 @@
 
 [中文说明](README.zh-CN.md)
 
-[![Test Check](https://github.com/hustcer/setup-nu/actions/workflows/run-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/run-matrix.yaml)
+[![Latest Main Check](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml)
 
 This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) environment for you.
 
@@ -102,7 +102,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 | ---------------- | -------- | ----------------------------------------------------------- | ------ | ------- |
 | `version`        | no       | A valid NPM-style semver specification.                     | string |   *     |
 | `check-latest`   | no       | Set to `true` if you want to use the latest version         | bool   | false   |
-| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins   | bool   | false   |
+| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins, Nu v0.68 and above is required   | bool   | false   |
 
 The semver specification is passed directly to NPM's [semver package](https://www.npmjs.com/package/semver).
 This GitHub Action will install the latest matching release.
