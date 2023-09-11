@@ -14,6 +14,8 @@
 
 ### 例子
 
+#### 基础使用
+
 在大多数情况下，你只需要在工作流程中通过 `version` 字段指定要使用的 Nushell 的版本即可。比如下面的例子将会安装 [Nushell](https://github.com/nushell/nushell) 的`v0.80`版本。然后你可以在后续步骤中配置你想运行的命令，最后别忘了设置`shell: nu {0}`以使命令被`nu`执行：
 
 ```yaml
@@ -31,6 +33,8 @@
     }
     greeting hustcer
 ```
+
+#### 设为默认 Shell
 
 当然，更简洁的办法是通过设置 `defaults.run.shell` 来让您的脚本或者命令默认由 `nu` 来执行，如下：
 
@@ -58,6 +62,29 @@ jobs:
       run: pwd && ls -la
       shell: bash
 ```
+
+#### 使用模块
+
+若想在 `Nu` 中使用模块, 可以参考如下示例：
+
+```yaml
+    - name: Setup nu@latest
+      uses: hustcer/setup-nu@develop
+      with:
+        version: ${{matrix.ver}}
+        enable-plugins: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Use Your Nu Modules
+      shell: nu {0}
+      run: |
+        nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+```
+
+你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.65` 及以上。这种方式并不完美, 不过也是我目前找到的唯一可行的方式，如果你有更好的办法（我相信一定有的）请告诉我，或者如果能提个 PR 就更好啦！
+
+#### 其它
 
 或者你也可以查看下面几个例子：
 

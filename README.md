@@ -16,6 +16,8 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 
 ### Examples
 
+#### Basic
+
 In most cases you just need to specify the `version` of Nushell to be used in your workflow.
 For example the following installs the `v0.80` version of [Nushell](https://github.com/nushell/nushell).
 Then you can set the command you want to run in the following steps, and don't forget to set `shell: nu {0}`
@@ -36,6 +38,8 @@ to make the commands be executed by `nu`:
     }
     greeting hustcer
 ```
+
+#### Used as Default Shell
 
 Of cause, You can also set the default shell to `nu` by setting the `defaults.run.shell` config:
 
@@ -63,6 +67,29 @@ jobs:
       run: pwd && ls -la
       shell: bash
 ```
+
+#### Use Modules
+
+To use modules in `Nu`, you can follow this example:
+
+```yaml
+    - name: Setup nu@latest
+      uses: hustcer/setup-nu@develop
+      with:
+        version: ${{matrix.ver}}
+        enable-plugins: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Use Your Nu Modules
+      shell: nu {0}
+      run: |
+        nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+```
+
+You have to wrap the `nu` code in `nu -c ""`, and the nu version should above `0.65`, it's not perfect yet, However, this is the only way I found works. Please tell me if you find a better way and PRs are welcomed.
+
+#### Others
 
 Or, check the following examples:
 
