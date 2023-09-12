@@ -80,7 +80,7 @@ jobs:
         nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
 ```
 
-你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.65` 及以上。这种方式并不完美, 不过也是我目前找到的唯一可行的方式，如果你有更好的办法（我相信一定有的）请告诉我，或者如果能提个 PR 就更好啦！
+你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.69` 及以上。这种方式并不完美, 不过也是我目前找到的唯一可行的方式，如果你有更好的办法（我相信一定有的）请告诉我，或者如果能提个 PR 就更好啦！
 
 #### 其它
 
@@ -117,7 +117,7 @@ jobs:
 | ---------------- | -------- | ---------------------------------------------------- | ------ | ------- |
 | `version`        | 否       | 合法的 NPM 风格的 semver 版本                        | string |   *     |
 | `check-latest`   | 否       | 可以设置为 `true` 如果你想使用最新的 Nushell 版本    | bool   | false   |
-| `enable-plugins` | 否       | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.68     | bool   | false   |
+| `enable-plugins` | 否       | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69     | bool   | false   |
 
 您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
 

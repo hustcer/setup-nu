@@ -85,7 +85,7 @@ To use modules in `Nu`, you can follow this example:
         nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
 ```
 
-You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal or above `0.65`, it's not perfect yet, However, this is the only way I found works. Please tell me if you found a better way and PRs are always welcomed.
+You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal or above `0.69`, it's not perfect yet, However, this is the only way I found works. Please tell me if you found a better way and PRs are always welcomed.
 
 #### Others
 
@@ -126,7 +126,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 | ---------------- | -------- | ----------------------------------------------------------- | ------ | ------- |
 | `version`        | no       | A valid NPM-style semver specification.                     | string |   *     |
 | `check-latest`   | no       | Set to `true` if you want to use the latest version         | bool   | false   |
-| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins, Nu v0.68 and above is required   | bool   | false   |
+| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins, Nu v0.69 and above is required   | bool   | false   |
 
 The semver specification is passed directly to NPM's [semver package](https://www.npmjs.com/package/semver).
 This GitHub Action will install the latest matching release.
