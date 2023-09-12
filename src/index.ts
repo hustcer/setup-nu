@@ -28,13 +28,11 @@ async function main() {
       versionSpec: ver,
     });
     core.addPath(tool.dir);
-    core.info('Reset NuShell config...');
-    shell.exec("nu -c 'config reset --without-backup'");
     core.info(`Successfully setup ${tool.name} v${tool.version}`);
 
     if (enablePlugins) {
       console.log('Running ./nu/register-plugins.nu to register plugins...');
-      shell.exec('nu ./nu/register-plugins.nu');
+      shell.exec(`nu ./nu/register-plugins.nu ${tool.version}`);
     }
   } catch (err) {
     core.setFailed(err.message);

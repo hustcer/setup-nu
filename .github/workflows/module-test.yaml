@@ -29,8 +29,8 @@ jobs:
     - name: Setup nu@latest
       uses: hustcer/setup-nu@develop
       with:
-        version: ${{matrix.ver}}
         enable-plugins: true
+        version: ${{matrix.ver}}
       env:
         ACTIONS_STEP_DEBUG: true
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

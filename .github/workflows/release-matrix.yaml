@@ -27,6 +27,7 @@ jobs:
     - name: Setup nu@${{matrix.ver}}
       uses: hustcer/setup-nu@v3.5
       with:
+        enable-plugins: true
         version: ${{matrix.ver}}
       env:
         ACTIONS_STEP_DEBUG: true
