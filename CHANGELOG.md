@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6] - 2023-09-12
+
+### Bug Fixes
+
+- Fix config reset for setup-nu action
+
+### Miscellaneous Tasks
+
+- Update CHANGELOG.md
+
+### Deps
+
+- Upgrade @actions/core, @typescript-eslint/eslint-plugin and @typescript-eslint/parser
+
 ## [3.5] - 2023-09-11
 
 ### Features
