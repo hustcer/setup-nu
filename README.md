@@ -10,8 +10,8 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 
 ### Which Version Should I Choose?
 
-1. `setup-nu@v3` supports `Nu` **v0.60.0 ~ latest**;
-2. `setup-nu@v2` supports `Nu` **v0.60.0 ~ 0.70.0**;
+1. `setup-nu@v3.6` supports `Nu` **v0.60.0 ~ latest**;
+2. `setup-nu@v2.1` supports `Nu` **v0.60.0 ~ 0.70.0**;
 3. `setup-nu@v1` supports `Nu` **v0.60.0 ~ 0.63.0**;
 
 ### Examples
@@ -24,7 +24,7 @@ Then you can set the command you want to run in the following steps, and don't f
 to make the commands be executed by `nu`:
 
 ```yaml
-- uses: hustcer/setup-nu@v3
+- uses: hustcer/setup-nu@v3.6
   with:
     version: '0.80'   # Don't use 0.80 here, as it was a float number and will be convert to 0.8, you can use v0.80/0.80.0 or '0.80'
 - run: print $'Nu version info:(char nl)'; version
@@ -74,7 +74,7 @@ To use modules in `Nu`, you can follow this example:
 
 ```yaml
     - name: Setup nu
-      uses: hustcer/setup-nu@v3.5
+      uses: hustcer/setup-nu@v3.6
       with:
         version: 0.83
       env:
@@ -100,7 +100,7 @@ If you want to use the latest version of nushell you can specify this by set `ch
 the latest version:
 
 ```yaml
-- uses: hustcer/setup-nu@v3
+- uses: hustcer/setup-nu@v3.6
   with:
     check-latest: true
 - run: print $'Nu version info:(char nl)'; version
@@ -113,7 +113,7 @@ workflow has to make requests to GitHub API in order to list available releases.
 If this happens you can set the `GITHUB_TOKEN` environment variable.
 
 ```yaml
-- uses: hustcer/setup-nu@v3
+- uses: hustcer/setup-nu@v3.6
   with:
     version: '0.80'
   env:
