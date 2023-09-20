@@ -76,7 +76,7 @@ To use modules in `Nu`, you can follow this example:
     - name: Setup nu
       uses: hustcer/setup-nu@v3.6
       with:
-        version: 0.83
+        version: 0.85
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Use Your Nu Modules
