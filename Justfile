@@ -51,7 +51,7 @@ all: lint fmt build
 fmt:
   @$'(ansi g)Start `fmt` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  pnpx rome format . --write; \
+  pnpm biome format . --write; \
   $'(ansi g)The `fmt` task finished!(ansi reset)(char nl)';
 
 # Code linting

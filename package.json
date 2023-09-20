@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "private": true,
   "scripts": {
-    "fmt": "rome format . --write",
+    "fmt": "biome format . --write",
     "lint": "eslint **/*.ts",
     "build": "rm -rf dist/ && ncc build src/index.ts --minify",
     "run": "pnpm run build && RUNNER_TOOL_CACHE=./runner/cache RUNNER_TEMP=./runner/temp node dist/index.js"
@@ -29,15 +29,15 @@
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
-    "@types/node": "^20.6.0",
-    "@types/semver": "^7.5.1",
+    "@biomejs/biome": "^1.2.2",
+    "@types/node": "^20.6.2",
+    "@types/semver": "^7.5.2",
     "@types/shelljs": "^0.8.12",
-    "@typescript-eslint/eslint-plugin": "^6.7.0",
-    "@typescript-eslint/parser": "^6.7.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
     "@vercel/ncc": "^0.38.0",
     "eslint": "^8.49.0",
-    "lefthook": "^1.4.10",
-    "rome": "^12.1.3",
+    "lefthook": "^1.4.11",
     "semver": "^7.5.4",
     "typescript": "^5.2.2"
   }
