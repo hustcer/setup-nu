@@ -70,22 +70,43 @@ jobs:
 
 #### Use Modules
 
-To use modules in `Nu`, you can follow this example:
+To use modules in `Nu`, please refer to the following examples:
+
+1. Use modules in `nu -c`
 
 ```yaml
-    - name: Setup nu
-      uses: hustcer/setup-nu@v3.6
-      with:
-        version: 0.85
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Use Your Nu Modules
-      shell: nu {0}
-      run: |
-        nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+  - name: Setup nu
+    uses: hustcer/setup-nu@v3.6
+    with:
+      version: 0.85
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Use Your Nu Modules
+    shell: nu {0}
+    run: |
+      nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
 ```
 
-You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal or above `0.69`, it's not perfect yet, However, this is the only way I found works. Please tell me if you found a better way and PRs are always welcomed.
+You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal or above `0.69`.
+
+2. Use modules from absolute path
+
+```yaml
+  - name: Setup nu
+    uses: hustcer/setup-nu@v3.6
+    with:
+      version: 0.85
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Use Your Nu Modules by Absolute Path
+      run: |
+        use ${{ github.workspace }}/nu/module.nu *
+        print 'Use module from: ${{ github.workspace }}/nu/module.nu'
+        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
+```
+Again, the nu version should be equal or above `0.69`.
+
+They are not perfect yet, but they do work. BTW: Please tell me if you found a better way and PRs are always welcomed.
 
 #### Others
 
