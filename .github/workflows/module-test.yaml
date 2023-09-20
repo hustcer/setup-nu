@@ -39,3 +39,8 @@ jobs:
     - name: Use Your Nu Modules
       run: |
         nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+    - name: Use Your Nu Modules by Absolute Path
+      run: |
+        use ${{ github.workspace }}/nu/module.nu *
+        print 'Use module from: ${{ github.workspace }}/nu/module.nu'
+        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
