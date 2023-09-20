@@ -59,7 +59,7 @@ jobs:
     - uses: hustcer/setup-nu@main
       with:
         version: '*'
-    - run: version; $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - run: version; print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
     - run: |
         print $'Current env:(char nl)'
         print $env
@@ -104,6 +104,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
         print 'Use module from: ${{ github.workspace }}/nu/module.nu'
         print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
 ```
+
 Again, the nu version should be equal or above `0.69`.
 
 They are not perfect yet, but they do work. BTW: Please tell me if you found a better way and PRs are always welcomed.

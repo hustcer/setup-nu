@@ -54,7 +54,7 @@ jobs:
     - uses: hustcer/setup-nu@main
       with:
         version: '*'
-    - run: version; $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - run: version; print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
     - run: |
         print $'Current env:(char nl)'
         print $env
@@ -99,6 +99,7 @@ jobs:
         print 'Use module from: ${{ github.workspace }}/nu/module.nu'
         print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
 ```
+
 同样，要求你使用的 Nu 版本在 `0.69` 及以上。
 
 这些方式并不完美, 不过确实可用，如果你有更好的办法（我相信一定有的）请告诉我，或者如果能提个 PR 就更好啦！
