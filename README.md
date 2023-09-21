@@ -119,12 +119,7 @@ Again, the nu version should be equal to or above `0.69`.
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   - name: Prepare Nu Modules
     shell: nu {0}
-    run: |
-      # Copy your nu modules to the default `NU_LIB_DIRS`
-      # Linux: '/home/runner/.config/nushell/scripts'
-      # Windows: 'C:/Users/runneradmin/AppData/Roaming/nushell/scripts'
-      # Darwin: '/Users/runner/Library/Application Support/nushell/scripts'
-      cp -r nu $'($nu.default-config-dir)/scripts'
+    run: cp -r nu $'($nu.default-config-dir)/scripts'
   - name: Use Your Nu Modules
     shell: nu {0}
     run: |
