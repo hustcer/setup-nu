@@ -94,13 +94,40 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   - name: Use Your Nu Modules by Absolute Path
-      run: |
-        use ${{ github.workspace }}/nu/module.nu *
-        print 'Use module from: ${{ github.workspace }}/nu/module.nu'
-        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
+    shell: nu {0}
+    run: |
+      use ${{ github.workspace }}/nu/module.nu *
+      print 'Use module from: ${{ github.workspace }}/nu/module.nu'
+      print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
 ```
 
 同样，要求你使用的 Nu 版本在 `0.69` 及以上。
+
+3. 将你的 Nu Modules 拷贝到 `$env.NU_LIB_DIRS` 的任意一个目录里面
+
+```yaml
+  - name: Setup nu@latest
+    uses: hustcer/setup-nu@v3.6
+    with:
+      version: 0.85
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Prepare Nu Modules
+    shell: nu {0}
+    run: |
+      # Copy your nu modules to the default `NU_LIB_DIRS`
+      # Linux: '/home/runner/.config/nushell/scripts'
+      # Windows: 'C:/Users/runneradmin/AppData/Roaming/nushell/scripts'
+      # Darwin: '/Users/runner/Library/Application Support/nushell/scripts'
+      cp -r nu $'($nu.default-config-dir)/scripts'
+  - name: Use Your Nu Modules
+    shell: nu {0}
+    run: |
+      use module.nu *
+      print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
+```
+
+要想通过这种方式使用 Nu Modules 请确保你的 Nu 版本不低于 `0.85`。
 
 这些方式并不完美, 不过确实可用，如果你有更好的办法（我相信一定有的）请告诉我，或者如果能提个 PR 就更好啦！
 

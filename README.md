@@ -68,11 +68,11 @@ jobs:
       shell: bash
 ```
 
-#### Use Modules
+#### Use Nu Modules
 
 To use modules in `Nu`, please refer to the following examples:
 
-1. Use modules in `nu -c`
+1. Use Nu modules in `nu -c`
 
 ```yaml
   - name: Setup nu
@@ -87,7 +87,7 @@ To use modules in `Nu`, please refer to the following examples:
       nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
 ```
 
-You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal or above `0.69`.
+You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal to or above `0.69`.
 
 2. Use modules from absolute path
 
@@ -99,13 +99,40 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   - name: Use Your Nu Modules by Absolute Path
-      run: |
-        use ${{ github.workspace }}/nu/module.nu *
-        print 'Use module from: ${{ github.workspace }}/nu/module.nu'
-        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
+    shell: nu {0}
+    run: |
+      use ${{ github.workspace }}/nu/module.nu *
+      print 'Use module from: ${{ github.workspace }}/nu/module.nu'
+      print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
 ```
 
-Again, the nu version should be equal or above `0.69`.
+Again, the nu version should be equal to or above `0.69`.
+
+3. Copy your modules to one of the default `$env.NU_LIB_DIRS`
+
+```yaml
+  - name: Setup nu@latest
+    uses: hustcer/setup-nu@v3.6
+    with:
+      version: 0.85
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  - name: Prepare Nu Modules
+    shell: nu {0}
+    run: |
+      # Copy your nu modules to the default `NU_LIB_DIRS`
+      # Linux: '/home/runner/.config/nushell/scripts'
+      # Windows: 'C:/Users/runneradmin/AppData/Roaming/nushell/scripts'
+      # Darwin: '/Users/runner/Library/Application Support/nushell/scripts'
+      cp -r nu $'($nu.default-config-dir)/scripts'
+  - name: Use Your Nu Modules
+    shell: nu {0}
+    run: |
+      use module.nu *
+      print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
+```
+
+To make it work please make sure that the nu version should be equal to or above `0.85`.
 
 They are not perfect yet, but they do work. BTW: Please tell me if you found a better way and PRs are always welcomed.
 
