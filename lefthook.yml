@@ -2,7 +2,7 @@
 # Refer for explanation to following link:
 # https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
 
-min_version: 1.4.1
+min_version: 1.5.0
 skip_output:
   - meta              # Skips lefthook version printing
   - skips             # Skips "skip" printing (i.e. no files matched)

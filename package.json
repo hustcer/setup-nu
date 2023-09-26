@@ -24,20 +24,20 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@actions/tool-cache": "^2.0.1",
-    "@octokit/rest": "^20.0.1",
+    "@octokit/rest": "^20.0.2",
     "globby": "^13.2.2",
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.2.2",
-    "@types/node": "^20.6.3",
-    "@types/semver": "^7.5.2",
-    "@types/shelljs": "^0.8.12",
-    "@typescript-eslint/eslint-plugin": "^6.7.2",
-    "@typescript-eslint/parser": "^6.7.2",
+    "@types/node": "^20.7.0",
+    "@types/semver": "^7.5.3",
+    "@types/shelljs": "^0.8.13",
+    "@typescript-eslint/eslint-plugin": "^6.7.3",
+    "@typescript-eslint/parser": "^6.7.3",
     "@vercel/ncc": "^0.38.0",
-    "eslint": "^8.49.0",
-    "lefthook": "^1.4.11",
+    "eslint": "^8.50.0",
+    "lefthook": "^1.5.0",
     "semver": "^7.5.4",
     "typescript": "^5.2.2"
   }
