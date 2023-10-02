@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.2.2",
-    "@types/node": "^20.7.0",
+    "@types/node": "^20.8.0",
     "@types/semver": "^7.5.3",
     "@types/shelljs": "^0.8.13",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
