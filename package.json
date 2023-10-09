@@ -30,14 +30,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.2.2",
-    "@types/node": "^20.8.2",
+    "@types/node": "^20.8.3",
     "@types/semver": "^7.5.3",
     "@types/shelljs": "^0.8.13",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "@vercel/ncc": "^0.38.0",
-    "eslint": "^8.50.0",
-    "lefthook": "^1.5.0",
+    "eslint": "^8.51.0",
+    "lefthook": "^1.5.1",
     "semver": "^7.5.4",
     "typescript": "^5.2.2"
   }
