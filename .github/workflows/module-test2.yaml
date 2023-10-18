@@ -42,9 +42,11 @@ jobs:
         # Linux: '/home/runner/.config/nushell'
         # Windows: 'C:/Users/runneradmin/AppData/Roaming/nushell'
         # Darwin: '/Users/runner/Library/Application Support/nushell'
-        cp -r nu $'($nu.default-config-dir)/scripts'
-        print $'Contents of ($nu.default-config-dir)/scripts:'
-        ls $'($nu.default-config-dir)/scripts'
+        let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
+        if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
+        cp -r nu $LIB_DIR
+        print $'Contents of ($LIB_DIR):'
+        ls $LIB_DIR
     - name: Use Your Nu Modules
       run: |
         use module.nu *
