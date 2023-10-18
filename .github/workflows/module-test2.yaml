@@ -44,7 +44,7 @@ jobs:
         # Darwin: '/Users/runner/Library/Application Support/nushell'
         let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
         if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
-        cp -r nu $LIB_DIR
+        cp -r nu/* $LIB_DIR
         print $'Contents of ($LIB_DIR):'
         ls $LIB_DIR
     - name: Use Your Nu Modules

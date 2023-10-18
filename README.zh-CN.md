@@ -109,7 +109,7 @@ jobs:
   - name: Setup nu@latest
     uses: hustcer/setup-nu@v3.6
     with:
-      version: 0.85
+      version: 0.86
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   - name: Prepare Nu Modules
@@ -117,7 +117,7 @@ jobs:
     run: |
       let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
       if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
-      cp -r nu $LIB_DIR
+      cp -r nu/* $LIB_DIR
   - name: Use Your Nu Modules
     shell: nu {0}
     run: |

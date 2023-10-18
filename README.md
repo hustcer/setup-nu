@@ -122,7 +122,7 @@ Again, the nu version should be equal to or above `0.69`.
     run: |
       let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
       if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
-      cp -r nu $LIB_DIR
+      cp -r nu/* $LIB_DIR
   - name: Use Your Nu Modules
     shell: nu {0}
     run: |
