@@ -114,7 +114,10 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   - name: Prepare Nu Modules
     shell: nu {0}
-    run: cp -r nu $'($nu.default-config-dir)/scripts'
+    run: |
+      let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
+      if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
+      cp -r nu $LIB_DIR
   - name: Use Your Nu Modules
     shell: nu {0}
     run: |
