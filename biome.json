@@ -1,6 +1,6 @@
 {
   "formatter": {
-    "indentSize": 2,
+    "indentWidth": 2,
     "lineWidth": 120,
     "indentStyle": "space",
     "ignore": ["dist", "node_modules"]
