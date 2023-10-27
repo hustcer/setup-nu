@@ -8,9 +8,10 @@
 
 ### 版本选择
 
-1. `setup-nu@v3.6` 支持 `Nu` **v0.60.0 ~ latest**;
-2. `setup-nu@v2.1` 支持 `Nu` **v0.60.0 ~ 0.70.0**;
-3. `setup-nu@v1` 支持 `Nu` **v0.60.0 ~ 0.63.0**;
+- `setup-nu@v3.7` 支持 `Nu` **v0.60.0 ~ latest** 以及最新的 `nightly` 版本;
+- `setup-nu@v3.6` 支持 `Nu` **v0.60.0 ~ latest**;
+- `setup-nu@v2.1` 支持 `Nu` **v0.60.0 ~ 0.70.0**;
+- `setup-nu@v1` 支持 `Nu` **v0.60.0 ~ 0.63.0**;
 
 ### 例子
 
@@ -21,7 +22,7 @@
 ```yaml
 - uses: hustcer/setup-nu@v3.6
   with:
-    version: '0.80'   # 不要使用 0.80, 它会被认为是一个浮点数并转换为 0.8, 你可以使用 v0.80/0.80.0 或者 '0.80'(加了引号变成字符串)
+    version: "0.80" # 不要使用 0.80, 它会被认为是一个浮点数并转换为 0.8, 你可以使用 v0.80/0.80.0 或者 '0.80'(加了引号变成字符串)
 - run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -50,17 +51,17 @@ jobs:
   basic-usage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.0.0
-    - uses: hustcer/setup-nu@main
-      with:
-        version: '*'
-    - run: version; print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
-    - run: |
-        print $'Current env:(char nl)'
-        print $env
-    - name: You can run bash commands, too
-      run: pwd && ls -la
-      shell: bash
+      - uses: actions/checkout@v4.0.0
+      - uses: hustcer/setup-nu@main
+        with:
+          version: "*"
+      - run: version; print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+      - run: |
+          print $'Current env:(char nl)'
+          print $env
+      - name: You can run bash commands, too
+        run: pwd && ls -la
+        shell: bash
 ```
 
 #### 使用模块
@@ -70,16 +71,16 @@ jobs:
 1. 通过 `nu -c` 使用模块
 
 ```yaml
-  - name: Setup nu
-    uses: hustcer/setup-nu@v3.6
-    with:
-      version: 0.86
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  - name: Use Your Nu Modules
-    shell: nu {0}
-    run: |
-      nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+- name: Setup nu
+  uses: hustcer/setup-nu@v3.6
+  with:
+    version: 0.86
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+- name: Use Your Nu Modules
+  shell: nu {0}
+  run: |
+    nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
 ```
 
 你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.69` 及以上。
@@ -87,18 +88,18 @@ jobs:
 2. 通过绝对路径使用模块
 
 ```yaml
-  - name: Setup nu
-    uses: hustcer/setup-nu@v3.6
-    with:
-      version: 0.86
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  - name: Use Your Nu Modules by Absolute Path
-    shell: nu {0}
-    run: |
-      use ${{ github.workspace }}/nu/module.nu *
-      print 'Use module from: ${{ github.workspace }}/nu/module.nu'
-      print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
+- name: Setup nu
+  uses: hustcer/setup-nu@v3.6
+  with:
+    version: 0.86
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+- name: Use Your Nu Modules by Absolute Path
+  shell: nu {0}
+  run: |
+    use ${{ github.workspace }}/nu/module.nu *
+    print 'Use module from: ${{ github.workspace }}/nu/module.nu'
+    print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
 ```
 
 同样，要求你使用的 Nu 版本在 `0.69` 及以上。
@@ -106,28 +107,52 @@ jobs:
 3. 将你的 Nu Modules 拷贝到 `$env.NU_LIB_DIRS` 的任意一个目录里面
 
 ```yaml
-  - name: Setup nu@latest
-    uses: hustcer/setup-nu@v3.6
-    with:
-      version: 0.86
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  - name: Prepare Nu Modules
-    shell: nu {0}
-    run: |
-      let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
-      if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
-      cp -r nu/* $LIB_DIR
-  - name: Use Your Nu Modules
-    shell: nu {0}
-    run: |
-      use module.nu *
-      print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
+- name: Setup nu@latest
+  uses: hustcer/setup-nu@v3.6
+  with:
+    version: 0.86
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+- name: Prepare Nu Modules
+  shell: nu {0}
+  run: |
+    let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
+    if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
+    cp -r nu/* $LIB_DIR
+- name: Use Your Nu Modules
+  shell: nu {0}
+  run: |
+    use module.nu *
+    print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
 ```
 
 要想通过这种方式使用 Nu Modules 请确保你的 Nu 版本不低于 `0.85`。
 
 这些方式并不完美, 不过确实可用，如果你有更好的办法（我相信一定有的）请告诉我，或者如果能提个 PR 就更好啦！
+
+#### 使用 Nu 最新的 `nightly` 版本
+
+`Nushell` 目前正处于活跃开发期，如果你想使用最新的特性也可以通过将版本设置为 `nightly` 获得，比如下面的例子：
+
+```yaml
+- uses: hustcer/setup-nu@v3.7
+  with:
+    version: nightly # Will download and setup the latest nightly version of Nushell
+- run: print $'Nu version info:(char nl)'; version
+  shell: nu {0}
+- name: Default shell will be `nu`
+  shell: nu {0}
+  run: |
+    print $'Nu path:(which nu)(char nl)'
+    def greeting [name: string] {
+        print $'Hello ($name)'
+    }
+    greeting hustcer
+```
+
+> **Warning**
+> 请谨慎使用 `Nushell` `nightly` 版本: nu 的二进制文件每天都可能发生变化，可能会导致你的工作流无法正常工作。
+> 而且只有最新的 `nightly` 版本会被下载并配置好, 同时它的版本只能被指定为 `nightly` 而不能是其它值。
 
 #### 其它
 
@@ -146,27 +171,27 @@ jobs:
 - run: print $'Nu version info:(char nl)'; version
 ```
 
-**备注**: ***在 Nushell 1.0 发布之前，每个版本可能会有较大的变化，所以建议您使用指定的 Nushell 版本***。
+**备注**: **_在 Nushell 1.0 发布之前，每个版本可能会有较大的变化，所以建议您使用指定的 Nushell 版本_**。
 
 在极少数情况下，你可能会看到速率限制之类的错误，这是因为这个工作流程必须向 GitHub API 发出请求，以便查询可用的 Nushell 版本。如果发生这种情况，你可以通过设置 `GITHUB_TOKEN` 环境变量来避免该问题：
 
 ```yaml
 - uses: hustcer/setup-nu@v3.6
   with:
-    version: '0.80'
+    version: "0.80"
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### 输入
 
-| 名称             | 必填     | 描述                                                 | 类型   | 默认值  |
-| ---------------- | -------- | ---------------------------------------------------- | ------ | ------- |
-| `version`        | 否       | 合法的 NPM 风格的 semver 版本                        | string |   *     |
-| `check-latest`   | 否       | 可以设置为 `true` 如果你想使用最新的 Nushell 版本    | bool   | false   |
-| `enable-plugins` | 否       | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69     | bool   | false   |
+| 名称             | 必填 | 描述                                                                    | 类型   | 默认值 |
+| ---------------- | ---- | ----------------------------------------------------------------------- | ------ | ------ |
+| `version`        | 否   | 合法的 NPM 风格的 semver 版本，such as `0.86.0` 也可以为`nightly`.      | string | \*     |
+| `check-latest`   | 否   | 可以设置为 `true` 如果你想使用最新的 Nushell 版本                       | bool   | false  |
+| `enable-plugins` | 否   | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69 | bool   | false  |
 
-您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
+您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver 包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
 
 ## 许可
 
