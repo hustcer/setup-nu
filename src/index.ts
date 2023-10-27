@@ -15,20 +15,23 @@ async function main() {
     console.log(`versionSpec: ${versionSpec}`);
     const checkLatest = (core.getInput('check-latest') || 'false').toUpperCase() === 'TRUE';
     const enablePlugins = (core.getInput('enable-plugins') || 'false').toUpperCase() === 'TRUE';
-    const version = versionSpec === '*' ? '*' : semver.valid(semver.coerce(versionSpec));
+    const version = ['*', 'nightly'].includes(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
     console.log(`coerce version: ${version}`);
     const ver = version === null ? undefined : version;
+    if (!ver) {
+      core.setFailed(`Invalid version: ${versionSpec}`);
+    }
 
     const tool = await setup.checkOrInstallTool({
       checkLatest,
       enablePlugins,
       bin: 'nu',
-      name: 'nushell',
       owner: 'nushell',
       versionSpec: ver,
+      name: version === 'nightly' ? 'nightly' : 'nushell',
     });
     core.addPath(tool.dir);
-    core.info(`Successfully setup ${tool.name} v${tool.version}`);
+    core.info(`Successfully setup ${tool.name} ${tool.version}`);
 
     if (enablePlugins) {
       console.log('Running ./nu/register-plugins.nu to register plugins...');

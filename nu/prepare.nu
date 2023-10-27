@@ -16,11 +16,11 @@ def-env setup-lib-dirs [] {
       | each {|p| ($p | str trim | path expand) }
       | filter {|p| ($p | path exists) }
   )
-  let-env NU_LIB_DIRS = ($env.NU_LIB_DIRS | append $dirs)
+  $env.NU_LIB_DIRS = ($env.NU_LIB_DIRS | append $dirs)
   print 'Current NU_LIB_DIRS: '
   print $env.NU_LIB_DIRS
   # open $nu.env-path
-  #   | str replace -s 'let-env NU_LIB_DIRS = [' $'let-env NU_LIB_DIRS = [(char nl)($env.NU_LIB_DIRS | str join (char nl))'
+  #   | str replace -s '$env.NU_LIB_DIRS = [' $'$env.NU_LIB_DIRS = [(char nl)($env.NU_LIB_DIRS | str join (char nl))'
   #   | save -f $nu.env-path
 }
 

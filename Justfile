@@ -74,8 +74,8 @@ build:
 run: build
   @$'(ansi g)Start `run` task...(ansi reset)'; \
   cd {{SETUP_NU_PATH}}; \
-  let-env RUNNER_TEMP = './runner/temp'; \
-  let-env RUNNER_TOOL_CACHE = './runner/cache'; \
+  $env.RUNNER_TEMP = './runner/temp'; \
+  $env.RUNNER_TOOL_CACHE = './runner/cache'; \
   node dist/index.js
 
 # 检查过期依赖, 需全局安装 `npm-check-updates`
