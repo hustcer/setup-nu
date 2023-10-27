@@ -10,8 +10,9 @@ def main [
   version: string,  # The tag name or version of the release to use.
 ] {
 
+  let name = if $version =~ 'nightly' { 'nightly' } else { 'nushell' }
   let config_path = ($nu.env-path | path dirname)
-  let config_prefix = $'https://github.com/nushell/nushell/blob/($version)/crates/nu-utils/src'
+  let config_prefix = $'https://github.com/nushell/($name)/blob/($version)/crates/nu-utils/src'
   aria2c $'($config_prefix)/sample_config/default_env.nu' -o env.nu -d $config_path
   aria2c $'($config_prefix)/sample_config/default_config.nu' -o config.nu -d $config_path
   # config reset --without-backup

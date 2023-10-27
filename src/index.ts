@@ -31,7 +31,7 @@ async function main() {
       name: version === 'nightly' ? 'nightly' : 'nushell',
     });
     core.addPath(tool.dir);
-    core.info(`Successfully setup ${tool.name} ${tool.version}`);
+    core.info(`Successfully setup Nu ${tool.version}`);
 
     if (enablePlugins) {
       console.log('Running ./nu/register-plugins.nu to register plugins...');
