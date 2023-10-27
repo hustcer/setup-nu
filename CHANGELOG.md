@@ -1,6 +1,42 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7] - 2023-10-27
+
+### Bug Fixes
+
+- Fix .github/workflows/module-test2.yaml
+- Fix .github/workflows/module-test2
+
+### Documentation
+
+- Update README
+
+### Features
+
+- Add .github/workflows/module-test2.yaml example workflow
+- Add Nushell nightly version support, close #58 (#59)
+
+### Miscellaneous Tasks
+
+- Upgrade some node modules, and use biome instead of rome for code formatting
+- Add use module from absolute path example (#44)
+- Update README.md
+- Update README.md
+- Update README.md
+- Upgrade deps: eslint, lefthook, @octokit/rest, etc.
+- Rebuild dist/index.js
+- Bump actions/checkout from 4.0.0 to 4.1.0 (#48)
+- Upgrade some deps
+- Try to Test Nu v0.86
+
+### Deps
+
+- Upgrade lefthook,eslint, and @typescript-eslint/*
+- Upgrade some node deps
+- Upgrade eslint, @vercel/ncc, @biomejs/biome and @typescript-eslint*
+- Upgrade actions/checkout@v4.1.1 and actions/setup-node@v4.0.0
+
 ## [3.6] - 2023-09-12
 
 ### Bug Fixes
