@@ -1,7 +1,7 @@
 {
   "name": "setup-nu",
-  "version": "3.6.0",
-  "actionVer": "v3.6",
+  "version": "3.7.0",
+  "actionVer": "v3.7",
   "description": "A Github Action to Setup a Nushell Environment to Run Nu Scripts or Commands",
   "main": "dist/index.js",
   "private": true,

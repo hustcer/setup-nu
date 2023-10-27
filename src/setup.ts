@@ -14,16 +14,17 @@ import { promises as fs, constants as fs_constants } from 'fs';
 /**
  * @returns {string[]} possible nushell target specifiers for the current platform.
  */
+type Platform = 'darwin' | 'win32' | 'linux';
+
 function getTargets(): string[] {
   const { arch, platform } = process;
+  const PLATFORM_MAP: Record<Platform, string[]> = {
+    darwin: ['x86_64-apple-darwin', 'macOS.zip'],
+    win32: ['x86_64-pc-windows-msvc.zip', 'windows.zip'],
+    linux: ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'],
+  };
   if (arch === 'x64') {
-    if (platform === 'linux') {
-      return ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'];
-    } else if (platform === 'darwin') {
-      return ['x86_64-apple-darwin', 'macOS.zip'];
-    } else if (platform === 'win32') {
-      return ['x86_64-pc-windows-msvc.zip', 'windows.zip'];
-    }
+    return PLATFORM_MAP[platform as Platform];
   }
   throw new Error(`failed to determine any valid targets; arch = ${arch}, platform = ${platform}`);
 }
@@ -123,6 +124,34 @@ function filterLatest(response: any): Release[] {
 }
 
 /**
+ * Filter the latest matching release for the given tool.
+ *
+ * @param response the response to filter a latest release from.
+ * @returns {Release[]} a single GitHub release.
+ */
+function filterLatestNightly(response: any): Release[] {
+  const targets = getTargets();
+  const publishedAt = response.data.map((r: { published_at: string }) => r.published_at);
+  const sortedDates = publishedAt.sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime());
+  const latest = sortedDates[0];
+  core.info(`Try to get latest nightly version published at: ${latest}`);
+
+  return response.data
+    .filter((rel: { published_at: string | Date }) => rel && rel.published_at === latest)
+    .map((rel: { assets: any[]; tag_name: string }) => {
+      const asset = rel.assets.find((ass: { name: string | string[] }) =>
+        targets.some((target) => ass.name.includes(target))
+      );
+      if (rel.assets) {
+        return {
+          version: rel.tag_name.replace(/^v/, ''),
+          downloadUrl: asset.browser_download_url,
+        };
+      }
+    });
+}
+
+/**
  * Fetch the latest matching release for the given tool.
  *
  * @param tool the tool to fetch a release for.
@@ -131,10 +160,14 @@ function filterLatest(response: any): Release[] {
  */
 async function getRelease(tool: Tool): Promise<Release> {
   const { owner, name, versionSpec, checkLatest = false } = tool;
+  const isNightly = versionSpec === 'nightly';
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
-      const releases = checkLatest ? filterLatest(response) : filterMatch(response, versionSpec);
+      const nightlyReleases = isNightly ? filterLatestNightly(response) : [];
+      const officialReleases = checkLatest ? filterLatest(response) : filterMatch(response, versionSpec);
+      const releases = isNightly ? nightlyReleases : officialReleases;
 
       if (releases) {
         done();
