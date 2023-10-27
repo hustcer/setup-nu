@@ -25,7 +25,7 @@ Then you can set the command you want to run in the following steps, and don't f
 to make the commands be executed by `nu`:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.6
+- uses: hustcer/setup-nu@v3.7
   with:
     version: "0.80" # Don't use 0.80 here, as it was a float number and will be convert to 0.8, you can use v0.80/0.80.0 or '0.80'
 - run: print $'Nu version info:(char nl)'; version
@@ -77,7 +77,7 @@ To use modules in `Nu`, please refer to the following examples:
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.6
+  uses: hustcer/setup-nu@v3.7
   with:
     version: 0.86
   env:
@@ -94,7 +94,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.6
+  uses: hustcer/setup-nu@v3.7
   with:
     version: 0.86
   env:
@@ -113,7 +113,7 @@ Again, the nu version should be equal to or above `0.69`.
 
 ```yaml
 - name: Setup nu@latest
-  uses: hustcer/setup-nu@v3.6
+  uses: hustcer/setup-nu@v3.7
   with:
     version: 0.86
   env:
@@ -172,7 +172,7 @@ If you want to use the latest version of nushell you can specify this by set `ch
 the latest version:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.6
+- uses: hustcer/setup-nu@v3.7
   with:
     check-latest: true
 - run: print $'Nu version info:(char nl)'; version
@@ -185,7 +185,7 @@ workflow has to make requests to GitHub API in order to list available releases.
 If this happens you can set the `GITHUB_TOKEN` environment variable.
 
 ```yaml
-- uses: hustcer/setup-nu@v3.6
+- uses: hustcer/setup-nu@v3.7
   with:
     version: "0.80"
   env:
@@ -196,7 +196,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 
 | Name             | Required | Description                                                                               | Type   | Default |
 | ---------------- | -------- | ----------------------------------------------------------------------------------------- | ------ | ------- |
-| `version`        | no       | A valid NPM-style semver specification, such as `0.86`, `nightly`, etc.                   | string | \*      |
+| `version`        | no       | A valid NPM-style semver specification, such as `0.86.0`, etc. and `nightly`.                   | string | \*      |
 | `check-latest`   | no       | Set to `true` if you want to use the latest version                                       | bool   | false   |
 | `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins, Nu v0.69 and above is required | bool   | false   |
 

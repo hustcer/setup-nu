@@ -20,7 +20,7 @@
 在大多数情况下，你只需要在工作流程中通过 `version` 字段指定要使用的 Nushell 的版本即可。比如下面的例子将会安装 [Nushell](https://github.com/nushell/nushell) 的`v0.80`版本。然后你可以在后续步骤中配置你想运行的命令，最后别忘了设置`shell: nu {0}`以使命令被`nu`执行：
 
 ```yaml
-- uses: hustcer/setup-nu@v3.6
+- uses: hustcer/setup-nu@v3.7
   with:
     version: "0.80" # 不要使用 0.80, 它会被认为是一个浮点数并转换为 0.8, 你可以使用 v0.80/0.80.0 或者 '0.80'(加了引号变成字符串)
 - run: print $'Nu version info:(char nl)'; version
@@ -72,7 +72,7 @@ jobs:
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.6
+  uses: hustcer/setup-nu@v3.7
   with:
     version: 0.86
   env:
@@ -89,7 +89,7 @@ jobs:
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.6
+  uses: hustcer/setup-nu@v3.7
   with:
     version: 0.86
   env:
@@ -108,7 +108,7 @@ jobs:
 
 ```yaml
 - name: Setup nu@latest
-  uses: hustcer/setup-nu@v3.6
+  uses: hustcer/setup-nu@v3.7
   with:
     version: 0.86
   env:
@@ -165,7 +165,7 @@ jobs:
 如果你想使用最新版本的 Nushell，你可以通过设置 `check-latest` 为 `true` 来做到（它与`version: '*'`配置的效果相同，但更易读）。例如，以下将会安装最新版本的 Nushell：
 
 ```yaml
-- uses: hustcer/setup-nu@v3.6
+- uses: hustcer/setup-nu@v3.7
   with:
     check-latest: true
 - run: print $'Nu version info:(char nl)'; version
@@ -176,7 +176,7 @@ jobs:
 在极少数情况下，你可能会看到速率限制之类的错误，这是因为这个工作流程必须向 GitHub API 发出请求，以便查询可用的 Nushell 版本。如果发生这种情况，你可以通过设置 `GITHUB_TOKEN` 环境变量来避免该问题：
 
 ```yaml
-- uses: hustcer/setup-nu@v3.6
+- uses: hustcer/setup-nu@v3.7
   with:
     version: "0.80"
   env:
