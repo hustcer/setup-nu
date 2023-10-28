@@ -41,3 +41,28 @@ jobs:
       run: print $'Nu path:(which nu)(char nl)'
     - name: Show Nu Package Contents
       run: print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
+
+  nightly-matrix:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-22.04, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, nu@nightly)
+    steps:
+    - uses: actions/checkout@v4.1.1
+    - name: Setup nu@nightly
+      uses: hustcer/setup-nu@develop
+      with:
+        feature: full
+        version: nightly
+        enable-plugins: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Show Nu Version
+      run: print $'Nu version info:(char nl)'; print (version)
+    - name: Show Nu Binary Path
+      run: print $'Nu path:(which nu)(char nl)'
+    - name: Show Nu Package Contents
+      run: print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
