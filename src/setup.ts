@@ -11,20 +11,31 @@ import * as tc from '@actions/tool-cache';
 import { Octokit } from '@octokit/rest';
 import { promises as fs, constants as fs_constants } from 'fs';
 
+type Platform = 'darwin' | 'win32' | 'linux';
+
+const PLATFORM_DEFAULT_MAP: Record<Platform, string[]> = {
+  darwin: ['x86_64-apple-darwin', 'macOS.zip'],
+  win32: ['x86_64-pc-windows-msvc.zip', 'windows.zip'],
+  linux: ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'],
+};
+
+const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
+  darwin: ['x86_64-darwin-full'],
+  win32: ['x86_64-windows-msvc-full.zip'],
+  linux: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
+};
+
 /**
  * @returns {string[]} possible nushell target specifiers for the current platform.
  */
-type Platform = 'darwin' | 'win32' | 'linux';
-
-function getTargets(): string[] {
+function getTargets(feature: 'default' | 'full'): string[] {
   const { arch, platform } = process;
-  const PLATFORM_MAP: Record<Platform, string[]> = {
-    darwin: ['x86_64-apple-darwin', 'macOS.zip'],
-    win32: ['x86_64-pc-windows-msvc.zip', 'windows.zip'],
-    linux: ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'],
-  };
-  if (arch === 'x64') {
-    return PLATFORM_MAP[platform as Platform];
+
+  if (arch === 'x64' && feature === 'default') {
+    return PLATFORM_DEFAULT_MAP[platform as Platform];
+  }
+  if (arch === 'x64' && feature === 'full') {
+    return PLATFORM_FULL_MAP[platform as Platform];
   }
   throw new Error(`failed to determine any valid targets; arch = ${arch}, platform = ${platform}`);
 }
@@ -43,6 +54,8 @@ export interface Tool {
   enablePlugins: boolean;
   /** A valid semantic version specifier for the tool. */
   versionSpec?: string;
+  /** Feature set: default or full. */
+  feature: 'default' | 'full';
   /** The name of the tool binary (defaults to the repo name) */
   bin?: string;
 }
@@ -79,8 +92,8 @@ interface Release {
  * @param response the response to filter a release from with the given versionSpec.
  * @returns {Release[]} a single GitHub release.
  */
-function filterMatch(response: any, versionSpec: string | undefined): Release[] {
-  const targets = getTargets();
+function filterMatch(response: any, versionSpec: string | undefined, feature: 'default' | 'full'): Release[] {
+  const targets = getTargets(feature);
   return response.data
     .map((rel: { assets: any[]; tag_name: string }) => {
       const asset = rel.assets.find((ass: { name: string | string[] }) =>
@@ -104,8 +117,8 @@ function filterMatch(response: any, versionSpec: string | undefined): Release[] 
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-function filterLatest(response: any): Release[] {
-  const targets = getTargets();
+function filterLatest(response: any, feature: 'default' | 'full'): Release[] {
+  const targets = getTargets(feature);
   const versions = response.data.map((r: { tag_name: string }) => r.tag_name);
   const latest = semver.rsort(versions)[0];
   return response.data
@@ -129,8 +142,8 @@ function filterLatest(response: any): Release[] {
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-function filterLatestNightly(response: any): Release[] {
-  const targets = getTargets();
+function filterLatestNightly(response: any, feature: 'default' | 'full'): Release[] {
+  const targets = getTargets(feature);
   const publishedAt = response.data.map((r: { published_at: string }) => r.published_at);
   const sortedDates = publishedAt.sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime());
   const latest = sortedDates[0];
@@ -159,14 +172,16 @@ function filterLatestNightly(response: any): Release[] {
  * @returns {Promise<Release>} a single GitHub release.
  */
 async function getRelease(tool: Tool): Promise<Release> {
-  const { owner, name, versionSpec, checkLatest = false } = tool;
+  const { owner, name, versionSpec, checkLatest = false, feature = 'default' } = tool;
   const isNightly = versionSpec === 'nightly';
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
-      const nightlyReleases = isNightly ? filterLatestNightly(response) : [];
-      const officialReleases = checkLatest ? filterLatest(response) : filterMatch(response, versionSpec);
+      const nightlyReleases = isNightly ? filterLatestNightly(response, feature) : [];
+      const officialReleases = checkLatest
+        ? filterLatest(response, feature)
+        : filterMatch(response, versionSpec, feature);
       const releases = isNightly ? nightlyReleases : officialReleases;
 
       if (releases) {

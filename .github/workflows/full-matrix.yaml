@@ -1,0 +1,43 @@
+name: Nu Full Features Check
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - release/*
+    paths-ignore:
+      - '**.md'
+
+defaults:
+  run:
+    shell: nu {0}
+
+jobs:
+  test-matrix:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-22.04, macos-latest]
+        ver: [0.86]
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, nu@${{matrix.ver}})
+    steps:
+    - uses: actions/checkout@v4.1.1
+    - name: Setup nu@${{matrix.ver}}
+      uses: hustcer/setup-nu@develop
+      with:
+        feature: full
+        enable-plugins: true
+        version: ${{matrix.ver}}
+      env:
+        ACTIONS_STEP_DEBUG: true
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Show Nu Version
+      run: print $'Nu version info:(char nl)'; print (version)
+    - name: Show env Variables
+      run: print $'Current env:(char nl)'; print $env
+    - name: Show Nu Binary Path
+      run: print $'Nu path:(which nu)(char nl)'
+    - name: Show Nu Package Contents
+      run: print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
