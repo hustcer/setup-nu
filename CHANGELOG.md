@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Miscellaneous Tasks
 
-- Use hustcer/setup-nu@v3.7 in workflows
+- Use `hustcer/setup-nu@v3.7` in workflows
 
 ### Deps
 
