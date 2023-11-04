@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8] - 2023-11-04
+
+### Features
+
+- Add use Nu of full features support
+- Add workflow to check full features of Nu nightly
+
+### Miscellaneous Tasks
+
+- Use hustcer/setup-nu@v3.7 in workflows
+
+### Deps
+
+- Upgrade node modules biome and eslint, etc.
+
 ## [3.7] - 2023-10-27
 
 ### Features
