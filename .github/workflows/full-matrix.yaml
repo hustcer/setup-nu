@@ -27,7 +27,7 @@ jobs:
     - name: Setup nu@${{matrix.ver}}
       uses: hustcer/setup-nu@develop
       with:
-        feature: full
+        features: full
         enable-plugins: true
         version: ${{matrix.ver}}
       env:
@@ -54,7 +54,7 @@ jobs:
     - name: Setup nu@nightly
       uses: hustcer/setup-nu@develop
       with:
-        feature: full
+        features: full
         version: nightly
         enable-plugins: true
       env:

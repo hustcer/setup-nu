@@ -20,7 +20,7 @@ inputs:
     default: '*'
     required: false
     description: 'A valid semver specifier of nushell version to install.'
-  feature:
+  features:
     default: 'default'
     required: false
     description: 'Nushell features to install, should be `full` or `default`.'

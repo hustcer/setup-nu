@@ -28,13 +28,13 @@ const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
 /**
  * @returns {string[]} possible nushell target specifiers for the current platform.
  */
-function getTargets(feature: 'default' | 'full'): string[] {
+function getTargets(features: 'default' | 'full'): string[] {
   const { arch, platform } = process;
 
-  if (arch === 'x64' && feature === 'default') {
+  if (arch === 'x64' && features === 'default') {
     return PLATFORM_DEFAULT_MAP[platform as Platform];
   }
-  if (arch === 'x64' && feature === 'full') {
+  if (arch === 'x64' && features === 'full') {
     return PLATFORM_FULL_MAP[platform as Platform];
   }
   throw new Error(`failed to determine any valid targets; arch = ${arch}, platform = ${platform}`);
@@ -55,7 +55,7 @@ export interface Tool {
   /** A valid semantic version specifier for the tool. */
   versionSpec?: string;
   /** Feature set: default or full. */
-  feature: 'default' | 'full';
+  features: 'default' | 'full';
   /** The name of the tool binary (defaults to the repo name) */
   bin?: string;
 }
@@ -92,8 +92,8 @@ interface Release {
  * @param response the response to filter a release from with the given versionSpec.
  * @returns {Release[]} a single GitHub release.
  */
-function filterMatch(response: any, versionSpec: string | undefined, feature: 'default' | 'full'): Release[] {
-  const targets = getTargets(feature);
+function filterMatch(response: any, versionSpec: string | undefined, features: 'default' | 'full'): Release[] {
+  const targets = getTargets(features);
   return response.data
     .map((rel: { assets: any[]; tag_name: string }) => {
       const asset = rel.assets.find((ass: { name: string | string[] }) =>
@@ -117,8 +117,8 @@ function filterMatch(response: any, versionSpec: string | undefined, feature: 'd
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-function filterLatest(response: any, feature: 'default' | 'full'): Release[] {
-  const targets = getTargets(feature);
+function filterLatest(response: any, features: 'default' | 'full'): Release[] {
+  const targets = getTargets(features);
   const versions = response.data.map((r: { tag_name: string }) => r.tag_name);
   const latest = semver.rsort(versions)[0];
   return response.data
@@ -142,8 +142,8 @@ function filterLatest(response: any, feature: 'default' | 'full'): Release[] {
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-function filterLatestNightly(response: any, feature: 'default' | 'full'): Release[] {
-  const targets = getTargets(feature);
+function filterLatestNightly(response: any, features: 'default' | 'full'): Release[] {
+  const targets = getTargets(features);
   const publishedAt = response.data.map((r: { published_at: string }) => r.published_at);
   const sortedDates = publishedAt.sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime());
   const latest = sortedDates[0];
@@ -172,16 +172,16 @@ function filterLatestNightly(response: any, feature: 'default' | 'full'): Releas
  * @returns {Promise<Release>} a single GitHub release.
  */
 async function getRelease(tool: Tool): Promise<Release> {
-  const { owner, name, versionSpec, checkLatest = false, feature = 'default' } = tool;
+  const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
   const isNightly = versionSpec === 'nightly';
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
-      const nightlyReleases = isNightly ? filterLatestNightly(response, feature) : [];
+      const nightlyReleases = isNightly ? filterLatestNightly(response, features) : [];
       const officialReleases = checkLatest
-        ? filterLatest(response, feature)
-        : filterMatch(response, versionSpec, feature);
+        ? filterLatest(response, features)
+        : filterMatch(response, versionSpec, features);
       const releases = isNightly ? nightlyReleases : officialReleases;
 
       if (releases) {

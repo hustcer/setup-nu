@@ -15,7 +15,7 @@ async function main() {
     console.log(`versionSpec: ${versionSpec}`);
     const checkLatest = (core.getInput('check-latest') || 'false').toUpperCase() === 'TRUE';
     const enablePlugins = (core.getInput('enable-plugins') || 'false').toUpperCase() === 'TRUE';
-    const feature = core.getInput('feature') || 'default';
+    const features = core.getInput('features') || 'default';
     const version = ['*', 'nightly'].includes(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
     console.log(`coerce version: ${version}`);
     const ver = version === null ? undefined : version;
@@ -29,11 +29,11 @@ async function main() {
       bin: 'nu',
       owner: 'nushell',
       versionSpec: ver,
-      feature: feature as 'default' | 'full',
+      features: features as 'default' | 'full',
       name: version === 'nightly' ? 'nightly' : 'nushell',
     });
     core.addPath(tool.dir);
-    core.info(`Successfully setup Nu ${tool.version}, with ${feature} features.}`);
+    core.info(`Successfully setup Nu ${tool.version}, with ${features} features.}`);
 
     if (enablePlugins) {
       console.log('Running ./nu/register-plugins.nu to register plugins...');
