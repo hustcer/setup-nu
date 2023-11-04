@@ -185,11 +185,12 @@ jobs:
 
 ### 输入
 
-| 名称             | 必填 | 描述                                                                    | 类型   | 默认值 |
-| ---------------- | ---- | ----------------------------------------------------------------------- | ------ | ------ |
-| `version`        | 否   | 合法的 NPM 风格的 semver 版本，such as `0.86.0` 也可以为`nightly`.      | string | \*     |
-| `check-latest`   | 否   | 可以设置为 `true` 如果你想使用最新的 Nushell 版本                       | bool   | false  |
-| `enable-plugins` | 否   | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69 | bool   | false  |
+| 名称             | 必填 | 描述                                                                            | 类型   | 默认值    |
+| ---------------- | ---- | ------------------------------------------------------------------------------- | ------ | --------- |
+| `version`        | 否   | 合法的 NPM 风格的 semver 版本，such as `0.86.0` 也可以为`nightly`.              | string | \*        |
+| `check-latest`   | 否   | 可以设置为 `true` 如果你想使用最新的 Nushell 版本                               | bool   | false     |
+| `enable-plugins` | 否   | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69         | bool   | false     |
+| `features`       | 否   | 可选项: `default`，`full`, 设置为 `full` 将包含 `extra` 和 `dataframe` 中的命令 | string | `default` |
 
 您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver 包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
 
