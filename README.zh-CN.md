@@ -74,7 +74,7 @@ jobs:
 - name: Setup nu
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.86
+    version: 0.87.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -91,7 +91,7 @@ jobs:
 - name: Setup nu
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.86
+    version: 0.87.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -110,7 +110,7 @@ jobs:
 - name: Setup nu@latest
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.86
+    version: 0.87.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
