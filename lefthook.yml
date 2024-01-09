@@ -2,7 +2,7 @@
 # Refer for explanation to following link:
 # https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
 
-min_version: 1.5.0
+min_version: 1.5.5
 skip_output:
   - meta              # Skips lefthook version printing
   - skips             # Skips "skip" printing (i.e. no files matched)
@@ -16,6 +16,7 @@ pre-push:
   scripts:
     'sync.sh':
       runner: sh
+      use_stdin: true
 
 pre-commit:
   parallel: true

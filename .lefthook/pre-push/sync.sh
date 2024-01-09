@@ -10,10 +10,10 @@ do
 
   # ----------------------------------------
   echo 'Pushing to remote...'
-  # echo $local_ref
-  # echo $local_oid
-  # echo $remote_ref
-  # echo $remote_oid
+  echo $local_ref
+  echo $local_oid
+  echo $remote_ref
+  echo $remote_oid
   echo '----------------------------------'
 
   # Break is important here, to stop another loop
