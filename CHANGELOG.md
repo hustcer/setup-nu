@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 
-- Add default github-token input support
+- Add default github-token input support, and `GITHUB_TOKEN` is no longer required anymore to avoid **API rate limit exceeded** error
 
 ### Miscellaneous Tasks
 

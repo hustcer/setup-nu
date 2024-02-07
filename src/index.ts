@@ -24,9 +24,9 @@ async function main() {
       core.setFailed(`Invalid version: ${versionSpec}`);
     }
 
-    core.exportVariable('GITHUB_TOKEN', githubToken);
     const tool = await setup.checkOrInstallTool({
       checkLatest,
+      githubToken,
       enablePlugins,
       bin: 'nu',
       owner: 'nushell',

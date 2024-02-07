@@ -45,7 +45,6 @@ jobs:
         enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Show Nu Path and Related Assets
       run: which $(printf nu | tr '[:upper:]' '[:lower:]') && echo "Dir contents --->:" && ls -la "$(dirname `which nu`)"
       shell: bash

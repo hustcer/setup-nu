@@ -48,6 +48,8 @@ export interface Tool {
   owner: string;
   /** The GitHub repo name. */
   name: string;
+  /** The GitHub token to use for API requests. */
+  githubToken: string;
   /** Set this option to `true` if you want to check for the latest version. */
   checkLatest: boolean;
   /** Set this option to `true` if you want to register plugins. */
@@ -174,7 +176,7 @@ function filterLatestNightly(response: any, features: 'default' | 'full'): Relea
 async function getRelease(tool: Tool): Promise<Release> {
   const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
   const isNightly = versionSpec === 'nightly';
-  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  const octokit = new Octokit({ auth: tool.githubToken });
 
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
