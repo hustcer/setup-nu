@@ -88,7 +88,7 @@ export def 'log' [
 }
 
 export def 'hr-line' [
-  --blank-line(-b): bool
+  --blank-line(-b)
 ] {
   print $'(ansi g)---------------------------------------------------------------------------->(ansi reset)'
   if $blank_line { char nl }

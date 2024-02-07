@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9] - 2024-02-07
+
+### Features
+
+- Add default github-token input support
+
+### Miscellaneous Tasks
+
+- Use `hustcer/setup-nu@v3.8` in workflows
+
+### Deps
+
+- Upgrade node modules @typescript-eslint/*, globby and @biomejs/biome, etc.
+
 ## [3.8] - 2023-11-04
 
 ### Features
