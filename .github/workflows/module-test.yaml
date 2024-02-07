@@ -33,7 +33,6 @@ jobs:
         version: ${{matrix.ver}}
       env:
         ACTIONS_STEP_DEBUG: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Show Nu Version
       run: print $'Nu version info:(char nl)'; print (version)
     - name: Use Your Nu Modules

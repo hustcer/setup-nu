@@ -30,7 +30,6 @@ jobs:
         enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: You can run bash commands, too
       run: pwd && ls -la
       shell: bash
@@ -53,17 +52,16 @@ jobs:
         os: [ubuntu-22.04, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
-    name: test (${{matrix.os}}, setup-nu@v3.8)
+    name: test (${{matrix.os}}, setup-nu@v3.9)
     steps:
     - uses: actions/checkout@v4.1.1
     - name: Setup nu@latest
-      uses: hustcer/setup-nu@v3.8
+      uses: hustcer/setup-nu@v3.9
       with:
         version: v0.80
         enable-plugins: true
       env:
         ACTIONS_STEP_DEBUG: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - run: print $'Nu version info:(char nl)'; version
     - run: print $'Current env:(char nl)'; $env
     - run: print $'Nu path:(which nu)(char nl)'
