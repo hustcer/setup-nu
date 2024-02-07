@@ -79,7 +79,7 @@ To use modules in `Nu`, please refer to the following examples:
 - name: Setup nu
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.87.1
+    version: 0.90.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -96,7 +96,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 - name: Setup nu
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.87.1
+    version: 0.90.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -115,7 +115,7 @@ Again, the nu version should be equal to or above `0.69`.
 - name: Setup nu@latest
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.87.1
+    version: 0.90.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
@@ -200,6 +200,7 @@ If this happens you can set the `GITHUB_TOKEN` environment variable.
 | `check-latest`   | no       | Set to `true` if you want to use the latest version                                                                                                           | bool   | false     |
 | `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins, Nu v0.69 and above is required                                                                     | bool   | false     |
 | `features`       | no       | Available choice: `default` or `full`, and the `full` features will include the commands from `extra` and `dataframe`. This option support `Nu` since `v0.86` | string | `default` |
+| `github-token`   | no       | Your GitHub token or PAT token | string | `${{ github.token }}` |
 
 The semver specification is passed directly to NPM's [semver package](https://www.npmjs.com/package/semver).
 This GitHub Action will install the latest matching release.

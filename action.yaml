@@ -32,6 +32,10 @@ inputs:
     default: false
     required: false
     description: 'Enable registering of plugins'
+  github-token:
+    description: 'GitHub token or PAT token'
+    required: false
+    default: ${{ github.token }}
 
 runs:
   using: 'node20'

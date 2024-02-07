@@ -16,6 +16,7 @@ async function main() {
     const checkLatest = (core.getInput('check-latest') || 'false').toUpperCase() === 'TRUE';
     const enablePlugins = (core.getInput('enable-plugins') || 'false').toUpperCase() === 'TRUE';
     const features = core.getInput('features') || 'default';
+    const githubToken = core.getInput('github-token');
     const version = ['*', 'nightly'].includes(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
     console.log(`coerce version: ${version}`);
     const ver = version === null ? undefined : version;
@@ -23,6 +24,7 @@ async function main() {
       core.setFailed(`Invalid version: ${versionSpec}`);
     }
 
+    core.exportVariable('GITHUB_TOKEN', githubToken);
     const tool = await setup.checkOrInstallTool({
       checkLatest,
       enablePlugins,

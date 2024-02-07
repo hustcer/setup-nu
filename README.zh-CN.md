@@ -74,7 +74,7 @@ jobs:
 - name: Setup nu
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.87.1
+    version: 0.90.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -91,7 +91,7 @@ jobs:
 - name: Setup nu
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.87.1
+    version: 0.90.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -110,7 +110,7 @@ jobs:
 - name: Setup nu@latest
   uses: hustcer/setup-nu@v3.8
   with:
-    version: 0.87.1
+    version: 0.90.1
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
@@ -191,6 +191,7 @@ jobs:
 | `check-latest`   | 否   | 可以设置为 `true` 如果你想使用最新的 Nushell 版本                                                                   | bool   | false     |
 | `enable-plugins` | 否   | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69                                             | bool   | false     |
 | `features`       | 否   | 可选项: `default`，`full`, 设置为 `full` 将包含 `extra` 和 `dataframe` 中的命令, 该选项支持 `Nu` `v0.86` 及以后版本 | string | `default` |
+| `github-token`   | 否   | 你的 GitHub Token 或者 PAT token | string | `${{ github.token }}` |
 
 您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver 包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
 
