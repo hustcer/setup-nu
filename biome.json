@@ -1,9 +1,12 @@
 {
+  "files": {
+    "ignoreUnknown": true,
+    "ignore": ["dist", "node_modules"]
+  },
   "formatter": {
     "indentWidth": 2,
     "lineWidth": 120,
-    "indentStyle": "space",
-    "ignore": ["dist", "node_modules"]
+    "indentStyle": "space"
   },
   "linter": {
     "enabled": false
