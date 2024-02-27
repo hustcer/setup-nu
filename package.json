@@ -30,14 +30,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.5.3",
-    "@types/node": "^20.11.19",
-    "@types/semver": "^7.5.7",
+    "@types/node": "^20.11.20",
+    "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.15",
-    "@typescript-eslint/eslint-plugin": "^7.0.1",
-    "@typescript-eslint/parser": "^7.0.1",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "@vercel/ncc": "^0.38.1",
-    "eslint": "^8.56.0",
-    "lefthook": "^1.6.1",
+    "eslint": "^8.57.0",
+    "lefthook": "^1.6.2",
     "semver": "^7.6.0",
     "typescript": "^5.3.3"
   }
