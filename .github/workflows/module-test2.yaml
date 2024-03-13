@@ -19,12 +19,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-22.04, macos-latest]
-        ver: [0.90.1, 0.87.1, 0.86, 0.85]
+        ver: [0.91.0, 0.90.1, 0.87.1, 0.86, 0.85]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.1.2
     - name: Setup nu@latest
       uses: hustcer/setup-nu@develop
       with:
