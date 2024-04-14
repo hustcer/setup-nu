@@ -26,34 +26,35 @@ export def 'has-ref' [
   if ($parse | is-empty) { false } else { true }
 }
 
-# Compare two version number, return `true` if first one is higher than second one,
-# Return `null` if they are equal, otherwise return `false`
-export def 'compare-ver' [
+# Compare two version number, return `1` if first one is higher than second one,
+# Return `0` if they are equal, otherwise return `-1`
+export def compare-ver [
   from: string,
   to: string,
 ] {
   let dest = ($to | str downcase | str trim -c 'v' | str trim)
   let source = ($from | str downcase | str trim -c 'v' | str trim)
-  let v1 = ($source | split row '.' | each {|it| ($it | into int)})
-  let v2 = ($dest | split row '.' | each {|it| ($it | into int)})
+  # Ignore '-beta' or '-rc' suffix
+  let v1 = ($source | split row '.' | each {|it| ($it | parse -r '(?P<v>\d+)' | get v | get 0 )})
+  let v2 = ($dest | split row '.' | each {|it| ($it | parse -r '(?P<v>\d+)' | get v | get 0 )})
   for $v in $v1 -n {
-    let c1 = ($v1 | get -i $v.index | default 0)
-    let c2 = ($v2 | get -i $v.index | default 0)
+    let c1 = ($v1 | get -i $v.index | default 0 | into int)
+    let c2 = ($v2 | get -i $v.index | default 0 | into int)
     if $c1 > $c2 {
-      return true
+      return 1
     } else if ($c1 < $c2) {
-      return false
+      return (-1)
     }
   }
-  return null
+  return 0
 }
 
 # Compare two version number, return true if first one is lower then second one
-export def 'is-lower-ver' [
+export def is-lower-ver [
   from: string,
   to: string,
 ] {
-  (compare-ver $from $to) == false
+  (compare-ver $from $to) < 0
 }
 
 # Check if git was installed and if current directory is a git repo
