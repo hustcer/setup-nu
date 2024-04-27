@@ -11,18 +11,20 @@ import * as tc from '@actions/tool-cache';
 import { Octokit } from '@octokit/rest';
 import { promises as fs, constants as fs_constants } from 'fs';
 
-type Platform = 'darwin' | 'win32' | 'linux';
+type Platform = 'darwin_x64' | 'darwin_arm64' | 'win32_x64' | 'linux_x64';
 
 const PLATFORM_DEFAULT_MAP: Record<Platform, string[]> = {
-  darwin: ['x86_64-apple-darwin', 'macOS.zip'],
-  win32: ['x86_64-pc-windows-msvc.zip', 'windows.zip'],
-  linux: ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'],
+  darwin_x64: ['x86_64-apple-darwin', 'macOS.zip'],
+  darwin_arm64: ['aarch64-apple-darwin', 'macOS.zip'],
+  win32_x64: ['x86_64-pc-windows-msvc.zip', 'windows.zip'],
+  linux_x64: ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'],
 };
 
 const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
-  darwin: ['x86_64-darwin-full'],
-  win32: ['x86_64-windows-msvc-full.zip'],
-  linux: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
+  darwin_x64: ['x86_64-darwin-full'],
+  darwin_arm64: ['aarch64-darwin-full'],
+  win32_x64: ['x86_64-windows-msvc-full.zip'],
+  linux_x64: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
 };
 
 /**
@@ -30,12 +32,13 @@ const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
  */
 function getTargets(features: 'default' | 'full'): string[] {
   const { arch, platform } = process;
+  const selector = `${platform}_${arch}`;
 
-  if (arch === 'x64' && features === 'default') {
-    return PLATFORM_DEFAULT_MAP[platform as Platform];
+  if (features === 'default') {
+    return PLATFORM_DEFAULT_MAP[selector as Platform];
   }
-  if (arch === 'x64' && features === 'full') {
-    return PLATFORM_FULL_MAP[platform as Platform];
+  if (features === 'full') {
+    return PLATFORM_FULL_MAP[selector as Platform];
   }
   throw new Error(`failed to determine any valid targets; arch = ${arch}, platform = ${platform}`);
 }
