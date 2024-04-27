@@ -11,10 +11,7 @@ All notable changes to this project will be documented in this file.
 
 - Upgrade globby and @typescript-eslint/*
 - Upgrade @types/node,@types/semver,@typescript-eslint/*,eslint and lefthook
-- Upgrade @biomejs/biome, lefthook and @typescript-eslint/*
 - Upgrade lefthook,@biomejs/biome,@octokit/rest,typescript, etc.
-- Upgrade @biomejs/biome and @typescript-eslint/*
-- Upgrade @biomejs/biome and @typescript-eslint/*
 
 ## [3.9] - 2024-02-07
 
