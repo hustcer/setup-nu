@@ -27,7 +27,7 @@ to make the commands be executed by `nu`:
 ```yaml
 - uses: hustcer/setup-nu@v3.10
   with:
-    version: "0.80" # Don't use 0.80 here, as it was a float number and will be convert to 0.8, you can use v0.80/0.80.0 or '0.80'
+    version: "0.90" # Don't use 0.90 here, as it was a float number and will be convert to 0.9, you can use v0.90/0.90.0 or '0.90'
 - run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
