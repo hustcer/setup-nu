@@ -56,7 +56,7 @@ jobs:
   basic-usage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.2
+      - uses: actions/checkout@v4.1.3
       - uses: hustcer/setup-nu@main
         with:
           version: "*"
@@ -79,7 +79,7 @@ To use modules in `Nu`, please refer to the following examples:
 - name: Setup nu
   uses: hustcer/setup-nu@v3.10
   with:
-    version: 0.92.2
+    version: 0.93.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -96,7 +96,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 - name: Setup nu
   uses: hustcer/setup-nu@v3.10
   with:
-    version: 0.92.2
+    version: 0.93.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -115,7 +115,7 @@ Again, the nu version should be equal to or above `0.69`.
 - name: Setup nu@latest
   uses: hustcer/setup-nu@v3.10
   with:
-    version: 0.92.2
+    version: 0.93.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
