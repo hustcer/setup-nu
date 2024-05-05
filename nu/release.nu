@@ -22,6 +22,7 @@ export def 'make-release' [
   	print $'The version ($releaseVer) already exists, Please choose another version.(char nl)'
   	exit 5
   }
+  let majorTag = $releaseVer | split row '.' | first
   let statusCheck = (git status --porcelain)
   if not ($statusCheck | is-empty) {
   	print $'You have uncommit changes, please commit them and try `release` again!(char nl)'
@@ -34,5 +35,9 @@ export def 'make-release' [
   # Delete tags that not exist in remote repo
   git fetch origin --prune '+refs/tags/*:refs/tags/*'
   let commitMsg = $'A new release for version: ($releaseVer) created by Release command of setup-nu'
-  git tag $releaseVer -am $commitMsg; git push origin --tags
+  git tag $releaseVer -am $commitMsg
+  # Remove local major version tag if exists and ignore errors
+  do -i { git tag -d $majorTag | complete | ignore }
+  git checkout $releaseVer; git tag $majorTag
+  git push origin $majorTag $releaseVer
 }
