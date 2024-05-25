@@ -23,7 +23,7 @@ inputs:
   features:
     default: 'default'
     required: false
-    description: 'Nushell features to install, should be `full` or `default`.'
+    description: 'Nushell features to install, should be `full` or `default`, `full` can be used for Nu 0.86 ~ 0.93.'
   check-latest:
     default: false
     required: false

@@ -53,7 +53,6 @@ jobs:
     - name: Setup nu@nightly
       uses: hustcer/setup-nu@develop
       with:
-        features: full
         version: nightly
         enable-plugins: true
       env:
