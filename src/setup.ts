@@ -40,7 +40,9 @@ function getTargets(features: 'default' | 'full'): string[] {
   if (features === 'full') {
     return PLATFORM_FULL_MAP[selector as Platform];
   }
-  throw new Error(`failed to determine any valid targets; arch = ${arch}, platform = ${platform}`);
+  throw new Error(
+    `Failed to determine any valid targets: arch = ${arch}, platform = ${platform}, feature = ${features}`
+  );
 }
 
 /**
@@ -132,7 +134,7 @@ function filterLatest(response: any, features: 'default' | 'full'): Release[] {
       const asset = rel.assets.find((ass: { name: string | string[] }) =>
         targets.some((target) => ass.name.includes(target))
       );
-      if (rel.assets) {
+      if (asset) {
         return {
           version: rel.tag_name.replace(/^v/, ''),
           downloadUrl: asset.browser_download_url,
@@ -160,7 +162,7 @@ function filterLatestNightly(response: any, features: 'default' | 'full'): Relea
       const asset = rel.assets.find((ass: { name: string | string[] }) =>
         targets.some((target) => ass.name.includes(target))
       );
-      if (rel.assets) {
+      if (asset) {
         return {
           version: rel.tag_name.replace(/^v/, ''),
           downloadUrl: asset.browser_download_url,
@@ -197,7 +199,10 @@ async function getRelease(tool: Tool): Promise<Release> {
     .then((releases) => {
       const release = releases.find((release) => release != null);
       if (release === undefined) {
-        throw new Error(`no release for ${name} matching version specifier ${versionSpec}`);
+        if (features === 'full') {
+          core.warning('WARN: "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.');
+        }
+        throw new Error(`No release for Nusehll matching version specifier ${versionSpec} of ${features} feature.`);
       }
       return release;
     });
