@@ -200,7 +200,7 @@ async function getRelease(tool: Tool): Promise<Release> {
       const release = releases.find((release) => release != null);
       if (release === undefined) {
         if (features === 'full') {
-          core.warning('WARN: "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.');
+          core.warning('The "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.');
         }
         throw new Error(`No release for Nusehll matching version specifier ${versionSpec} of ${features} feature.`);
       }
