@@ -180,7 +180,7 @@ jobs:
 | `version`        | 否   | 合法的 NPM 风格的 semver 版本，such as `0.86.0` 也可以为`nightly`.                                                  | string | \*        |
 | `check-latest`   | 否   | 可以设置为 `true` 如果你想使用最新的 Nushell 版本                                                                   | bool   | false     |
 | `enable-plugins` | 否   | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69                                             | bool   | false     |
-| `features`       | 否   | 可选项: `default`，`full`, 设置为 `full` 将包含 `extra` 和 `dataframe` 中的命令, 该选项支持 `Nu` `v0.86` ~ `v0.93` | string | `default` |
+| `features`       | 否   | 可选项: `default`，`full`, 设置为 `full` 将包含 `extra` 和 `dataframe` 中的命令, `full` 仅支持 `Nu` `v0.86` ~ `v0.93`, 之后版本中默认版本将包含所有特性 | string | `default` |
 | `github-token`   | 否   | 你的 GitHub Token 或者 PAT token | string | `${{ github.token }}` |
 
 您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver 包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
