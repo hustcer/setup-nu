@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-22.04, macos-latest]
-        ver: [0.93.0, 0.92.2, 0.91.0, 0.90.1, 0.88.1, 0.87.1, 0.86]
+        ver: [0.93.0, 0.92.2, 0.91.0, 0.90.1, 0.89.0, 0.88.1, 0.87.1, 0.86]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
@@ -36,29 +36,6 @@ jobs:
       run: print $'Nu version info:(char nl)'; print (version)
     - name: Show env Variables
       run: print $'Current env:(char nl)'; print $env
-    - name: Show Nu Binary Path
-      run: print $'Nu path:(which nu)(char nl)'
-    - name: Show Nu Package Contents
-      run: print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
-
-  nightly-matrix:
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-22.04, macos-latest]
-
-    runs-on: ${{ matrix.os }}
-    name: test (${{matrix.os}}, nu@nightly)
-    steps:
-    - uses: actions/checkout@v4.1.6
-    - name: Setup nu@nightly
-      uses: hustcer/setup-nu@develop
-      with:
-        version: nightly
-        enable-plugins: true
-      env:
-        ACTIONS_STEP_DEBUG: true
-    - name: Show Nu Version
-      run: print $'Nu version info:(char nl)'; print (version)
     - name: Show Nu Binary Path
       run: print $'Nu path:(which nu)(char nl)'
     - name: Show Nu Package Contents
