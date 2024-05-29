@@ -1,6 +1,26 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.11] - 2024-05-29
+
+### Bug Fixes
+
+- Remove full feature for nightly tests
+
+### Features
+
+- Make sure major version tag always point to the latest semver tag that has the same major version
+- Add warning tip for full builds
+
+### Miscellaneous Tasks
+
+- Remove nightly test of full features
+
+### Deps
+
+- Upgrade @octokit/rest,@biomejs/biome,lefthook,semver and @typescript-eslint/*
+- Update to actions/checkout@v4.1.6
+
 ## [3.10] - 2024-04-27
 
 ### Features
