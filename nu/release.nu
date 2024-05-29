@@ -39,5 +39,5 @@ export def 'make-release' [
   # Remove local major version tag if exists and ignore errors
   do -i { git tag -d $majorTag | complete | ignore }
   git checkout $releaseVer; git tag $majorTag
-  git push origin $majorTag $releaseVer
+  git push origin $majorTag $releaseVer --force
 }
