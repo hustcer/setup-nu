@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
 ### Deps
 
 - Upgrade @octokit/rest,@biomejs/biome,lefthook,semver and @typescript-eslint/*
-- Update to actions/checkout@v4.1.6
+- Update to actions/checkout@v4.1.7
 
 ## [3.10] - 2024-04-27
 

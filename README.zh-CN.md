@@ -44,7 +44,7 @@ jobs:
   basic-usage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.6
+      - uses: actions/checkout@v4.1.7
       - uses: hustcer/setup-nu@main
         with:
           version: "*"
