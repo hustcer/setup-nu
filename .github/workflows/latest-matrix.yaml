@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-22.04, macos-latest]
-        ver: [0.95.0, 0.93.0, 0.92.2, 0.91.0, 0.90.1, 0.88.1, 0.87.1, 0.86, 0.85, 0.83.1, 0.82, '0.80']
+        ver: [0.95.0, 0.93.0, 0.92.2, 0.91.0, 0.90.1, 0.88.1, 0.87.1, 0.86, 0.85, 0.83.1]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})

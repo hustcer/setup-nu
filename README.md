@@ -8,13 +8,6 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 
 ## Usage
 
-### Which Version Should I Choose?
-
-- `setup-nu@v3.7` supports `Nu` **v0.60.0 ~ latest** and latest `nightly` version;
-- `setup-nu@v3.6` supports `Nu` **v0.60.0 ~ latest**;
-- `setup-nu@v2.1` supports `Nu` **v0.60.0 ~ 0.70.0**;
-- `setup-nu@v1` supports `Nu` **v0.60.0 ~ 0.63.0**;
-
 ### Examples
 
 #### Basic
@@ -25,7 +18,7 @@ Then you can set the command you want to run in the following steps, and don't f
 to make the commands be executed by `nu`:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.10
+- uses: hustcer/setup-nu@v3.11
   with:
     version: "0.90" # Don't use 0.90 here, as it was a float number and will be convert to 0.9, you can use v0.90/0.90.0 or '0.90'
 - run: print $'Nu version info:(char nl)'; version
@@ -77,7 +70,7 @@ To use modules in `Nu`, please refer to the following examples:
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.10
+  uses: hustcer/setup-nu@v3.11
   with:
     version: 0.93.0
   env:
@@ -94,7 +87,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.10
+  uses: hustcer/setup-nu@v3.11
   with:
     version: 0.93.0
   env:
@@ -113,7 +106,7 @@ Again, the nu version should be equal to or above `0.69`.
 
 ```yaml
 - name: Setup nu@latest
-  uses: hustcer/setup-nu@v3.10
+  uses: hustcer/setup-nu@v3.11
   with:
     version: 0.93.0
   env:
@@ -140,7 +133,7 @@ They are not perfect yet, but they do work. BTW: Please tell me if you found a b
 `Nushell` is currently in active development, if you want to use the latest features it's also available by set the version to `nightly`, just as below:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.10
+- uses: hustcer/setup-nu@v3.11
   with:
     version: nightly # Will download and setup the latest nightly version of Nushell
 - run: print $'Nu version info:(char nl)'; version
@@ -172,7 +165,7 @@ If you want to use the latest version of nushell you can specify this by set `ch
 the latest version:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.10
+- uses: hustcer/setup-nu@v3.11
   with:
     check-latest: true
 - run: print $'Nu version info:(char nl)'; version
