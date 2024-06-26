@@ -13,7 +13,7 @@ def main [
 ] {
 
   let name = if $version =~ 'nightly' { 'nightly' } else { 'nushell' }
-  let useRegister = if $version =~ 'nightly' or $version == '*' or (is-lower-ver 0.93.0 $version) { false } else { true }
+  let useRegister = if $version =~ 'nightly' or $version == '*' or (is-lower-ver 0.92.3 $version) { false } else { true }
   let config_path = ($nu.env-path | path dirname)
   let config_prefix = $'https://github.com/nushell/($name)/blob/($version)/crates/nu-utils/src'
   aria2c $'($config_prefix)/sample_config/default_env.nu' -o env.nu -d $config_path
