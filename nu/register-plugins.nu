@@ -6,11 +6,14 @@
 # Config files are needed to avoid plugin register failure.
 # The following lines were used to fix `× Plugin failed to load: No such file or directory (os error 2)`
 
+use common.nu [is-lower-ver]
+
 def main [
   version: string,  # The tag name or version of the release to use.
 ] {
 
   let name = if $version =~ 'nightly' { 'nightly' } else { 'nushell' }
+  let useRegister = if $version =~ 'nightly' or $version == '*' or (is-lower-ver 0.93.0 $version) { false } else { true }
   let config_path = ($nu.env-path | path dirname)
   let config_prefix = $'https://github.com/nushell/($name)/blob/($version)/crates/nu-utils/src'
   aria2c $'($config_prefix)/sample_config/default_env.nu' -o env.nu -d $config_path
@@ -22,7 +25,11 @@ def main [
       | where name =~ nu_plugin
       | each {|plugin|
           print $'Registering ($plugin.name)'
-          nu -c $'register ($plugin.name)'
+          if $useRegister {
+            nu -c $'register ($plugin.name)'
+          } else {
+            nu -c $'plugin add ($plugin.name)'
+          }
       }
   }
 
