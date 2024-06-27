@@ -6,18 +6,20 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 - Fix release script of pushing release Tags
-- Fix plugin add for Nu after v0.93.0
+- Fix plugin register related issue
+
+### Features
+
+- `enable-plugins` could be set to a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`
 
 ### Miscellaneous Tasks
 
 - Remove older Nu versions from test workflow
-- Update README
 
 ### Deps
 
-- Upgrade @biomejs/biome,lefthook and @typescript-eslint/*
-- Upgrade @biomejs/biome, lefthook, typescript, etc.
-- Upgrade actions/checkout@v4.1.7
+- Upgrade `@biomejs/biome`,`lefthook`, `typescript` and `@typescript-eslint/*`
+- Upgrade to `actions/checkout@v4.1.7`
 
 ## [3.11] - 2024-05-29
 
