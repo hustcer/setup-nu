@@ -58,7 +58,7 @@ export interface Tool {
   /** Set this option to `true` if you want to check for the latest version. */
   checkLatest: boolean;
   /** Set this option to `true` if you want to register plugins. */
-  enablePlugins: boolean;
+  enablePlugins: string;
   /** A valid semantic version specifier for the tool. */
   versionSpec?: string;
   /** Feature set: default or full. */
