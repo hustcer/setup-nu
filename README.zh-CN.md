@@ -13,7 +13,7 @@
 在大多数情况下，你只需要在工作流程中通过 `version` 字段指定要使用的 Nushell 的版本即可。比如下面的例子将会安装 [Nushell](https://github.com/nushell/nushell) 的`v0.80`版本。然后你可以在后续步骤中配置你想运行的命令，最后别忘了设置`shell: nu {0}`以使命令被`nu`执行：
 
 ```yaml
-- uses: hustcer/setup-nu@v3.11
+- uses: hustcer/setup-nu@v3
   with:
     version: "0.90" # 不要使用 0.90, 它会被认为是一个浮点数并转换为 0.9, 你可以使用 v0.90/0.90.0 或者 '0.90'(加了引号变成字符串)
 - run: print $'Nu version info:(char nl)'; version
@@ -65,9 +65,9 @@ jobs:
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.11
+  uses: hustcer/setup-nu@v3
   with:
-    version: 0.93.0
+    version: 0.95.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -82,9 +82,9 @@ jobs:
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.11
+  uses: hustcer/setup-nu@v3
   with:
-    version: 0.93.0
+    version: 0.95.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -101,9 +101,9 @@ jobs:
 
 ```yaml
 - name: Setup nu@latest
-  uses: hustcer/setup-nu@v3.11
+  uses: hustcer/setup-nu@v3
   with:
-    version: 0.93.0
+    version: 0.95.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
@@ -128,7 +128,7 @@ jobs:
 `Nushell` 目前正处于活跃开发期，如果你想使用最新的特性也可以通过将版本设置为 `nightly` 获得，比如下面的例子：
 
 ```yaml
-- uses: hustcer/setup-nu@v3.11
+- uses: hustcer/setup-nu@v3
   with:
     version: nightly # Will download and setup the latest nightly version of Nushell
 - run: print $'Nu version info:(char nl)'; version
@@ -158,7 +158,7 @@ jobs:
 如果你想使用最新版本的 Nushell，你可以通过设置 `check-latest` 为 `true` 来做到（它与`version: '*'`配置的效果相同，但更易读）。例如，以下将会安装最新版本的 Nushell：
 
 ```yaml
-- uses: hustcer/setup-nu@v3.11
+- uses: hustcer/setup-nu@v3
   with:
     check-latest: true
 - run: print $'Nu version info:(char nl)'; version
@@ -172,7 +172,7 @@ jobs:
 | ---------------- | ---- | ------------------------------------------------------------------------------------------------------------------- | ------ | --------- |
 | `version`        | 否   | 合法的 NPM 风格的 semver 版本，such as `0.86.0` 也可以为`nightly`.                                                  | string | \*        |
 | `check-latest`   | 否   | 可以设置为 `true` 如果你想使用最新的 Nushell 版本                                                                   | bool   | false     |
-| `enable-plugins` | 否   | 可以设置为 `true` 如果你需要注册二进制包内的插件, 需要 Nu 版本 >= v0.69                                             | bool   | false     |
+| `enable-plugins` | 否   | 可以设置为 `true` 如果你需要注册二进制包内的插件或者逗号分隔的插件名称字符串：`nu_plugin_polars,nu_plugin_query`, 需要 Nu 版本 >= v0.69                                             | bool\|string   | false     |
 | `features`       | 否   | 可选项: `default`，`full`, 设置为 `full` 将包含 `extra` 和 `dataframe` 中的命令, `full` 仅支持 `Nu` `v0.86` ~ `v0.93`, 之后版本中默认版本将包含所有特性 | string | `default` |
 | `github-token`   | 否   | 你的 GitHub Token 或者 PAT token | string | `${{ github.token }}` |
 

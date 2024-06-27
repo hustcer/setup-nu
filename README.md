@@ -18,7 +18,7 @@ Then you can set the command you want to run in the following steps, and don't f
 to make the commands be executed by `nu`:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.11
+- uses: hustcer/setup-nu@v3
   with:
     version: "0.90" # Don't use 0.90 here, as it was a float number and will be convert to 0.9, you can use v0.90/0.90.0 or '0.90'
 - run: print $'Nu version info:(char nl)'; version
@@ -70,9 +70,9 @@ To use modules in `Nu`, please refer to the following examples:
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.11
+  uses: hustcer/setup-nu@v3
   with:
-    version: 0.93.0
+    version: 0.95.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -87,9 +87,9 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 
 ```yaml
 - name: Setup nu
-  uses: hustcer/setup-nu@v3.11
+  uses: hustcer/setup-nu@v3
   with:
-    version: 0.93.0
+    version: 0.95.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -106,9 +106,9 @@ Again, the nu version should be equal to or above `0.69`.
 
 ```yaml
 - name: Setup nu@latest
-  uses: hustcer/setup-nu@v3.11
+  uses: hustcer/setup-nu@v3
   with:
-    version: 0.93.0
+    version: 0.95.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
@@ -133,7 +133,7 @@ They are not perfect yet, but they do work. BTW: Please tell me if you found a b
 `Nushell` is currently in active development, if you want to use the latest features it's also available by set the version to `nightly`, just as below:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.11
+- uses: hustcer/setup-nu@v3
   with:
     version: nightly # Will download and setup the latest nightly version of Nushell
 - run: print $'Nu version info:(char nl)'; version
@@ -165,7 +165,7 @@ If you want to use the latest version of nushell you can specify this by set `ch
 the latest version:
 
 ```yaml
-- uses: hustcer/setup-nu@v3.11
+- uses: hustcer/setup-nu@v3
   with:
     check-latest: true
 - run: print $'Nu version info:(char nl)'; version
@@ -179,7 +179,7 @@ the latest version:
 | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------- |
 | `version`        | no       | A valid NPM-style semver specification, such as `0.86.0`, etc. and `nightly`.                                                                                 | string | \*        |
 | `check-latest`   | no       | Set to `true` if you want to use the latest version                                                                                                           | bool   | false     |
-| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins, Nu v0.69 and above is required                                                                     | bool   | false     |
+| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`, Nu v0.69 and above is required                                                                     | bool\|string   | false     |
 | `features`       | no       | Available choice: `default` or `full`, and the `full` features will include the commands from `extra` and `dataframe`. `full` can be used for `Nu` from `v0.86` to `v0.93` and was removed after `v0.93.1` | string | `default` |
 | `github-token`   | no       | Your GitHub token or PAT token | string | `${{ github.token }}` |
 
