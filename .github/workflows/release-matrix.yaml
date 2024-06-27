@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4.1.7
     - name: Setup nu@${{matrix.ver}}
-      uses: hustcer/setup-nu@v3.11
+      uses: hustcer/setup-nu@v3
       with:
         enable-plugins: false
         version: ${{matrix.ver}}
