@@ -8,13 +8,14 @@ import semver from 'semver';
 import * as core from '@actions/core';
 
 import * as setup from './setup';
+import { registerPlugins } from './plugins';
 
 async function main() {
   try {
     const versionSpec = core.getInput('version');
     console.log(`versionSpec: ${versionSpec}`);
     const checkLatest = (core.getInput('check-latest') || 'false').toUpperCase() === 'TRUE';
-    const enablePlugins = (core.getInput('enable-plugins') || 'false').toUpperCase() === 'TRUE';
+    const enablePlugins = (core.getInput('enable-plugins') || 'false').toLowerCase();
     const features = core.getInput('features') || 'default';
     const githubToken = core.getInput('github-token');
     const version = ['*', 'nightly'].includes(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
@@ -35,12 +36,13 @@ async function main() {
       name: version === 'nightly' ? 'nightly' : 'nushell',
     });
     core.addPath(tool.dir);
-    core.info(`Successfully setup Nu ${tool.version}, with ${features} features.}`);
+    // version: * --> 0.95.0; nightly --> nightly-56ed69a; 0.95 --> 0.95.0
+    core.info(`Successfully setup Nu ${tool.version}, with ${features} features.`);
 
-    if (enablePlugins) {
-      console.log('Running ./nu/register-plugins.nu to register plugins...');
-      shell.exec(`nu ./nu/register-plugins.nu ${tool.version}`);
-    }
+    // Change to workspace directory so that the register-plugins.nu script can be found.
+    shell.cd(process.env.GITHUB_WORKSPACE);
+    console.log(`Current directory: ${process.cwd()}`);
+    registerPlugins(enablePlugins, tool.version);
   } catch (err) {
     core.setFailed(err.message);
   }
