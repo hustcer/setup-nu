@@ -1,6 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.12] - 2024-06-27
+
+### Bug Fixes
+
+- Fix release script of pushing release Tags
+- Fix plugin add for Nu after v0.93.0
+
+### Miscellaneous Tasks
+
+- Remove older Nu versions from test workflow
+- Update README
+
+### Deps
+
+- Upgrade @biomejs/biome,lefthook and @typescript-eslint/*
+- Upgrade @biomejs/biome, lefthook, typescript, etc.
+- Upgrade actions/checkout@v4.1.7
+
 ## [3.11] - 2024-05-29
 
 ### Bug Fixes
