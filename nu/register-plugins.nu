@@ -4,36 +4,42 @@
 #   1. https://github.com/actions/runner-images/blob/main/images/win/Windows2022-Readme.md
 
 # Config files are needed to avoid plugin register failure.
-# The following lines were used to fix `× Plugin failed to load: No such file or directory (os error 2)`
-
-use common.nu [is-lower-ver]
+# The following lines were used to fix "× Plugin failed to load: No such file or directory (os error 2)"
 
 def main [
-  version: string,  # The tag name or version of the release to use.
+  enablePlugins: string,  # Whether to enable or disable plugins.
+  version: string,        # The tag name or version of the release to use.
+  --is-legacy,            # Whether to use the legacy plugin registration command for Nu 0.92.3 and below.
 ] {
 
-  let name = if $version =~ 'nightly' { 'nightly' } else { 'nushell' }
-  let useRegister = if $version =~ 'nightly' or $version == '*' or (is-lower-ver 0.92.3 $version) { false } else { true }
-  let config_path = ($nu.env-path | path dirname)
-  let config_prefix = $'https://github.com/nushell/($name)/blob/($version)/crates/nu-utils/src'
-  aria2c $'($config_prefix)/sample_config/default_env.nu' -o env.nu -d $config_path
-  aria2c $'($config_prefix)/sample_config/default_config.nu' -o config.nu -d $config_path
-  # config reset --without-backup
+  let useRegister = if $is_legacy { true } else { false }
+  let nuDir = (which nu | get 0.path | path dirname)
 
-  def register-plugins [] {
-    ls (which nu | get 0.path | path dirname)
-      | where name =~ nu_plugin
-      | each {|plugin|
-          print $'Registering ($plugin.name)'
-          if $useRegister {
-            nu -c $'register ($plugin.name)'
-          } else {
-            nu -c $'plugin add ($plugin.name)'
-          }
+  print 'Output of (which nu):'
+  print (which nu)
+  print 'Directory contents:'
+  ls $nuDir | print
+
+  # print $nu
+  # Create Nu config directory if it does not exist
+  if not ($nu.default-config-dir | path exists) { mkdir $nu.default-config-dir }
+  config env --default | save -f $nu.env-path
+  config nu --default | save -f $nu.config-path
+  # print (ls $nu.default-config-dir)
+
+  let allPlugins = ls $nuDir | where name =~ nu_plugin
+  let filteredPlugins = if $enablePlugins == 'true' { $allPlugins } else {
+      $allPlugins | filter {|it| $enablePlugins =~ ($it.name | path basename | split row . | first)}
+    }
+
+  $filteredPlugins | each {|plugin|
+        let p = $plugin.name | str replace -a \ /
+        if $useRegister {
+          echo ([('print "' + $'Registering ($p)' + '"') $'register ($p)'] | str join "\n")
+        } else {
+          echo ([('print "' + $'Registering ($p)' + '"') $'plugin add ($p)'] | str join "\n")
+        }
       }
-  }
-
-  register-plugins
-  print $'(char nl)Plugins registered successfully for Nu ($version).'
+    | str join "\n"
+    | save -rf do-register.nu
 }
-

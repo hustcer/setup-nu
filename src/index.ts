@@ -42,7 +42,7 @@ async function main() {
     // Change to workspace directory so that the register-plugins.nu script can be found.
     shell.cd(process.env.GITHUB_WORKSPACE);
     console.log(`Current directory: ${process.cwd()}`);
-    registerPlugins(enablePlugins, tool.version);
+    await registerPlugins(enablePlugins, tool.version);
   } catch (err) {
     core.setFailed(err.message);
   }

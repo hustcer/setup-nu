@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 - Fix release script of pushing release Tags
-- Fix plugin register related issue
+- Fix plugin register related issue for all platforms
 
 ### Features
 

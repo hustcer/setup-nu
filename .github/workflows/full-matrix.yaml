@@ -6,6 +6,7 @@ on:
       - main
       - develop
       - release/*
+      - fix/plugins
     paths-ignore:
       - '**.md'
 
@@ -29,8 +30,11 @@ jobs:
       uses: hustcer/setup-nu@develop
       with:
         features: full
-        enable-plugins: true
         version: ${{matrix.ver}}
+        # Set to `true` will register all plugins
+        # enable-plugins: true
+        # You can also set to a comma-separated string of plugin names to register them
+        enable-plugins: nu_plugin_inc,nu_plugin_query
       env:
         ACTIONS_STEP_DEBUG: true
     - name: Show Nu Version
