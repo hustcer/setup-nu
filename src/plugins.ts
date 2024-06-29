@@ -21,6 +21,7 @@ def main [
 
   let useRegister = if $is_legacy { true } else { false }
   let nuDir = (which nu | get 0.path | path dirname)
+  print $'enablePlugins: ($enablePlugins) of Nu version: ($version)'
 
   print 'Output of (which nu):'
   print (which nu)
@@ -35,9 +36,14 @@ def main [
   # print (ls $nu.default-config-dir)
 
   let allPlugins = ls $nuDir | where name =~ nu_plugin
-  let filteredPlugins = if $enablePlugins == 'true' { $allPlugins } else {
+  let filteredPlugins = if $enablePlugins == "'true'" or $enablePlugins == 'true' {
+      $allPlugins
+    } else {
       $allPlugins | filter {|it| $enablePlugins =~ ($it.name | path basename | split row . | first)}
     }
+
+  print $'Filtered plugins:'
+  print $filteredPlugins
 
   $filteredPlugins | each {|plugin|
         let p = $plugin.name | str replace -a \ /
@@ -71,9 +77,9 @@ export async function registerPlugins(enablePlugins: string, version: string) {
   } else {
     shell.exec(`nu ${script} "'${enablePlugins}'" ${version}`);
   }
-  console.log('Contents of `do-register.nu`:\n');
-  const content = shell.cat('do-register.nu');
-  console.log(content.toString());
+  // console.log('Contents of `do-register.nu`:\n');
+  // const content = shell.cat('do-register.nu');
+  // console.log(content.toString());
   console.log('\nRegistering plugins...\n');
   shell.exec('nu do-register.nu');
   console.log(`Plugins registered successfully for Nu ${version}.`);

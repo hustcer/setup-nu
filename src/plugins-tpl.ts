@@ -27,9 +27,9 @@ export async function registerPlugins(enablePlugins: string, version: string) {
   } else {
     shell.exec(`nu ${script} "'${enablePlugins}'" ${version}`);
   }
-  console.log('Contents of `do-register.nu`:\n');
-  const content = shell.cat('do-register.nu');
-  console.log(content.toString());
+  // console.log('Contents of `do-register.nu`:\n');
+  // const content = shell.cat('do-register.nu');
+  // console.log(content.toString());
   console.log('\nRegistering plugins...\n');
   shell.exec('nu do-register.nu');
   console.log(`Plugins registered successfully for Nu ${version}.`);
