@@ -179,7 +179,7 @@ the latest version:
 | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------- |
 | `version`        | no       | A valid NPM-style semver specification, such as `0.86.0`, etc. and `nightly`.                                                                                 | string | \*        |
 | `check-latest`   | no       | Set to `true` if you want to use the latest version                                                                                                           | bool   | false     |
-| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`, Nu v0.69 and above is required                                                                     | bool\|string   | false     |
+| `enable-plugins` | no       | Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`, Nu v0.86 and above is required                                                                     | bool\|string   | false     |
 | `features`       | no       | Available choice: `default` or `full`, and the `full` features will include the commands from `extra` and `dataframe`. `full` can be used for `Nu` from `v0.86` to `v0.93` and was removed after `v0.93.1` | string | `default` |
 | `github-token`   | no       | Your GitHub token or PAT token | string | `${{ github.token }}` |
 
