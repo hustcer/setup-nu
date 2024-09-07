@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.13] - 2024-09-07
+
+### Features
+
+- Add `aarch64_linux` and `aarch64_windows` runners support
+
+### Deps
+
+- Upgrade @octokit/rest,globby,@biomejs/biome,lefthook, etc.
+- Upgrade semver,lefthook,@octokit/rest and @typescript-eslint/*
+
 ## [3.12] - 2024-06-27
 
 ### Bug Fixes
