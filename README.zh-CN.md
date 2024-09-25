@@ -44,7 +44,7 @@ jobs:
   basic-usage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4
       - uses: hustcer/setup-nu@main
         with:
           version: "*"
@@ -67,7 +67,7 @@ jobs:
 - name: Setup nu
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.95.0
+    version: 0.98.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -84,7 +84,7 @@ jobs:
 - name: Setup nu
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.95.0
+    version: 0.98.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -103,7 +103,7 @@ jobs:
 - name: Setup nu@latest
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.95.0
+    version: 0.98.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
