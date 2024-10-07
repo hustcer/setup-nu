@@ -16,8 +16,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.1.7
-    - uses: actions/setup-node@v4.0.2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: '20'
     - name: Build Setup Script
@@ -37,7 +37,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, ${{ matrix.crate.owner }}/${{ matrix.crate.name }})
     steps:
-    - uses: actions/checkout@v4.1.7
+    - uses: actions/checkout@v4
     - name: Setup ${{ matrix.crate.owner }}/${{ matrix.crate.name }}
       uses: ./
       with:
