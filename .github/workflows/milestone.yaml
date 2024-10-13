@@ -13,7 +13,7 @@ jobs:
     if: ${{github.event.pull_request.merged == true}}
 
     steps:
-      - uses: radcortez/milestone-set-action@main
+      - uses: hustcer/milestone-action@main
         name: milestone set
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
