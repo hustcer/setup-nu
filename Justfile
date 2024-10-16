@@ -58,7 +58,7 @@ fmt:
 lint:
   @$'(ansi g)Start `lint` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  pnpm eslint src/**/*.ts; \
+  pnpm biome lint src/**/*.ts; \
   $'(ansi g)The `lint` task finished!(ansi reset)(char nl)';
 
 # Build dist/index.js
