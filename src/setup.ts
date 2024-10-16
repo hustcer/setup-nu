@@ -3,13 +3,13 @@
  * Created: 2022/04/28 18:50:20
  */
 
-import * as path from 'path';
 import { globby } from 'globby';
 import * as semver from 'semver';
+import * as path from 'node:path';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import { Octokit } from '@octokit/rest';
-import { promises as fs, constants as fs_constants } from 'fs';
+import { promises as fs, constants as fs_constants } from 'node:fs';
 
 type Platform = 'darwin_x64' | 'darwin_arm64' | 'win32_x64' | 'win32_arm64' | 'linux_x64' | 'linux_arm64';
 
@@ -103,23 +103,27 @@ interface Release {
  * @param response the response to filter a release from with the given versionSpec.
  * @returns {Release[]} a single GitHub release.
  */
+// biome-ignore lint: Ignore
 function filterMatch(response: any, versionSpec: string | undefined, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
-  return response.data
-    .map((rel: { assets: any[]; tag_name: string }) => {
-      const asset = rel.assets.find((ass: { name: string | string[] }) =>
-        targets.some((target) => ass.name.includes(target))
-      );
-      if (asset) {
-        return {
-          version: rel.tag_name.replace(/^v/, ''),
-          downloadUrl: asset.browser_download_url,
-        };
-      }
-    })
-    .filter((rel: { version: string | semver.SemVer }) =>
-      rel && versionSpec ? semver.satisfies(rel.version, versionSpec) : true
-    );
+  return (
+    response.data
+      // biome-ignore lint: Ignore
+      .map((rel: { assets: any[]; tag_name: string }) => {
+        const asset = rel.assets.find((ass: { name: string | string[] }) =>
+          targets.some((target) => ass.name.includes(target))
+        );
+        if (asset) {
+          return {
+            version: rel.tag_name.replace(/^v/, ''),
+            downloadUrl: asset.browser_download_url,
+          };
+        }
+      })
+      .filter((rel: { version: string | semver.SemVer }) =>
+        rel && versionSpec ? semver.satisfies(rel.version, versionSpec) : true
+      )
+  );
 }
 
 /**
@@ -128,23 +132,27 @@ function filterMatch(response: any, versionSpec: string | undefined, features: '
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
+// biome-ignore lint: Ignore
 function filterLatest(response: any, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   const versions = response.data.map((r: { tag_name: string }) => r.tag_name);
   const latest = semver.rsort(versions)[0];
-  return response.data
-    .filter((rel: { tag_name: string | semver.SemVer | undefined }) => rel && rel.tag_name === latest)
-    .map((rel: { assets: any[]; tag_name: string }) => {
-      const asset = rel.assets.find((ass: { name: string | string[] }) =>
-        targets.some((target) => ass.name.includes(target))
-      );
-      if (asset) {
-        return {
-          version: rel.tag_name.replace(/^v/, ''),
-          downloadUrl: asset.browser_download_url,
-        };
-      }
-    });
+  return (
+    response.data
+      .filter((rel: { tag_name: string | semver.SemVer | undefined }) => rel && rel.tag_name === latest)
+      // biome-ignore lint: Ignore
+      .map((rel: { assets: any[]; tag_name: string }) => {
+        const asset = rel.assets.find((ass: { name: string | string[] }) =>
+          targets.some((target) => ass.name.includes(target))
+        );
+        if (asset) {
+          return {
+            version: rel.tag_name.replace(/^v/, ''),
+            downloadUrl: asset.browser_download_url,
+          };
+        }
+      })
+  );
 }
 
 /**
@@ -153,6 +161,7 @@ function filterLatest(response: any, features: 'default' | 'full'): Release[] {
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
+// biome-ignore lint: Ignore
 function filterLatestNightly(response: any, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   const publishedAt = response.data.map((r: { published_at: string }) => r.published_at);
@@ -160,19 +169,22 @@ function filterLatestNightly(response: any, features: 'default' | 'full'): Relea
   const latest = sortedDates[0];
   core.info(`Try to get latest nightly version published at: ${latest}`);
 
-  return response.data
-    .filter((rel: { published_at: string | Date }) => rel && rel.published_at === latest)
-    .map((rel: { assets: any[]; tag_name: string }) => {
-      const asset = rel.assets.find((ass: { name: string | string[] }) =>
-        targets.some((target) => ass.name.includes(target))
-      );
-      if (asset) {
-        return {
-          version: rel.tag_name.replace(/^v/, ''),
-          downloadUrl: asset.browser_download_url,
-        };
-      }
-    });
+  return (
+    response.data
+      .filter((rel: { published_at: string | Date }) => rel && rel.published_at === latest)
+      // biome-ignore lint: Ignore
+      .map((rel: { assets: any[]; tag_name: string }) => {
+        const asset = rel.assets.find((ass: { name: string | string[] }) =>
+          targets.some((target) => ass.name.includes(target))
+        );
+        if (asset) {
+          return {
+            version: rel.tag_name.replace(/^v/, ''),
+            downloadUrl: asset.browser_download_url,
+          };
+        }
+      })
+  );
 }
 
 /**
@@ -256,7 +268,7 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
     const artifact = await tc.downloadTool(downloadUrl);
     core.debug(`Successfully downloaded ${name} v${version}`);
 
-    let extractDir;
+    let extractDir: string;
     if (downloadUrl.endsWith('.zip')) {
       extractDir = await tc.extractZip(artifact);
     } else {

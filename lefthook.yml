@@ -27,7 +27,7 @@ pre-commit:
         - rebase
       stage_fixed: true
       glob: "*.{ts,tsx,js,jsx,es,cjs,mjs}"
-      run: pnpm eslint --cache --fix --no-error-on-unmatched-pattern {staged_files}
+      run: pnpm biome lint --fix {staged_files}
     fmt:
       skip:
         - merge

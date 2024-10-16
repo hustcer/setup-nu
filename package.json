@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "fmt": "biome format . --write",
-    "lint": "eslint **/*.ts",
+    "lint": "biome lint **/*.ts",
     "build": "rm -rf dist/ && ncc build src/index.ts --minify",
     "run": "pnpm run build && RUNNER_TOOL_CACHE=./runner/cache RUNNER_TEMP=./runner/temp node dist/index.js"
   },
@@ -33,10 +33,7 @@
     "@types/node": "^22.7.5",
     "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.15",
-    "@typescript-eslint/eslint-plugin": "^8.8.1",
-    "@typescript-eslint/parser": "^8.8.1",
     "@vercel/ncc": "^0.38.2",
-    "eslint": "^8.57.1",
     "lefthook": "^1.7.18",
     "semver": "^7.6.3",
     "typescript": "^5.6.3"

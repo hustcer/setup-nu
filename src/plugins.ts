@@ -1,6 +1,6 @@
 import shell from 'shelljs';
 import semver from 'semver';
-import { promises as fs, constants as fs_constants } from 'fs';
+import { promises as fs, constants as fs_constants } from 'node:fs';
 
 const nu = String.raw;
 
