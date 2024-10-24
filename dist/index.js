@@ -48,6 +48,7 @@ e.exports=runParallel;const r=A(5092);function runParallel(e,t){let A,s,n;let o=
 def main [
   enablePlugins: string,  # Whether to enable or disable plugins.
   version: string,        # The tag name or version of the release to use.
+  --debug,                # Whether to enable debug mode.
   --is-legacy,            # Whether to use the legacy plugin registration command for Nu 0.92.3 and below.
 ] {
 
@@ -55,10 +56,10 @@ def main [
   let nuDir = (which nu | get 0.path | path dirname)
   print $'enablePlugins: ($enablePlugins) of Nu version: ($version)'
 
-  print 'Output of (which nu):'
-  print (which nu)
-  print 'Directory contents:'
-  ls $nuDir | print
+  if $debug {
+    print 'Output of (which nu):'; print (which nu)
+    print 'Directory contents:'; ls $nuDir | print
+  }
 
   # print $nu
   # Create Nu config directory if it does not exist
@@ -74,8 +75,9 @@ def main [
       $allPlugins | filter {|it| $enablePlugins =~ ($it.name | path basename | split row . | first)}
     }
 
-  print $'Filtered plugins:'
-  print $filteredPlugins
+  if $debug {
+    print $'Filtered plugins:'; print $filteredPlugins
+  }
 
   $filteredPlugins | each {|plugin|
         let p = $plugin.name | str replace -a \ /
