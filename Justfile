@@ -84,11 +84,11 @@ outdated:
   ncu
 
 # Release a new version for `setup-nu`
-release updateLog=('false'):
+release *OPTIONS:
   @overlay use {{ join(SETUP_NU_PATH, 'nu', 'common.nu') }}; \
     overlay use {{ join(SETUP_NU_PATH, 'nu', 'release.nu') }}; \
     git-check --check-repo=1 {{SETUP_NU_PATH}}; \
-    make-release --update-log={{updateLog}}
+    make-release {{OPTIONS}}
 
 # Plugins need to be registered only once after nu v0.61
 _setup:

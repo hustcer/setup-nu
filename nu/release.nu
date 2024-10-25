@@ -11,7 +11,7 @@
 # Usage:
 #   Change `actionVer` in package.json and then run: `just release` OR `just release true`
 
-export def 'make-release' [
+export def make-release [
   --update-log(-u),   # Set to `true` do enable updating CHANGELOG.md
 ] {
 
