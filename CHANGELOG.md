@@ -1,6 +1,23 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.15] - 2024-10-25
+
+### Miscellaneous Tasks
+
+- Add milestone.yaml
+- Add more nu release to workflows
+- Simplify console output for plugin registering (#113)
+
+### Deps
+
+- Upgrade typescript,@vercel/ncc,biomejs and @typescript-eslint/*
+- Upgrade @actions/core to 1.11.1
+- Use actions/checkout@v4
+- Upgrade typescript and @typescript-eslint/* (#109)
+- Use biomejs instead of eslint for code linting (#111)
+- Upgrade @biomejs/biome and lefthook
+
 ## [3.13] - 2024-09-07
 
 ### Features
