@@ -13,7 +13,7 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 #### Basic
 
 In most cases you just need to specify the `version` of Nushell to be used in your workflow.
-For example the following installs the `v0.80` version of [Nushell](https://github.com/nushell/nushell).
+For example the following installs the `v0.90` version of [Nushell](https://github.com/nushell/nushell).
 Then you can set the command you want to run in the following steps, and don't forget to set `shell: nu {0}`
 to make the commands be executed by `nu`:
 
