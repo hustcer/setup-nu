@@ -5,7 +5,7 @@
 #
 # TODO:
 #   [√] Make sure the release tag does not exist;
-#   [√] Make sure there are no uncommit changes;
+#   [√] Make sure there are no uncommitted changes;
 #   [√] Update change log if required;
 #   [√] Create a release tag and push it to the remote repo;
 # Usage:
@@ -25,7 +25,7 @@ export def make-release [
   let majorTag = $releaseVer | split row '.' | first
   let statusCheck = (git status --porcelain)
   if not ($statusCheck | is-empty) {
-  	print $'You have uncommit changes, please commit them and try `release` again!(char nl)'
+  	print $'You have uncommitted changes, please commit them and try `release` again!(char nl)'
   	exit 5
   }
   if ($update_log) {
