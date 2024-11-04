@@ -218,7 +218,7 @@ async function getRelease(tool: Tool): Promise<Release> {
         if (features === 'full') {
           core.warning('The "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.');
         }
-        throw new Error(`No release for Nusehll matching version specifier ${versionSpec} of ${features} feature.`);
+        throw new Error(`No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`);
       }
       return release;
     });
