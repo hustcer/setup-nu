@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.16] - 2024-11-13
+
+### Miscellaneous Tasks
+
+- Fix some typos
+- Add `cspell` check hook for lefthook (#116)
+- Use `hustcer/milestone-action` to set milestone to merged PRs or closed issues automatically (#115)
+
+### Deps
+
+- Upgrade `cspell` and `lefthook` (#117)
+
 ## [3.15] - 2024-10-25
 
 ### Miscellaneous Tasks
