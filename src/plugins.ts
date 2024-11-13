@@ -58,6 +58,7 @@ def main [
     | str join "\n"
     | save -rf do-register.nu
 }
+
 `;
 
 export async function registerPlugins(enablePlugins: string, version: string) {
