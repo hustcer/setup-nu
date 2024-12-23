@@ -72,7 +72,7 @@ To use modules in `Nu`, please refer to the following examples:
 - name: Setup nu
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.98.0
+    version: 0.101.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -89,7 +89,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 - name: Setup nu
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.98.0
+    version: 0.101.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
@@ -108,7 +108,7 @@ Again, the nu version should be equal to or above `0.69`.
 - name: Setup nu@latest
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.98.0
+    version: 0.101.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Prepare Nu Modules
