@@ -38,6 +38,7 @@ function getTargets(features: 'default' | 'full'): string[] {
   const { arch, platform } = process;
   const selector = `${platform}_${arch}`;
 
+  core.info(`Try to get assets for Nu: arch = ${arch}, platform = ${platform}, feature = ${features}`);
   if (features === 'default') {
     return PLATFORM_DEFAULT_MAP[selector as Platform];
   }
