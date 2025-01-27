@@ -1,4 +1,4 @@
-name: Basic Develop Test
+name: Develop Test
 
 on:
   push:
@@ -30,3 +30,35 @@ jobs:
     - name: You can run bash commands, too
       run: pwd && ls -la
       shell: bash
+
+  test-dev-matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, setup-nu@latest-dev)
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup nu@latest
+      uses: hustcer/setup-nu@develop
+      with:
+        check-latest: true
+        enable-plugins: true
+      env:
+        ACTIONS_STEP_DEBUG: true
+    - name: You can run bash commands, too
+      run: pwd && ls -la
+      shell: bash
+    - name: Default shell will be `nu`
+      run: |
+        print $'Nu version info:(char nl)'; print (version)
+        print $'Current env:(char nl)'; print $env
+        print 'Current NU_LIB_DIRS:'
+        print $env.NU_LIB_DIRS
+        print $'Nu path:(which nu)(char nl)'
+        print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
+        def greeting [name: string] {
+          print $'Hello ($name)'
+        }
+        greeting hustcer
