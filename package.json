@@ -23,19 +23,19 @@
   "homepage": "https://github.com/hustcer/setup-nu#readme",
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@actions/tool-cache": "^2.0.1",
+    "@actions/tool-cache": "^2.0.2",
     "@octokit/rest": "^21.1.0",
     "globby": "^14.0.2",
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.10.10",
     "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.15",
     "@vercel/ncc": "^0.38.3",
-    "cspell": "^8.17.1",
-    "lefthook": "^1.10.1",
+    "cspell": "^8.17.2",
+    "lefthook": "^1.10.10",
     "semver": "^7.6.3",
     "typescript": "^5.7.3"
   }
