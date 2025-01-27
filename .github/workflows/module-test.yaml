@@ -33,6 +33,12 @@ jobs:
         ACTIONS_STEP_DEBUG: true
     - name: Show Nu Version
       run: print $'Nu version info:(char nl)'; print (version)
+    - name: Use Your Nu Modules by NU_LIB_DIRS Constant
+      run: |
+        const NU_LIB_DIRS = [ ${{ github.workspace }}/nu ]
+        use module.nu *
+        print 'Use module by NU_LIB_DIRS Constant'
+        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
     - name: Use Your Nu Modules
       run: |
         nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
