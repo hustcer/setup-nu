@@ -22,7 +22,7 @@ jobs:
     - name: Build Setup Script
       run: |
         npm i -g pnpm
-        pnpm i --registry=https://registry.npmmirror.com
+        pnpm i
         pnpm run lint
         pnpm run build
 
