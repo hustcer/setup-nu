@@ -1,6 +1,6 @@
 # setup-nu
 
-[![`main`分支测试](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml)
+[![`main`分支测试](https://github.com/hustcer/setup-nu/actions/workflows/main-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/main-matrix.yaml)
 
 此 GitHub Action 将为您配置 [Nushell](https://github.com/nushell/nushell) 运行环境。
 
@@ -151,9 +151,8 @@ jobs:
 
 或者你也可以查看下面几个例子：
 
-1. [run-test.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml)
-2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/latest-matrix.yaml)
-3. 进阶使用: 看看 Nushell 是如何发版的吧 [工作流](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [脚本](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
+1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
+2. 进阶使用: 看看 Nushell 是如何发版的吧 [工作流](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [脚本](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
 如果你想使用最新版本的 Nushell，你可以通过设置 `check-latest` 为 `true` 来做到（它与`version: '*'`配置的效果相同，但更易读）。例如，以下将会安装最新版本的 Nushell：
 

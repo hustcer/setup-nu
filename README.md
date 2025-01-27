@@ -2,7 +2,7 @@
 
 [中文说明](README.zh-CN.md)
 
-[![Latest Main Check](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/latest-matrix.yaml)
+[![Latest Main Check](https://github.com/hustcer/setup-nu/actions/workflows/main-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/main-matrix.yaml)
 
 This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) environment for you.
 
@@ -156,9 +156,8 @@ They are not perfect yet, but they do work. BTW: Please tell me if you found a b
 
 Or, check the following examples:
 
-1. [run-test.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/run-test.yaml)
-2. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/latest-matrix.yaml)
-3. Advanced example: How Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
+1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
+2. Advanced example: How Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
 If you want to use the latest version of nushell you can specify this by set `check-latest` to
 `true`(it's the same as `version: '*'`, but more readable). For example the following installs
