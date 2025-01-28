@@ -66,7 +66,23 @@ jobs:
 
 To use modules in `Nu`, please refer to the following examples:
 
-1. Use Nu modules in `nu -c`
+1. Use Nu modules by setting `NU_LIB_DIRS` constant:
+
+```yaml
+- name: Setup nu
+  uses: hustcer/setup-nu@v3
+  with:
+    version: 0.101.0
+- name: Use Your Nu Modules by NU_LIB_DIRS Constant
+  shell: nu {0}
+  run: |
+    const NU_LIB_DIRS = [ ${{ github.workspace }}/nu ]
+    use module.nu *
+    print 'Use module by NU_LIB_DIRS Constant'
+    print (get-env 'ABC-XYZ' 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
+```
+
+2. Use Nu modules in `nu -c`
 
 ```yaml
 - name: Setup nu
@@ -83,7 +99,7 @@ To use modules in `Nu`, please refer to the following examples:
 
 You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal to or above `0.69`.
 
-2. Use modules from absolute path
+3. Use modules from absolute path
 
 ```yaml
 - name: Setup nu
@@ -101,30 +117,6 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 ```
 
 Again, the nu version should be equal to or above `0.69`.
-
-3. Copy your modules to one of the default `$env.NU_LIB_DIRS`
-
-```yaml
-- name: Setup nu@latest
-  uses: hustcer/setup-nu@v3
-  with:
-    version: 0.101.0
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-- name: Prepare Nu Modules
-  shell: nu {0}
-  run: |
-    let LIB_DIR = [$nu.default-config-dir 'scripts'] | path join
-    if not ($LIB_DIR | path exists) { mkdir $LIB_DIR }
-    cp -r nu/* $LIB_DIR
-- name: Use Your Nu Modules
-  shell: nu {0}
-  run: |
-    use module.nu *
-    print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')
-```
-
-To make it work please make sure that the nu version should be equal to or above `0.85`.
 
 They are not perfect yet, but they do work. BTW: Please tell me if you found a better way and PRs are always welcomed.
 
