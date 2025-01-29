@@ -1,6 +1,26 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.17] - 2025-01-29
+
+**Celebrate Chinese New Year with our festive update!** 🐉✨
+
+May prosperity glow brighter and workflows soar higher! 🎇
+
+**Cheers to innovation, luck, and new beginnings!** 🧧🎉
+
+### Miscellaneous Tasks
+
+- Cleanup Github workflows (#119)
+- Add `ubuntu-22.04-arm` runner test (#122)
+- Add more debug info while setting up `nushell`
+- Add use Nu Modules by setting `NU_LIB_DIRS` constant example to README.md
+
+### Deps
+
+- Upgrade `@vercel/ncc`, `lefthook` and `typescript`
+- Upgrade `cspell`, `@octokit/rest` and `@actions/tool-cache`
+
 ## [3.16] - 2024-11-13
 
 ### Miscellaneous Tasks
