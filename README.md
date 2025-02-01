@@ -12,10 +12,9 @@ This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) en
 
 #### Basic
 
-In most cases you just need to specify the `version` of Nushell to be used in your workflow.
-For example the following installs the `v0.90` version of [Nushell](https://github.com/nushell/nushell).
-Then you can set the command you want to run in the following steps, and don't forget to set `shell: nu {0}`
-to make the commands be executed by `nu`:
+In most cases, you only need to specify the `version` of Nushell to be used in your workflow.
+For instance, the example below installs version `v0.90` of [Nushell](https://github.com/nushell/nushell).
+After that, you can define the commands to be executed in subsequent steps. Remember to set `shell: nu {0}` to ensure the commands are run using `nu`:
 
 ```yaml
 - uses: hustcer/setup-nu@v3
@@ -118,11 +117,11 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 
 Again, the nu version should be equal to or above `0.69`.
 
-They are not perfect yet, but they do work. BTW: Please tell me if you found a better way and PRs are always welcomed.
+They aren't perfect yet, but they do work. By the way, if you discover a better approach, feel free to let me know—PRs are always welcome!
 
 #### Use Nu Nightly Version
 
-`Nushell` is currently in active development, if you want to use the latest features it's also available by set the version to `nightly`, just as below:
+`Nushell` is actively being developed. If you'd like to try out the latest features, you can set the version to `nightly`, as shown below:
 
 ```yaml
 - uses: hustcer/setup-nu@v3
@@ -141,8 +140,9 @@ They are not perfect yet, but they do work. BTW: Please tell me if you found a b
 ```
 
 > **Warning**
-> Use `Nushell` nightly version with caution: The nu binary may change every other day and this may break your workflow.
-> Only the latest nightly version will be downloaded and setup, and the version must be `nightly`.
+> Use the `Nushell` nightly version with caution: The `nu` binary is subject to frequent changes,
+> which may disrupt your workflow. Only the latest nightly version will be downloaded and set up,
+> and the version requirement is `nightly`.
 
 #### Others
 
@@ -151,9 +151,9 @@ Or, check the following examples:
 1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
 2. Advanced example: How Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
-If you want to use the latest version of nushell you can specify this by set `check-latest` to
-`true`(it's the same as `version: '*'`, but more readable). For example the following installs
-the latest version:
+If you'd like to use the latest version of nushell, you can do so by setting `check-latest` to `true`
+(this is functionally identical to using `version: '*'`, but it's more readable). For example, the
+following command installs the latest version:
 
 ```yaml
 - uses: hustcer/setup-nu@v3
@@ -162,7 +162,7 @@ the latest version:
 - run: print $'Nu version info:(char nl)'; version
 ```
 
-**Note**: **Before Nushell reaches 1.0, each version may change a lot, it is recommend that you use a specified version instead**.
+**Note**: **As Nushell is still evolving toward version `1.0`, significant changes may occur with each release. It is recommended to use a specific version instead.**
 
 ### Inputs
 

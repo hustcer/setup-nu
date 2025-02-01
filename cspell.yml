@@ -15,7 +15,7 @@ words:
 - justfile
 - lefthook
 - linewise
-- Deepseek
+- DeepSeek
 - dataframe
 ignorePaths:
 - dist
