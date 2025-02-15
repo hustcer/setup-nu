@@ -24,19 +24,19 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/tool-cache": "^2.0.2",
-    "@octokit/rest": "^21.1.0",
+    "@octokit/rest": "^21.1.1",
     "globby": "^14.1.0",
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.13.0",
+    "@types/node": "^22.13.4",
     "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.15",
     "@vercel/ncc": "^0.38.3",
     "cspell": "^8.17.3",
     "lefthook": "^1.10.10",
-    "semver": "^7.7.0",
+    "semver": "^7.7.1",
     "typescript": "^5.7.3"
   }
 }
