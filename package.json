@@ -30,12 +30,12 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.13.4",
+    "@types/node": "^22.13.10",
     "@types/semver": "^7.5.8",
     "@types/shelljs": "^0.8.15",
     "@vercel/ncc": "^0.38.3",
-    "cspell": "^8.17.3",
-    "lefthook": "^1.11.0",
+    "cspell": "^8.17.5",
+    "lefthook": "^1.11.3",
     "semver": "^7.7.1",
     "typescript": "^5.8.2"
   }
