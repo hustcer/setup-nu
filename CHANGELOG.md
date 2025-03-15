@@ -1,6 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.18] - 2025-03-15
+
+### Documentation
+
+- Update README.md docs (#127)
+
+### Miscellaneous Tasks
+
+- Add AI code review by using `hustcer/deepseek-review`
+- Bump `@types/node` from 22.12.0 to 22.13.0 (#128)
+- Bump `globby` from 14.0.2 to 14.1.0 (#129)
+- Bump `lefthook` from 1.10.10 to 1.11.0 (#130)
+- Bump `typescript` from 5.7.3 to 5.8.2 (#131)
+- Bump `shelljs` from 0.8.5 to 0.9.1 (#132)
+- Rebuild setup scripts
+
+### Deps
+
+- Upgrade `cspell` and `semver` (#124)
+- Upgrade `semver`,`@octokit/rest` and `@types/node`
+- Upgrade `@types/node`,`cspell` and `lefthook`
+
 ## [3.17] - 2025-01-29
 
 **Celebrate Chinese New Year with our festive update!** 🐉✨
