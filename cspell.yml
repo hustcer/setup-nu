@@ -5,6 +5,7 @@
 
 words:
 - msvc
+- gstat
 - rsort
 - ECODE
 - endfor
