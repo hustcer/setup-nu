@@ -19,7 +19,7 @@ After that, you can define the commands to be executed in subsequent steps. Reme
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: "0.90" # Don't use 0.90 here, as it was a float number and will be convert to 0.9, you can use v0.90/0.90.0 or '0.90'
+    version: "0.90" # Don't use 0.90 here, as it would be a float number and would be converted to 0.9, you can use v0.90/0.90.0 or '0.90'
 - run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -34,7 +34,7 @@ After that, you can define the commands to be executed in subsequent steps. Reme
 
 #### Used as Default Shell
 
-Of cause, You can also set the default shell to `nu` by setting the `defaults.run.shell` config:
+Of course, you can also set the default shell to `nu` by setting the `defaults.run.shell` config:
 
 ```yaml
 name: basic
@@ -117,7 +117,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 
 Again, the nu version should be equal to or above `0.69`.
 
-They aren't perfect yet, but they do work. By the way, if you discover a better approach, feel free to let me know—PRs are always welcome!
+They aren't perfect yet, but they do work. By the way, if you discover a better approach, feel free to let me know — PRs are always welcome!
 
 #### Use Nu Nightly Version
 
