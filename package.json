@@ -26,16 +26,16 @@
     "@actions/tool-cache": "^2.0.2",
     "@octokit/rest": "^21.1.1",
     "globby": "^14.1.0",
-    "shelljs": "^0.9.1"
+    "shelljs": "^0.9.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.13.10",
-    "@types/semver": "^7.5.8",
+    "@types/node": "^22.13.14",
+    "@types/semver": "^7.7.0",
     "@types/shelljs": "^0.8.15",
     "@vercel/ncc": "^0.38.3",
-    "cspell": "^8.17.5",
-    "lefthook": "^1.11.3",
+    "cspell": "^8.18.1",
+    "lefthook": "^1.11.5",
     "semver": "^7.7.1",
     "typescript": "^5.8.2"
   }
