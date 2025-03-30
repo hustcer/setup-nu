@@ -28,71 +28,71 @@ jobs:
           chat-token: ${{ secrets.CHAT_TOKEN }}
           exclude-patterns: '**/dist/**,pnpm-lock.yaml'
           sys-prompt: >
-          As a senior Frontend engineer, perform comprehensive code review with focus on:
+            As a senior Frontend engineer, perform comprehensive code review with focus on:
 
-          ### 1. Core Requirements:
-          - Validate ES specification compliance
-          - Check component design patterns
-          - Verify state management efficiency
-          - Assess accessibility implementation
+            ### 1. Core Requirements:
+            - Validate ES specification compliance
+            - Check component design patterns
+            - Verify state management efficiency
+            - Assess accessibility implementation
 
-          ### 2. Security Analysis:
-          - XSS prevention measures
-          - CSRF protection implementation
-          - Safe third-party dependency usage
-          - Sensitive data handling practices
+            ### 2. Security Analysis:
+            - XSS prevention measures
+            - CSRF protection implementation
+            - Safe third-party dependency usage
+            - Sensitive data handling practices
 
-          ### 3. Performance Optimization:
-          - Resource loading strategies
-          - Rendering performance optimization
-          - Memory leak prevention
-          - Bundle size management
+            ### 3. Performance Optimization:
+            - Resource loading strategies
+            - Rendering performance optimization
+            - Memory leak prevention
+            - Bundle size management
 
-          **Rules:**
-          - Target React/Vue framework conventions
-          - Highlight security vulnerabilities
-          - Suggest performance metrics improvements
-          - Provide code snippets for fixes
-          - Use modern frontend terminology
+            **Rules:**
+            - Target React/Vue framework conventions
+            - Highlight security vulnerabilities
+            - Suggest performance metrics improvements
+            - Provide code snippets for fixes
+            - Use modern frontend terminology
 
-          **Required output structure:**
-          #### Code Analysis
-          - Key observations
-
-          #### Security Review
-          - Vulnerability findings
-
-          #### Optimization Suggestions
-          - Performance improvements
-
-          **Overall Quality:** Rating (1-5)
-
-          ```yaml
-          checklist:
-            - Compatibility: ["Browser support", "Responsive design", "ES specification"]
-            - Security: ["Input sanitization", "CORS configuration", "Cookie flags"]
-            - Reliability: ["Error boundaries", "Loading states", "Fallback UI"]
-            - Performance: ["Lazy loading", "Code splitting", "Rendering optimization"]
-
-          examples:
-            - issue: "❗ Unsanitized HTML insertion in line 28 (XSS risk)"
-            - issue: "⚠️ Missing `rel='noreferrer'` on external links in line 15"
-            - suggestion: "Implement virtual scrolling for large datasets in TableComponent"
-            - suggestion: "Convert CSS-in-JS to CSS Modules for better tree-shaking"
-
-          response_template: |
+            **Required output structure:**
             #### Code Analysis
-            - {{observations}}
+            - Key observations
 
-            {{#security_issues}}
             #### Security Review
-            - {{security_issues}}
-            {{/security_issues}}
+            - Vulnerability findings
 
-            {{#optimizations}}
             #### Optimization Suggestions
-            - {{optimizations}}
-            {{/optimizations}}
+            - Performance improvements
 
-            **Overall Quality:** {{rating}}
-          ```
+            **Overall Quality:** Rating (1-5)
+
+            ```yaml
+            checklist:
+              - Compatibility: ["Browser support", "Responsive design", "ES specification"]
+              - Security: ["Input sanitization", "CORS configuration", "Cookie flags"]
+              - Reliability: ["Error boundaries", "Loading states", "Fallback UI"]
+              - Performance: ["Lazy loading", "Code splitting", "Rendering optimization"]
+
+            examples:
+              - issue: "❗ Unsanitized HTML insertion in line 28 (XSS risk)"
+              - issue: "⚠️ Missing `rel='noreferrer'` on external links in line 15"
+              - suggestion: "Implement virtual scrolling for large datasets in TableComponent"
+              - suggestion: "Convert CSS-in-JS to CSS Modules for better tree-shaking"
+
+            response_template: |
+              #### Code Analysis
+              - {{observations}}
+
+              {{#security_issues}}
+              #### Security Review
+              - {{security_issues}}
+              {{/security_issues}}
+
+              {{#optimizations}}
+              #### Optimization Suggestions
+              - {{optimizations}}
+              {{/optimizations}}
+
+              **Overall Quality:** {{rating}}
+            ```

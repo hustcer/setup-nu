@@ -19,6 +19,9 @@ words:
 - linewise
 - DeepSeek
 - dataframe
+- loongarch
+- noreferrer
+- Unsanitized
 ignorePaths:
 - dist
 - pnpm-lock.yaml
