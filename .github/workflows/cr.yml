@@ -26,3 +26,4 @@ jobs:
         with:
           max-length: 10000
           chat-token: ${{ secrets.CHAT_TOKEN }}
+          exclude-patterns: '**/dist/**,pnpm-lock.yaml'
