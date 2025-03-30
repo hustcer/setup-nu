@@ -1,6 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.19] - 2025-03-30
+
+### Bug Fixes
+
+- Fix known security issues (#136)
+
+### Features
+
+- Add `latest-matrix.yaml` workflow to test latest Nu on various platform (#135)
+- Add `linux_riscv64` platform setup support (#137)
+- Add `linux_loong64` platform setup support (#138)
+
+### Miscellaneous Tasks
+
+- Update `exclude-patterns` for code review
+- Update code review prompt
+- Update `Nu` version in workflows and README files to 0.103 (#139)
+
+### Deps
+
+- Upgrade `shelljs`,`cspell` and `lefthook` (#134)
+
 ## [3.18] - 2025-03-15
 
 ### Documentation
