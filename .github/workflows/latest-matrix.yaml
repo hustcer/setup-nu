@@ -1,0 +1,40 @@
+name: Latest Nu Matrix Check
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - 'v*'
+    paths-ignore:
+      - '**.md'
+
+defaults:
+  run:
+    shell: nu {0}
+
+jobs:
+  test-matrix:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-22.04, ubuntu-22.04-arm, macos-13, macos-latest]
+        ver: [0.102.0]
+
+    runs-on: ${{ matrix.os }}
+    name: test (${{matrix.os}}, nu@${{matrix.ver}})
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup nu@${{matrix.ver}}
+      uses: hustcer/setup-nu@v3
+      with:
+        version: ${{matrix.ver}}
+        enable-plugins: nu_plugin_polars,nu_plugin_query,nu_plugin_inc,nu_plugin_gstat,nu_plugin_formats
+      env:
+        ACTIONS_STEP_DEBUG: true
+    - name: Show Nu Version
+      run: print $'Nu version info:(char nl)'; print (version)
+    - name: Show Nu Binary Path
+      run: print $'Nu path:(which nu)(char nl)'
+    - name: Show Nu Package Contents
+      run: print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
