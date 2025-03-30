@@ -9,6 +9,7 @@ words:
 - rsort
 - ECODE
 - riscv
+- loong
 - endfor
 - dotenv
 - nushell

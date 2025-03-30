@@ -11,6 +11,7 @@ import * as tc from '@actions/tool-cache';
 import { Octokit } from '@octokit/rest';
 import { promises as fs, constants as fs_constants } from 'node:fs';
 
+// REF: https://nodejs.org/api/process.html#processarch
 type Platform =
   | 'darwin_x64'
   | 'darwin_arm64'
@@ -18,6 +19,7 @@ type Platform =
   | 'win32_arm64'
   | 'linux_x64'
   | 'linux_arm64'
+  | 'linux_loong64'
   | 'linux_riscv64';
 
 const PLATFORM_DEFAULT_MAP: Record<Platform, string[]> = {
@@ -26,6 +28,7 @@ const PLATFORM_DEFAULT_MAP: Record<Platform, string[]> = {
   win32_x64: ['x86_64-pc-windows-msvc.zip', 'windows.zip'],
   win32_arm64: ['aarch64-pc-windows-msvc.zip'],
   linux_riscv64: ['riscv64gc-unknown-linux-gnu'],
+  linux_loong64: ['loongarch64-unknown-linux-gnu'],
   linux_arm64: ['aarch64-unknown-linux-musl', 'aarch64-unknown-linux-gnu'],
   linux_x64: ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'],
 };
@@ -37,6 +40,7 @@ const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
   win32_arm64: ['aarch64-windows-msvc-full.zip'],
   linux_arm64: ['aarch64-linux-gnu-full'],
   linux_riscv64: ['riscv64gc-unknown-linux-gnu-full'],
+  linux_loong64: ['loongarch64-unknown-linux-gnu-full'],
   linux_x64: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
 };
 
