@@ -38,5 +38,10 @@
     "lefthook": "^1.11.5",
     "semver": "^7.7.1",
     "typescript": "^5.8.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "undici@>=4.5.0 <5.28.5": ">=5.28.5"
+    }
   }
 }
