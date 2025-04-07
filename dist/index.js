@@ -55491,7 +55491,8 @@ function getRelease(tool) {
     return __awaiter(this, void 0, void 0, function* () {
         const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
         const isNightly = versionSpec === 'nightly';
-        const octokit = new rest_1.Octokit({ auth: tool.githubToken });
+        // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
+        const octokit = new rest_1.Octokit({ auth: tool.githubToken, baseUrl: 'https://api.github.com' });
         return octokit
             .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
             const nightlyReleases = isNightly ? filterLatestNightly(response, features) : [];
