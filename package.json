@@ -34,7 +34,7 @@
     "@types/semver": "^7.7.0",
     "@types/shelljs": "^0.8.15",
     "@vercel/ncc": "^0.38.3",
-    "cspell": "^8.18.1",
+    "cspell": "^8.19.2",
     "lefthook": "^1.11.5",
     "semver": "^7.7.1",
     "typescript": "^5.8.2"
