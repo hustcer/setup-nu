@@ -3234,7 +3234,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports._readLinuxVersionFile = exports._getOsVersion = exports._findMatch = void 0;
-const semver = __importStar(__nccwpck_require__(6423));
+const semver = __importStar(__nccwpck_require__(8804));
 const core_1 = __nccwpck_require__(9999);
 // needs to be require for core node modules to be mocked
 /* eslint @typescript-eslint/no-require-imports: 0 */
@@ -3472,7 +3472,7 @@ const mm = __importStar(__nccwpck_require__(679));
 const os = __importStar(__nccwpck_require__(857));
 const path = __importStar(__nccwpck_require__(6928));
 const httpm = __importStar(__nccwpck_require__(4016));
-const semver = __importStar(__nccwpck_require__(6423));
+const semver = __importStar(__nccwpck_require__(8804));
 const stream = __importStar(__nccwpck_require__(4584));
 const util = __importStar(__nccwpck_require__(9023));
 const assert_1 = __nccwpck_require__(2613);
@@ -5958,15 +5958,15 @@ exports.flatten = (...args) => {
 
 /***/ }),
 
-/***/ 7966:
+/***/ 4791:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 const cp = __nccwpck_require__(5317);
-const parse = __nccwpck_require__(7329);
-const enoent = __nccwpck_require__(9537);
+const parse = __nccwpck_require__(8000);
+const enoent = __nccwpck_require__(710);
 
 function spawn(command, args, options) {
     // Parse the arguments
@@ -6005,7 +6005,7 @@ module.exports._enoent = enoent;
 
 /***/ }),
 
-/***/ 9537:
+/***/ 710:
 /***/ ((module) => {
 
 "use strict";
@@ -6035,7 +6035,7 @@ function hookChildProcess(cp, parsed) {
         // the command exists and emit an "error" instead
         // See https://github.com/IndigoUnited/node-cross-spawn/issues/16
         if (name === 'exit') {
-            const err = verifyENOENT(arg1, parsed, 'spawn');
+            const err = verifyENOENT(arg1, parsed);
 
             if (err) {
                 return originalEmit.call(cp, 'error', err);
@@ -6072,25 +6072,20 @@ module.exports = {
 
 /***/ }),
 
-/***/ 7329:
+/***/ 8000:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 const path = __nccwpck_require__(6928);
-const niceTry = __nccwpck_require__(5847);
-const resolveCommand = __nccwpck_require__(2838);
-const escape = __nccwpck_require__(776);
-const readShebang = __nccwpck_require__(1787);
-const semver = __nccwpck_require__(2808);
+const resolveCommand = __nccwpck_require__(7311);
+const escape = __nccwpck_require__(7297);
+const readShebang = __nccwpck_require__(3724);
 
 const isWin = process.platform === 'win32';
 const isExecutableRegExp = /\.(?:com|exe)$/i;
 const isCmdShimRegExp = /node_modules[\\/].bin[\\/][^\\/]+\.cmd$/i;
-
-// `options.shell` is supported in Node ^4.8.0, ^5.7.0 and >= 6.0.0
-const supportsShellOption = niceTry(() => semver.satisfies(process.version, '^4.8.0 || ^5.7.0 || >= 6.0.0', true)) || false;
 
 function detectShebang(parsed) {
     parsed.file = resolveCommand(parsed);
@@ -6145,35 +6140,6 @@ function parseNonShell(parsed) {
     return parsed;
 }
 
-function parseShell(parsed) {
-    // If node supports the shell option, there's no need to mimic its behavior
-    if (supportsShellOption) {
-        return parsed;
-    }
-
-    // Mimic node shell option
-    // See https://github.com/nodejs/node/blob/b9f6a2dc059a1062776133f3d4fd848c4da7d150/lib/child_process.js#L335
-    const shellCommand = [parsed.command].concat(parsed.args).join(' ');
-
-    if (isWin) {
-        parsed.command = typeof parsed.options.shell === 'string' ? parsed.options.shell : process.env.comspec || 'cmd.exe';
-        parsed.args = ['/d', '/s', '/c', `"${shellCommand}"`];
-        parsed.options.windowsVerbatimArguments = true; // Tell node's spawn that the arguments are already escaped
-    } else {
-        if (typeof parsed.options.shell === 'string') {
-            parsed.command = parsed.options.shell;
-        } else if (process.platform === 'android') {
-            parsed.command = '/system/bin/sh';
-        } else {
-            parsed.command = '/bin/sh';
-        }
-
-        parsed.args = ['-c', shellCommand];
-    }
-
-    return parsed;
-}
-
 function parse(command, args, options) {
     // Normalize arguments, similar to nodejs
     if (args && !Array.isArray(args)) {
@@ -6197,7 +6163,7 @@ function parse(command, args, options) {
     };
 
     // Delegate further parsing to shell or non-shell
-    return options.shell ? parseShell(parsed) : parseNonShell(parsed);
+    return options.shell ? parsed : parseNonShell(parsed);
 }
 
 module.exports = parse;
@@ -6205,7 +6171,7 @@ module.exports = parse;
 
 /***/ }),
 
-/***/ 776:
+/***/ 7297:
 /***/ ((module) => {
 
 "use strict";
@@ -6260,28 +6226,19 @@ module.exports.argument = escapeArgument;
 
 /***/ }),
 
-/***/ 1787:
+/***/ 3724:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 const fs = __nccwpck_require__(9896);
-const shebangCommand = __nccwpck_require__(9557);
+const shebangCommand = __nccwpck_require__(4260);
 
 function readShebang(command) {
     // Read the first 150 bytes from the file
     const size = 150;
-    let buffer;
-
-    if (Buffer.alloc) {
-        // Node.js v4.5+ / v5.10+
-        buffer = Buffer.alloc(size);
-    } else {
-        // Old Node.js API
-        buffer = new Buffer(size);
-        buffer.fill(0); // zero-fill
-    }
+    const buffer = Buffer.alloc(size);
 
     let fd;
 
@@ -6300,21 +6257,22 @@ module.exports = readShebang;
 
 /***/ }),
 
-/***/ 2838:
+/***/ 7311:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 const path = __nccwpck_require__(6928);
-const which = __nccwpck_require__(5754);
-const pathKey = __nccwpck_require__(2287)();
+const which = __nccwpck_require__(7133);
+const getPathKey = __nccwpck_require__(7979);
 
 function resolveCommandAttempt(parsed, withoutPathExt) {
+    const env = parsed.options.env || process.env;
     const cwd = process.cwd();
     const hasCustomCwd = parsed.options.cwd != null;
     // Worker threads do not have process.chdir()
-    const shouldSwitchCwd = hasCustomCwd && process.chdir !== undefined;
+    const shouldSwitchCwd = hasCustomCwd && process.chdir !== undefined && !process.chdir.disabled;
 
     // If a custom `cwd` was specified, we need to change the process cwd
     // because `which` will do stat calls but does not support a custom cwd
@@ -6330,7 +6288,7 @@ function resolveCommandAttempt(parsed, withoutPathExt) {
 
     try {
         resolved = which.sync(parsed.command, {
-            path: (parsed.options.env || process.env)[pathKey],
+            path: env[getPathKey({ env })],
             pathExt: withoutPathExt ? path.delimiter : undefined,
         });
     } catch (e) {
@@ -6359,191 +6317,689 @@ module.exports = resolveCommand;
 
 /***/ }),
 
-/***/ 5859:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var once = __nccwpck_require__(8068);
-
-var noop = function() {};
-
-var isRequest = function(stream) {
-	return stream.setHeader && typeof stream.abort === 'function';
-};
-
-var isChildProcess = function(stream) {
-	return stream.stdio && Array.isArray(stream.stdio) && stream.stdio.length === 3
-};
-
-var eos = function(stream, opts, callback) {
-	if (typeof opts === 'function') return eos(stream, null, opts);
-	if (!opts) opts = {};
-
-	callback = once(callback || noop);
-
-	var ws = stream._writableState;
-	var rs = stream._readableState;
-	var readable = opts.readable || (opts.readable !== false && stream.readable);
-	var writable = opts.writable || (opts.writable !== false && stream.writable);
-	var cancelled = false;
-
-	var onlegacyfinish = function() {
-		if (!stream.writable) onfinish();
-	};
-
-	var onfinish = function() {
-		writable = false;
-		if (!readable) callback.call(stream);
-	};
-
-	var onend = function() {
-		readable = false;
-		if (!writable) callback.call(stream);
-	};
-
-	var onexit = function(exitCode) {
-		callback.call(stream, exitCode ? new Error('exited with error code: ' + exitCode) : null);
-	};
-
-	var onerror = function(err) {
-		callback.call(stream, err);
-	};
-
-	var onclose = function() {
-		process.nextTick(onclosenexttick);
-	};
-
-	var onclosenexttick = function() {
-		if (cancelled) return;
-		if (readable && !(rs && (rs.ended && !rs.destroyed))) return callback.call(stream, new Error('premature close'));
-		if (writable && !(ws && (ws.ended && !ws.destroyed))) return callback.call(stream, new Error('premature close'));
-	};
-
-	var onrequest = function() {
-		stream.req.on('finish', onfinish);
-	};
-
-	if (isRequest(stream)) {
-		stream.on('complete', onfinish);
-		stream.on('abort', onclose);
-		if (stream.req) onrequest();
-		else stream.on('request', onrequest);
-	} else if (writable && !ws) { // legacy streams
-		stream.on('end', onlegacyfinish);
-		stream.on('close', onlegacyfinish);
-	}
-
-	if (isChildProcess(stream)) stream.on('exit', onexit);
-
-	stream.on('end', onend);
-	stream.on('finish', onfinish);
-	if (opts.error !== false) stream.on('error', onerror);
-	stream.on('close', onclose);
-
-	return function() {
-		cancelled = true;
-		stream.removeListener('complete', onfinish);
-		stream.removeListener('abort', onclose);
-		stream.removeListener('request', onrequest);
-		if (stream.req) stream.req.removeListener('finish', onfinish);
-		stream.removeListener('end', onlegacyfinish);
-		stream.removeListener('close', onlegacyfinish);
-		stream.removeListener('finish', onfinish);
-		stream.removeListener('exit', onexit);
-		stream.removeListener('end', onend);
-		stream.removeListener('error', onerror);
-		stream.removeListener('close', onclose);
-	};
-};
-
-module.exports = eos;
-
-
-/***/ }),
-
-/***/ 5823:
+/***/ 2783:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 const path = __nccwpck_require__(6928);
 const childProcess = __nccwpck_require__(5317);
-const crossSpawn = __nccwpck_require__(7966);
-const stripEof = __nccwpck_require__(1717);
-const npmRunPath = __nccwpck_require__(530);
-const isStream = __nccwpck_require__(6156);
-const _getStream = __nccwpck_require__(2553);
-const pFinally = __nccwpck_require__(5491);
-const onExit = __nccwpck_require__(5620);
-const errname = __nccwpck_require__(9695);
-const stdio = __nccwpck_require__(2970);
+const crossSpawn = __nccwpck_require__(4791);
+const stripFinalNewline = __nccwpck_require__(192);
+const npmRunPath = __nccwpck_require__(5541);
+const onetime = __nccwpck_require__(602);
+const makeError = __nccwpck_require__(3341);
+const normalizeStdio = __nccwpck_require__(5546);
+const {spawnedKill, spawnedCancel, setupTimeout, validateTimeout, setExitHandler} = __nccwpck_require__(891);
+const {handleInput, getSpawnedResult, makeAllStream, validateInputSync} = __nccwpck_require__(8043);
+const {mergePromise, getSpawnedPromise} = __nccwpck_require__(1806);
+const {joinCommand, parseCommand, getEscapedCommand} = __nccwpck_require__(5486);
 
-const TEN_MEGABYTES = 1000 * 1000 * 10;
+const DEFAULT_MAX_BUFFER = 1000 * 1000 * 100;
 
-function handleArgs(cmd, args, opts) {
-	let parsed;
+const getEnv = ({env: envOption, extendEnv, preferLocal, localDir, execPath}) => {
+	const env = extendEnv ? {...process.env, ...envOption} : envOption;
 
-	opts = Object.assign({
-		extendEnv: true,
-		env: {}
-	}, opts);
-
-	if (opts.extendEnv) {
-		opts.env = Object.assign({}, process.env, opts.env);
+	if (preferLocal) {
+		return npmRunPath.env({env, cwd: localDir, execPath});
 	}
 
-	if (opts.__winShell === true) {
-		delete opts.__winShell;
-		parsed = {
-			command: cmd,
-			args,
-			options: opts,
-			file: cmd,
-			original: {
-				cmd,
-				args
-			}
-		};
-	} else {
-		parsed = crossSpawn._parse(cmd, args, opts);
-	}
+	return env;
+};
 
-	opts = Object.assign({
-		maxBuffer: TEN_MEGABYTES,
+const handleArguments = (file, args, options = {}) => {
+	const parsed = crossSpawn._parse(file, args, options);
+	file = parsed.command;
+	args = parsed.args;
+	options = parsed.options;
+
+	options = {
+		maxBuffer: DEFAULT_MAX_BUFFER,
 		buffer: true,
-		stripEof: true,
-		preferLocal: true,
-		localDir: parsed.options.cwd || process.cwd(),
+		stripFinalNewline: true,
+		extendEnv: true,
+		preferLocal: false,
+		localDir: options.cwd || process.cwd(),
+		execPath: process.execPath,
 		encoding: 'utf8',
 		reject: true,
-		cleanup: true
-	}, parsed.options);
+		cleanup: true,
+		all: false,
+		windowsHide: true,
+		...options
+	};
 
-	opts.stdio = stdio(opts);
+	options.env = getEnv(options);
 
-	if (opts.preferLocal) {
-		opts.env = npmRunPath.env(Object.assign({}, opts, {cwd: opts.localDir}));
-	}
+	options.stdio = normalizeStdio(options);
 
-	if (opts.detached) {
-		// #115
-		opts.cleanup = false;
-	}
-
-	if (process.platform === 'win32' && path.basename(parsed.command) === 'cmd.exe') {
+	if (process.platform === 'win32' && path.basename(file, '.exe') === 'cmd') {
 		// #116
-		parsed.args.unshift('/q');
+		args.unshift('/q');
+	}
+
+	return {file, args, options, parsed};
+};
+
+const handleOutput = (options, value, error) => {
+	if (typeof value !== 'string' && !Buffer.isBuffer(value)) {
+		// When `execa.sync()` errors, we normalize it to '' to mimic `execa()`
+		return error === undefined ? undefined : '';
+	}
+
+	if (options.stripFinalNewline) {
+		return stripFinalNewline(value);
+	}
+
+	return value;
+};
+
+const execa = (file, args, options) => {
+	const parsed = handleArguments(file, args, options);
+	const command = joinCommand(file, args);
+	const escapedCommand = getEscapedCommand(file, args);
+
+	validateTimeout(parsed.options);
+
+	let spawned;
+	try {
+		spawned = childProcess.spawn(parsed.file, parsed.args, parsed.options);
+	} catch (error) {
+		// Ensure the returned error is always both a promise and a child process
+		const dummySpawned = new childProcess.ChildProcess();
+		const errorPromise = Promise.reject(makeError({
+			error,
+			stdout: '',
+			stderr: '',
+			all: '',
+			command,
+			escapedCommand,
+			parsed,
+			timedOut: false,
+			isCanceled: false,
+			killed: false
+		}));
+		return mergePromise(dummySpawned, errorPromise);
+	}
+
+	const spawnedPromise = getSpawnedPromise(spawned);
+	const timedPromise = setupTimeout(spawned, parsed.options, spawnedPromise);
+	const processDone = setExitHandler(spawned, parsed.options, timedPromise);
+
+	const context = {isCanceled: false};
+
+	spawned.kill = spawnedKill.bind(null, spawned.kill.bind(spawned));
+	spawned.cancel = spawnedCancel.bind(null, spawned, context);
+
+	const handlePromise = async () => {
+		const [{error, exitCode, signal, timedOut}, stdoutResult, stderrResult, allResult] = await getSpawnedResult(spawned, parsed.options, processDone);
+		const stdout = handleOutput(parsed.options, stdoutResult);
+		const stderr = handleOutput(parsed.options, stderrResult);
+		const all = handleOutput(parsed.options, allResult);
+
+		if (error || exitCode !== 0 || signal !== null) {
+			const returnedError = makeError({
+				error,
+				exitCode,
+				signal,
+				stdout,
+				stderr,
+				all,
+				command,
+				escapedCommand,
+				parsed,
+				timedOut,
+				isCanceled: context.isCanceled,
+				killed: spawned.killed
+			});
+
+			if (!parsed.options.reject) {
+				return returnedError;
+			}
+
+			throw returnedError;
+		}
+
+		return {
+			command,
+			escapedCommand,
+			exitCode: 0,
+			stdout,
+			stderr,
+			all,
+			failed: false,
+			timedOut: false,
+			isCanceled: false,
+			killed: false
+		};
+	};
+
+	const handlePromiseOnce = onetime(handlePromise);
+
+	handleInput(spawned, parsed.options.input);
+
+	spawned.all = makeAllStream(spawned, parsed.options);
+
+	return mergePromise(spawned, handlePromiseOnce);
+};
+
+module.exports = execa;
+
+module.exports.sync = (file, args, options) => {
+	const parsed = handleArguments(file, args, options);
+	const command = joinCommand(file, args);
+	const escapedCommand = getEscapedCommand(file, args);
+
+	validateInputSync(parsed.options);
+
+	let result;
+	try {
+		result = childProcess.spawnSync(parsed.file, parsed.args, parsed.options);
+	} catch (error) {
+		throw makeError({
+			error,
+			stdout: '',
+			stderr: '',
+			all: '',
+			command,
+			escapedCommand,
+			parsed,
+			timedOut: false,
+			isCanceled: false,
+			killed: false
+		});
+	}
+
+	const stdout = handleOutput(parsed.options, result.stdout, result.error);
+	const stderr = handleOutput(parsed.options, result.stderr, result.error);
+
+	if (result.error || result.status !== 0 || result.signal !== null) {
+		const error = makeError({
+			stdout,
+			stderr,
+			error: result.error,
+			signal: result.signal,
+			exitCode: result.status,
+			command,
+			escapedCommand,
+			parsed,
+			timedOut: result.error && result.error.code === 'ETIMEDOUT',
+			isCanceled: false,
+			killed: result.signal !== null
+		});
+
+		if (!parsed.options.reject) {
+			return error;
+		}
+
+		throw error;
 	}
 
 	return {
-		cmd: parsed.command,
-		args: parsed.args,
-		opts,
-		parsed
+		command,
+		escapedCommand,
+		exitCode: 0,
+		stdout,
+		stderr,
+		failed: false,
+		timedOut: false,
+		isCanceled: false,
+		killed: false
 	};
-}
+};
 
-function handleInput(spawned, input) {
-	if (input === null || input === undefined) {
+module.exports.command = (command, options) => {
+	const [file, ...args] = parseCommand(command);
+	return execa(file, args, options);
+};
+
+module.exports.commandSync = (command, options) => {
+	const [file, ...args] = parseCommand(command);
+	return execa.sync(file, args, options);
+};
+
+module.exports.node = (scriptPath, args, options = {}) => {
+	if (args && !Array.isArray(args) && typeof args === 'object') {
+		options = args;
+		args = [];
+	}
+
+	const stdio = normalizeStdio.node(options);
+	const defaultExecArgv = process.execArgv.filter(arg => !arg.startsWith('--inspect'));
+
+	const {
+		nodePath = process.execPath,
+		nodeOptions = defaultExecArgv
+	} = options;
+
+	return execa(
+		nodePath,
+		[
+			...nodeOptions,
+			scriptPath,
+			...(Array.isArray(args) ? args : [])
+		],
+		{
+			...options,
+			stdin: undefined,
+			stdout: undefined,
+			stderr: undefined,
+			stdio,
+			shell: false
+		}
+	);
+};
+
+
+/***/ }),
+
+/***/ 5486:
+/***/ ((module) => {
+
+"use strict";
+
+const normalizeArgs = (file, args = []) => {
+	if (!Array.isArray(args)) {
+		return [file];
+	}
+
+	return [file, ...args];
+};
+
+const NO_ESCAPE_REGEXP = /^[\w.-]+$/;
+const DOUBLE_QUOTES_REGEXP = /"/g;
+
+const escapeArg = arg => {
+	if (typeof arg !== 'string' || NO_ESCAPE_REGEXP.test(arg)) {
+		return arg;
+	}
+
+	return `"${arg.replace(DOUBLE_QUOTES_REGEXP, '\\"')}"`;
+};
+
+const joinCommand = (file, args) => {
+	return normalizeArgs(file, args).join(' ');
+};
+
+const getEscapedCommand = (file, args) => {
+	return normalizeArgs(file, args).map(arg => escapeArg(arg)).join(' ');
+};
+
+const SPACES_REGEXP = / +/g;
+
+// Handle `execa.command()`
+const parseCommand = command => {
+	const tokens = [];
+	for (const token of command.trim().split(SPACES_REGEXP)) {
+		// Allow spaces to be escaped by a backslash if not meant as a delimiter
+		const previousToken = tokens[tokens.length - 1];
+		if (previousToken && previousToken.endsWith('\\')) {
+			// Merge previous token with current one
+			tokens[tokens.length - 1] = `${previousToken.slice(0, -1)} ${token}`;
+		} else {
+			tokens.push(token);
+		}
+	}
+
+	return tokens;
+};
+
+module.exports = {
+	joinCommand,
+	getEscapedCommand,
+	parseCommand
+};
+
+
+/***/ }),
+
+/***/ 3341:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+const {signalsByName} = __nccwpck_require__(272);
+
+const getErrorPrefix = ({timedOut, timeout, errorCode, signal, signalDescription, exitCode, isCanceled}) => {
+	if (timedOut) {
+		return `timed out after ${timeout} milliseconds`;
+	}
+
+	if (isCanceled) {
+		return 'was canceled';
+	}
+
+	if (errorCode !== undefined) {
+		return `failed with ${errorCode}`;
+	}
+
+	if (signal !== undefined) {
+		return `was killed with ${signal} (${signalDescription})`;
+	}
+
+	if (exitCode !== undefined) {
+		return `failed with exit code ${exitCode}`;
+	}
+
+	return 'failed';
+};
+
+const makeError = ({
+	stdout,
+	stderr,
+	all,
+	error,
+	signal,
+	exitCode,
+	command,
+	escapedCommand,
+	timedOut,
+	isCanceled,
+	killed,
+	parsed: {options: {timeout}}
+}) => {
+	// `signal` and `exitCode` emitted on `spawned.on('exit')` event can be `null`.
+	// We normalize them to `undefined`
+	exitCode = exitCode === null ? undefined : exitCode;
+	signal = signal === null ? undefined : signal;
+	const signalDescription = signal === undefined ? undefined : signalsByName[signal].description;
+
+	const errorCode = error && error.code;
+
+	const prefix = getErrorPrefix({timedOut, timeout, errorCode, signal, signalDescription, exitCode, isCanceled});
+	const execaMessage = `Command ${prefix}: ${command}`;
+	const isError = Object.prototype.toString.call(error) === '[object Error]';
+	const shortMessage = isError ? `${execaMessage}\n${error.message}` : execaMessage;
+	const message = [shortMessage, stderr, stdout].filter(Boolean).join('\n');
+
+	if (isError) {
+		error.originalMessage = error.message;
+		error.message = message;
+	} else {
+		error = new Error(message);
+	}
+
+	error.shortMessage = shortMessage;
+	error.command = command;
+	error.escapedCommand = escapedCommand;
+	error.exitCode = exitCode;
+	error.signal = signal;
+	error.signalDescription = signalDescription;
+	error.stdout = stdout;
+	error.stderr = stderr;
+
+	if (all !== undefined) {
+		error.all = all;
+	}
+
+	if ('bufferedData' in error) {
+		delete error.bufferedData;
+	}
+
+	error.failed = true;
+	error.timedOut = Boolean(timedOut);
+	error.isCanceled = isCanceled;
+	error.killed = killed && !timedOut;
+
+	return error;
+};
+
+module.exports = makeError;
+
+
+/***/ }),
+
+/***/ 891:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+const os = __nccwpck_require__(857);
+const onExit = __nccwpck_require__(5620);
+
+const DEFAULT_FORCE_KILL_TIMEOUT = 1000 * 5;
+
+// Monkey-patches `childProcess.kill()` to add `forceKillAfterTimeout` behavior
+const spawnedKill = (kill, signal = 'SIGTERM', options = {}) => {
+	const killResult = kill(signal);
+	setKillTimeout(kill, signal, options, killResult);
+	return killResult;
+};
+
+const setKillTimeout = (kill, signal, options, killResult) => {
+	if (!shouldForceKill(signal, options, killResult)) {
+		return;
+	}
+
+	const timeout = getForceKillAfterTimeout(options);
+	const t = setTimeout(() => {
+		kill('SIGKILL');
+	}, timeout);
+
+	// Guarded because there's no `.unref()` when `execa` is used in the renderer
+	// process in Electron. This cannot be tested since we don't run tests in
+	// Electron.
+	// istanbul ignore else
+	if (t.unref) {
+		t.unref();
+	}
+};
+
+const shouldForceKill = (signal, {forceKillAfterTimeout}, killResult) => {
+	return isSigterm(signal) && forceKillAfterTimeout !== false && killResult;
+};
+
+const isSigterm = signal => {
+	return signal === os.constants.signals.SIGTERM ||
+		(typeof signal === 'string' && signal.toUpperCase() === 'SIGTERM');
+};
+
+const getForceKillAfterTimeout = ({forceKillAfterTimeout = true}) => {
+	if (forceKillAfterTimeout === true) {
+		return DEFAULT_FORCE_KILL_TIMEOUT;
+	}
+
+	if (!Number.isFinite(forceKillAfterTimeout) || forceKillAfterTimeout < 0) {
+		throw new TypeError(`Expected the \`forceKillAfterTimeout\` option to be a non-negative integer, got \`${forceKillAfterTimeout}\` (${typeof forceKillAfterTimeout})`);
+	}
+
+	return forceKillAfterTimeout;
+};
+
+// `childProcess.cancel()`
+const spawnedCancel = (spawned, context) => {
+	const killResult = spawned.kill();
+
+	if (killResult) {
+		context.isCanceled = true;
+	}
+};
+
+const timeoutKill = (spawned, signal, reject) => {
+	spawned.kill(signal);
+	reject(Object.assign(new Error('Timed out'), {timedOut: true, signal}));
+};
+
+// `timeout` option handling
+const setupTimeout = (spawned, {timeout, killSignal = 'SIGTERM'}, spawnedPromise) => {
+	if (timeout === 0 || timeout === undefined) {
+		return spawnedPromise;
+	}
+
+	let timeoutId;
+	const timeoutPromise = new Promise((resolve, reject) => {
+		timeoutId = setTimeout(() => {
+			timeoutKill(spawned, killSignal, reject);
+		}, timeout);
+	});
+
+	const safeSpawnedPromise = spawnedPromise.finally(() => {
+		clearTimeout(timeoutId);
+	});
+
+	return Promise.race([timeoutPromise, safeSpawnedPromise]);
+};
+
+const validateTimeout = ({timeout}) => {
+	if (timeout !== undefined && (!Number.isFinite(timeout) || timeout < 0)) {
+		throw new TypeError(`Expected the \`timeout\` option to be a non-negative integer, got \`${timeout}\` (${typeof timeout})`);
+	}
+};
+
+// `cleanup` option handling
+const setExitHandler = async (spawned, {cleanup, detached}, timedPromise) => {
+	if (!cleanup || detached) {
+		return timedPromise;
+	}
+
+	const removeExitHandler = onExit(() => {
+		spawned.kill();
+	});
+
+	return timedPromise.finally(() => {
+		removeExitHandler();
+	});
+};
+
+module.exports = {
+	spawnedKill,
+	spawnedCancel,
+	setupTimeout,
+	validateTimeout,
+	setExitHandler
+};
+
+
+/***/ }),
+
+/***/ 1806:
+/***/ ((module) => {
+
+"use strict";
+
+
+const nativePromisePrototype = (async () => {})().constructor.prototype;
+const descriptors = ['then', 'catch', 'finally'].map(property => [
+	property,
+	Reflect.getOwnPropertyDescriptor(nativePromisePrototype, property)
+]);
+
+// The return value is a mixin of `childProcess` and `Promise`
+const mergePromise = (spawned, promise) => {
+	for (const [property, descriptor] of descriptors) {
+		// Starting the main `promise` is deferred to avoid consuming streams
+		const value = typeof promise === 'function' ?
+			(...args) => Reflect.apply(descriptor.value, promise(), args) :
+			descriptor.value.bind(promise);
+
+		Reflect.defineProperty(spawned, property, {...descriptor, value});
+	}
+
+	return spawned;
+};
+
+// Use promises instead of `child_process` events
+const getSpawnedPromise = spawned => {
+	return new Promise((resolve, reject) => {
+		spawned.on('exit', (exitCode, signal) => {
+			resolve({exitCode, signal});
+		});
+
+		spawned.on('error', error => {
+			reject(error);
+		});
+
+		if (spawned.stdin) {
+			spawned.stdin.on('error', error => {
+				reject(error);
+			});
+		}
+	});
+};
+
+module.exports = {
+	mergePromise,
+	getSpawnedPromise
+};
+
+
+
+/***/ }),
+
+/***/ 5546:
+/***/ ((module) => {
+
+"use strict";
+
+const aliases = ['stdin', 'stdout', 'stderr'];
+
+const hasAlias = options => aliases.some(alias => options[alias] !== undefined);
+
+const normalizeStdio = options => {
+	if (!options) {
+		return;
+	}
+
+	const {stdio} = options;
+
+	if (stdio === undefined) {
+		return aliases.map(alias => options[alias]);
+	}
+
+	if (hasAlias(options)) {
+		throw new Error(`It's not possible to provide \`stdio\` in combination with one of ${aliases.map(alias => `\`${alias}\``).join(', ')}`);
+	}
+
+	if (typeof stdio === 'string') {
+		return stdio;
+	}
+
+	if (!Array.isArray(stdio)) {
+		throw new TypeError(`Expected \`stdio\` to be of type \`string\` or \`Array\`, got \`${typeof stdio}\``);
+	}
+
+	const length = Math.max(stdio.length, aliases.length);
+	return Array.from({length}, (value, index) => stdio[index]);
+};
+
+module.exports = normalizeStdio;
+
+// `ipc` is pushed unless it is already present
+module.exports.node = options => {
+	const stdio = normalizeStdio(options);
+
+	if (stdio === 'ipc') {
+		return 'ipc';
+	}
+
+	if (stdio === undefined || typeof stdio === 'string') {
+		return [stdio, stdio, stdio, 'ipc'];
+	}
+
+	if (stdio.includes('ipc')) {
+		return stdio;
+	}
+
+	return [...stdio, 'ipc'];
+};
+
+
+/***/ }),
+
+/***/ 8043:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+const isStream = __nccwpck_require__(3187);
+const getStream = __nccwpck_require__(3123);
+const mergeStream = __nccwpck_require__(6072);
+
+// `input` option
+const handleInput = (spawned, input) => {
+	// Checking for stdin is workaround for https://github.com/nodejs/node/issues/26852
+	// @todo remove `|| spawned.stdin === undefined` once we drop support for Node.js <=12.2.0
+	if (input === undefined || spawned.stdin === undefined) {
 		return;
 	}
 
@@ -6552,375 +7008,85 @@ function handleInput(spawned, input) {
 	} else {
 		spawned.stdin.end(input);
 	}
-}
-
-function handleOutput(opts, val) {
-	if (val && opts.stripEof) {
-		val = stripEof(val);
-	}
-
-	return val;
-}
-
-function handleShell(fn, cmd, opts) {
-	let file = '/bin/sh';
-	let args = ['-c', cmd];
-
-	opts = Object.assign({}, opts);
-
-	if (process.platform === 'win32') {
-		opts.__winShell = true;
-		file = process.env.comspec || 'cmd.exe';
-		args = ['/s', '/c', `"${cmd}"`];
-		opts.windowsVerbatimArguments = true;
-	}
-
-	if (opts.shell) {
-		file = opts.shell;
-		delete opts.shell;
-	}
-
-	return fn(file, args, opts);
-}
-
-function getStream(process, stream, {encoding, buffer, maxBuffer}) {
-	if (!process[stream]) {
-		return null;
-	}
-
-	let ret;
-
-	if (!buffer) {
-		// TODO: Use `ret = util.promisify(stream.finished)(process[stream]);` when targeting Node.js 10
-		ret = new Promise((resolve, reject) => {
-			process[stream]
-				.once('end', resolve)
-				.once('error', reject);
-		});
-	} else if (encoding) {
-		ret = _getStream(process[stream], {
-			encoding,
-			maxBuffer
-		});
-	} else {
-		ret = _getStream.buffer(process[stream], {maxBuffer});
-	}
-
-	return ret.catch(err => {
-		err.stream = stream;
-		err.message = `${stream} ${err.message}`;
-		throw err;
-	});
-}
-
-function makeError(result, options) {
-	const {stdout, stderr} = result;
-
-	let err = result.error;
-	const {code, signal} = result;
-
-	const {parsed, joinedCmd} = options;
-	const timedOut = options.timedOut || false;
-
-	if (!err) {
-		let output = '';
-
-		if (Array.isArray(parsed.opts.stdio)) {
-			if (parsed.opts.stdio[2] !== 'inherit') {
-				output += output.length > 0 ? stderr : `\n${stderr}`;
-			}
-
-			if (parsed.opts.stdio[1] !== 'inherit') {
-				output += `\n${stdout}`;
-			}
-		} else if (parsed.opts.stdio !== 'inherit') {
-			output = `\n${stderr}${stdout}`;
-		}
-
-		err = new Error(`Command failed: ${joinedCmd}${output}`);
-		err.code = code < 0 ? errname(code) : code;
-	}
-
-	err.stdout = stdout;
-	err.stderr = stderr;
-	err.failed = true;
-	err.signal = signal || null;
-	err.cmd = joinedCmd;
-	err.timedOut = timedOut;
-
-	return err;
-}
-
-function joinCmd(cmd, args) {
-	let joinedCmd = cmd;
-
-	if (Array.isArray(args) && args.length > 0) {
-		joinedCmd += ' ' + args.join(' ');
-	}
-
-	return joinedCmd;
-}
-
-module.exports = (cmd, args, opts) => {
-	const parsed = handleArgs(cmd, args, opts);
-	const {encoding, buffer, maxBuffer} = parsed.opts;
-	const joinedCmd = joinCmd(cmd, args);
-
-	let spawned;
-	try {
-		spawned = childProcess.spawn(parsed.cmd, parsed.args, parsed.opts);
-	} catch (err) {
-		return Promise.reject(err);
-	}
-
-	let removeExitHandler;
-	if (parsed.opts.cleanup) {
-		removeExitHandler = onExit(() => {
-			spawned.kill();
-		});
-	}
-
-	let timeoutId = null;
-	let timedOut = false;
-
-	const cleanup = () => {
-		if (timeoutId) {
-			clearTimeout(timeoutId);
-			timeoutId = null;
-		}
-
-		if (removeExitHandler) {
-			removeExitHandler();
-		}
-	};
-
-	if (parsed.opts.timeout > 0) {
-		timeoutId = setTimeout(() => {
-			timeoutId = null;
-			timedOut = true;
-			spawned.kill(parsed.opts.killSignal);
-		}, parsed.opts.timeout);
-	}
-
-	const processDone = new Promise(resolve => {
-		spawned.on('exit', (code, signal) => {
-			cleanup();
-			resolve({code, signal});
-		});
-
-		spawned.on('error', err => {
-			cleanup();
-			resolve({error: err});
-		});
-
-		if (spawned.stdin) {
-			spawned.stdin.on('error', err => {
-				cleanup();
-				resolve({error: err});
-			});
-		}
-	});
-
-	function destroy() {
-		if (spawned.stdout) {
-			spawned.stdout.destroy();
-		}
-
-		if (spawned.stderr) {
-			spawned.stderr.destroy();
-		}
-	}
-
-	const handlePromise = () => pFinally(Promise.all([
-		processDone,
-		getStream(spawned, 'stdout', {encoding, buffer, maxBuffer}),
-		getStream(spawned, 'stderr', {encoding, buffer, maxBuffer})
-	]).then(arr => {
-		const result = arr[0];
-		result.stdout = arr[1];
-		result.stderr = arr[2];
-
-		if (result.error || result.code !== 0 || result.signal !== null) {
-			const err = makeError(result, {
-				joinedCmd,
-				parsed,
-				timedOut
-			});
-
-			// TODO: missing some timeout logic for killed
-			// https://github.com/nodejs/node/blob/master/lib/child_process.js#L203
-			// err.killed = spawned.killed || killed;
-			err.killed = err.killed || spawned.killed;
-
-			if (!parsed.opts.reject) {
-				return err;
-			}
-
-			throw err;
-		}
-
-		return {
-			stdout: handleOutput(parsed.opts, result.stdout),
-			stderr: handleOutput(parsed.opts, result.stderr),
-			code: 0,
-			failed: false,
-			killed: false,
-			signal: null,
-			cmd: joinedCmd,
-			timedOut: false
-		};
-	}), destroy);
-
-	crossSpawn._enoent.hookChildProcess(spawned, parsed.parsed);
-
-	handleInput(spawned, parsed.opts.input);
-
-	spawned.then = (onfulfilled, onrejected) => handlePromise().then(onfulfilled, onrejected);
-	spawned.catch = onrejected => handlePromise().catch(onrejected);
-
-	return spawned;
 };
 
-// TODO: set `stderr: 'ignore'` when that option is implemented
-module.exports.stdout = (...args) => module.exports(...args).then(x => x.stdout);
+// `all` interleaves `stdout` and `stderr`
+const makeAllStream = (spawned, {all}) => {
+	if (!all || (!spawned.stdout && !spawned.stderr)) {
+		return;
+	}
 
-// TODO: set `stdout: 'ignore'` when that option is implemented
-module.exports.stderr = (...args) => module.exports(...args).then(x => x.stderr);
+	const mixed = mergeStream();
 
-module.exports.shell = (cmd, opts) => handleShell(module.exports, cmd, opts);
+	if (spawned.stdout) {
+		mixed.add(spawned.stdout);
+	}
 
-module.exports.sync = (cmd, args, opts) => {
-	const parsed = handleArgs(cmd, args, opts);
-	const joinedCmd = joinCmd(cmd, args);
+	if (spawned.stderr) {
+		mixed.add(spawned.stderr);
+	}
 
-	if (isStream(parsed.opts.input)) {
+	return mixed;
+};
+
+// On failure, `result.stdout|stderr|all` should contain the currently buffered stream
+const getBufferedData = async (stream, streamPromise) => {
+	if (!stream) {
+		return;
+	}
+
+	stream.destroy();
+
+	try {
+		return await streamPromise;
+	} catch (error) {
+		return error.bufferedData;
+	}
+};
+
+const getStreamPromise = (stream, {encoding, buffer, maxBuffer}) => {
+	if (!stream || !buffer) {
+		return;
+	}
+
+	if (encoding) {
+		return getStream(stream, {encoding, maxBuffer});
+	}
+
+	return getStream.buffer(stream, {maxBuffer});
+};
+
+// Retrieve result of child process: exit code, signal, error, streams (stdout/stderr/all)
+const getSpawnedResult = async ({stdout, stderr, all}, {encoding, buffer, maxBuffer}, processDone) => {
+	const stdoutPromise = getStreamPromise(stdout, {encoding, buffer, maxBuffer});
+	const stderrPromise = getStreamPromise(stderr, {encoding, buffer, maxBuffer});
+	const allPromise = getStreamPromise(all, {encoding, buffer, maxBuffer: maxBuffer * 2});
+
+	try {
+		return await Promise.all([processDone, stdoutPromise, stderrPromise, allPromise]);
+	} catch (error) {
+		return Promise.all([
+			{error, signal: error.signal, timedOut: error.timedOut},
+			getBufferedData(stdout, stdoutPromise),
+			getBufferedData(stderr, stderrPromise),
+			getBufferedData(all, allPromise)
+		]);
+	}
+};
+
+const validateInputSync = ({input}) => {
+	if (isStream(input)) {
 		throw new TypeError('The `input` option cannot be a stream in sync mode');
 	}
-
-	const result = childProcess.spawnSync(parsed.cmd, parsed.args, parsed.opts);
-	result.code = result.status;
-
-	if (result.error || result.status !== 0 || result.signal !== null) {
-		const err = makeError(result, {
-			joinedCmd,
-			parsed
-		});
-
-		if (!parsed.opts.reject) {
-			return err;
-		}
-
-		throw err;
-	}
-
-	return {
-		stdout: handleOutput(parsed.opts, result.stdout),
-		stderr: handleOutput(parsed.opts, result.stderr),
-		code: 0,
-		failed: false,
-		signal: null,
-		cmd: joinedCmd,
-		timedOut: false
-	};
 };
 
-module.exports.shellSync = (cmd, opts) => handleShell(module.exports.sync, cmd, opts);
-
-
-/***/ }),
-
-/***/ 9695:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-// Older verions of Node.js might not have `util.getSystemErrorName()`.
-// In that case, fall back to a deprecated internal.
-const util = __nccwpck_require__(9023);
-
-let uv;
-
-if (typeof util.getSystemErrorName === 'function') {
-	module.exports = util.getSystemErrorName;
-} else {
-	try {
-		uv = process.binding('uv');
-
-		if (typeof uv.errname !== 'function') {
-			throw new TypeError('uv.errname is not a function');
-		}
-	} catch (err) {
-		console.error('execa/lib/errname: unable to establish process.binding(\'uv\')', err);
-		uv = null;
-	}
-
-	module.exports = code => errname(uv, code);
-}
-
-// Used for testing the fallback behavior
-module.exports.__test__ = errname;
-
-function errname(uv, code) {
-	if (uv) {
-		return uv.errname(code);
-	}
-
-	if (!(code < 0)) {
-		throw new Error('err >= 0');
-	}
-
-	return `Unknown system error ${code}`;
-}
-
-
-
-/***/ }),
-
-/***/ 2970:
-/***/ ((module) => {
-
-"use strict";
-
-const alias = ['stdin', 'stdout', 'stderr'];
-
-const hasAlias = opts => alias.some(x => Boolean(opts[x]));
-
-module.exports = opts => {
-	if (!opts) {
-		return null;
-	}
-
-	if (opts.stdio && hasAlias(opts)) {
-		throw new Error(`It's not possible to provide \`stdio\` in combination with one of ${alias.map(x => `\`${x}\``).join(', ')}`);
-	}
-
-	if (typeof opts.stdio === 'string') {
-		return opts.stdio;
-	}
-
-	const stdio = opts.stdio || [];
-
-	if (!Array.isArray(stdio)) {
-		throw new TypeError(`Expected \`stdio\` to be of type \`string\` or \`Array\`, got \`${typeof stdio}\``);
-	}
-
-	const result = [];
-	const len = Math.max(stdio.length, alias.length);
-
-	for (let i = 0; i < len; i++) {
-		let value = null;
-
-		if (stdio[i] !== undefined) {
-			value = stdio[i];
-		} else if (opts[alias[i]] !== undefined) {
-			value = opts[alias[i]];
-		}
-
-		result[i] = value;
-	}
-
-	return result;
+module.exports = {
+	handleInput,
+	makeAllStream,
+	getSpawnedResult,
+	validateInputSync
 };
+
 
 
 /***/ }),
@@ -8900,58 +9066,59 @@ module.exports = fill;
 
 /***/ }),
 
-/***/ 8656:
+/***/ 2030:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
-const {PassThrough} = __nccwpck_require__(4584);
+const {PassThrough: PassThroughStream} = __nccwpck_require__(4584);
 
 module.exports = options => {
-	options = Object.assign({}, options);
+	options = {...options};
 
 	const {array} = options;
 	let {encoding} = options;
-	const buffer = encoding === 'buffer';
+	const isBuffer = encoding === 'buffer';
 	let objectMode = false;
 
 	if (array) {
-		objectMode = !(encoding || buffer);
+		objectMode = !(encoding || isBuffer);
 	} else {
 		encoding = encoding || 'utf8';
 	}
 
-	if (buffer) {
+	if (isBuffer) {
 		encoding = null;
 	}
 
-	let len = 0;
-	const ret = [];
-	const stream = new PassThrough({objectMode});
+	const stream = new PassThroughStream({objectMode});
 
 	if (encoding) {
 		stream.setEncoding(encoding);
 	}
 
+	let length = 0;
+	const chunks = [];
+
 	stream.on('data', chunk => {
-		ret.push(chunk);
+		chunks.push(chunk);
 
 		if (objectMode) {
-			len = ret.length;
+			length = chunks.length;
 		} else {
-			len += chunk.length;
+			length += chunk.length;
 		}
 	});
 
 	stream.getBufferedValue = () => {
 		if (array) {
-			return ret;
+			return chunks;
 		}
 
-		return buffer ? Buffer.concat(ret, len) : ret.join('');
+		return isBuffer ? Buffer.concat(chunks, length) : chunks.join('');
 	};
 
-	stream.getBufferedLength = () => len;
+	stream.getBufferedLength = () => length;
 
 	return stream;
 };
@@ -8959,13 +9126,17 @@ module.exports = options => {
 
 /***/ }),
 
-/***/ 2553:
+/***/ 3123:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
-const pump = __nccwpck_require__(1653);
-const bufferStream = __nccwpck_require__(8656);
+const {constants: BufferConstants} = __nccwpck_require__(181);
+const stream = __nccwpck_require__(4584);
+const {promisify} = __nccwpck_require__(9023);
+const bufferStream = __nccwpck_require__(2030);
+
+const streamPipelinePromisified = promisify(stream.pipeline);
 
 class MaxBufferError extends Error {
 	constructor() {
@@ -8974,44 +9145,51 @@ class MaxBufferError extends Error {
 	}
 }
 
-function getStream(inputStream, options) {
+async function getStream(inputStream, options) {
 	if (!inputStream) {
-		return Promise.reject(new Error('Expected a stream'));
+		throw new Error('Expected a stream');
 	}
 
-	options = Object.assign({maxBuffer: Infinity}, options);
+	options = {
+		maxBuffer: Infinity,
+		...options
+	};
 
 	const {maxBuffer} = options;
+	const stream = bufferStream(options);
 
-	let stream;
-	return new Promise((resolve, reject) => {
+	await new Promise((resolve, reject) => {
 		const rejectPromise = error => {
-			if (error) { // A null check
+			// Don't retrieve an oversized buffer.
+			if (error && stream.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
 				error.bufferedData = stream.getBufferedValue();
 			}
+
 			reject(error);
 		};
 
-		stream = pump(inputStream, bufferStream(options), error => {
-			if (error) {
+		(async () => {
+			try {
+				await streamPipelinePromisified(inputStream, stream);
+				resolve();
+			} catch (error) {
 				rejectPromise(error);
-				return;
 			}
-
-			resolve();
-		});
+		})();
 
 		stream.on('data', () => {
 			if (stream.getBufferedLength() > maxBuffer) {
 				rejectPromise(new MaxBufferError());
 			}
 		});
-	}).then(() => stream.getBufferedValue());
+	});
+
+	return stream.getBufferedValue();
 }
 
 module.exports = getStream;
-module.exports.buffer = (stream, options) => getStream(stream, Object.assign({}, options, {encoding: 'buffer'}));
-module.exports.array = (stream, options) => getStream(stream, Object.assign({}, options, {array: true}));
+module.exports.buffer = (stream, options) => getStream(stream, {...options, encoding: 'buffer'});
+module.exports.array = (stream, options) => getStream(stream, {...options, array: true});
 module.exports.MaxBufferError = MaxBufferError;
 
 
@@ -9064,6 +9242,432 @@ module.exports = function globParent(str, opts) {
   return str.replace(escaped, '$1');
 };
 
+
+/***/ }),
+
+/***/ 4614:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", ({value:true}));exports.SIGNALS=void 0;
+
+const SIGNALS=[
+{
+name:"SIGHUP",
+number:1,
+action:"terminate",
+description:"Terminal closed",
+standard:"posix"},
+
+{
+name:"SIGINT",
+number:2,
+action:"terminate",
+description:"User interruption with CTRL-C",
+standard:"ansi"},
+
+{
+name:"SIGQUIT",
+number:3,
+action:"core",
+description:"User interruption with CTRL-\\",
+standard:"posix"},
+
+{
+name:"SIGILL",
+number:4,
+action:"core",
+description:"Invalid machine instruction",
+standard:"ansi"},
+
+{
+name:"SIGTRAP",
+number:5,
+action:"core",
+description:"Debugger breakpoint",
+standard:"posix"},
+
+{
+name:"SIGABRT",
+number:6,
+action:"core",
+description:"Aborted",
+standard:"ansi"},
+
+{
+name:"SIGIOT",
+number:6,
+action:"core",
+description:"Aborted",
+standard:"bsd"},
+
+{
+name:"SIGBUS",
+number:7,
+action:"core",
+description:
+"Bus error due to misaligned, non-existing address or paging error",
+standard:"bsd"},
+
+{
+name:"SIGEMT",
+number:7,
+action:"terminate",
+description:"Command should be emulated but is not implemented",
+standard:"other"},
+
+{
+name:"SIGFPE",
+number:8,
+action:"core",
+description:"Floating point arithmetic error",
+standard:"ansi"},
+
+{
+name:"SIGKILL",
+number:9,
+action:"terminate",
+description:"Forced termination",
+standard:"posix",
+forced:true},
+
+{
+name:"SIGUSR1",
+number:10,
+action:"terminate",
+description:"Application-specific signal",
+standard:"posix"},
+
+{
+name:"SIGSEGV",
+number:11,
+action:"core",
+description:"Segmentation fault",
+standard:"ansi"},
+
+{
+name:"SIGUSR2",
+number:12,
+action:"terminate",
+description:"Application-specific signal",
+standard:"posix"},
+
+{
+name:"SIGPIPE",
+number:13,
+action:"terminate",
+description:"Broken pipe or socket",
+standard:"posix"},
+
+{
+name:"SIGALRM",
+number:14,
+action:"terminate",
+description:"Timeout or timer",
+standard:"posix"},
+
+{
+name:"SIGTERM",
+number:15,
+action:"terminate",
+description:"Termination",
+standard:"ansi"},
+
+{
+name:"SIGSTKFLT",
+number:16,
+action:"terminate",
+description:"Stack is empty or overflowed",
+standard:"other"},
+
+{
+name:"SIGCHLD",
+number:17,
+action:"ignore",
+description:"Child process terminated, paused or unpaused",
+standard:"posix"},
+
+{
+name:"SIGCLD",
+number:17,
+action:"ignore",
+description:"Child process terminated, paused or unpaused",
+standard:"other"},
+
+{
+name:"SIGCONT",
+number:18,
+action:"unpause",
+description:"Unpaused",
+standard:"posix",
+forced:true},
+
+{
+name:"SIGSTOP",
+number:19,
+action:"pause",
+description:"Paused",
+standard:"posix",
+forced:true},
+
+{
+name:"SIGTSTP",
+number:20,
+action:"pause",
+description:"Paused using CTRL-Z or \"suspend\"",
+standard:"posix"},
+
+{
+name:"SIGTTIN",
+number:21,
+action:"pause",
+description:"Background process cannot read terminal input",
+standard:"posix"},
+
+{
+name:"SIGBREAK",
+number:21,
+action:"terminate",
+description:"User interruption with CTRL-BREAK",
+standard:"other"},
+
+{
+name:"SIGTTOU",
+number:22,
+action:"pause",
+description:"Background process cannot write to terminal output",
+standard:"posix"},
+
+{
+name:"SIGURG",
+number:23,
+action:"ignore",
+description:"Socket received out-of-band data",
+standard:"bsd"},
+
+{
+name:"SIGXCPU",
+number:24,
+action:"core",
+description:"Process timed out",
+standard:"bsd"},
+
+{
+name:"SIGXFSZ",
+number:25,
+action:"core",
+description:"File too big",
+standard:"bsd"},
+
+{
+name:"SIGVTALRM",
+number:26,
+action:"terminate",
+description:"Timeout or timer",
+standard:"bsd"},
+
+{
+name:"SIGPROF",
+number:27,
+action:"terminate",
+description:"Timeout or timer",
+standard:"bsd"},
+
+{
+name:"SIGWINCH",
+number:28,
+action:"ignore",
+description:"Terminal window size changed",
+standard:"bsd"},
+
+{
+name:"SIGIO",
+number:29,
+action:"terminate",
+description:"I/O is available",
+standard:"other"},
+
+{
+name:"SIGPOLL",
+number:29,
+action:"terminate",
+description:"Watched event",
+standard:"other"},
+
+{
+name:"SIGINFO",
+number:29,
+action:"ignore",
+description:"Request for process information",
+standard:"other"},
+
+{
+name:"SIGPWR",
+number:30,
+action:"terminate",
+description:"Device running out of power",
+standard:"systemv"},
+
+{
+name:"SIGSYS",
+number:31,
+action:"core",
+description:"Invalid system call",
+standard:"other"},
+
+{
+name:"SIGUNUSED",
+number:31,
+action:"terminate",
+description:"Invalid system call",
+standard:"other"}];exports.SIGNALS=SIGNALS;
+//# sourceMappingURL=core.js.map
+
+/***/ }),
+
+/***/ 272:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", ({value:true}));exports.signalsByNumber=exports.signalsByName=void 0;var _os=__nccwpck_require__(857);
+
+var _signals=__nccwpck_require__(4872);
+var _realtime=__nccwpck_require__(6640);
+
+
+
+const getSignalsByName=function(){
+const signals=(0,_signals.getSignals)();
+return signals.reduce(getSignalByName,{});
+};
+
+const getSignalByName=function(
+signalByNameMemo,
+{name,number,description,supported,action,forced,standard})
+{
+return{
+...signalByNameMemo,
+[name]:{name,number,description,supported,action,forced,standard}};
+
+};
+
+const signalsByName=getSignalsByName();exports.signalsByName=signalsByName;
+
+
+
+
+const getSignalsByNumber=function(){
+const signals=(0,_signals.getSignals)();
+const length=_realtime.SIGRTMAX+1;
+const signalsA=Array.from({length},(value,number)=>
+getSignalByNumber(number,signals));
+
+return Object.assign({},...signalsA);
+};
+
+const getSignalByNumber=function(number,signals){
+const signal=findSignalByNumber(number,signals);
+
+if(signal===undefined){
+return{};
+}
+
+const{name,description,supported,action,forced,standard}=signal;
+return{
+[number]:{
+name,
+number,
+description,
+supported,
+action,
+forced,
+standard}};
+
+
+};
+
+
+
+const findSignalByNumber=function(number,signals){
+const signal=signals.find(({name})=>_os.constants.signals[name]===number);
+
+if(signal!==undefined){
+return signal;
+}
+
+return signals.find(signalA=>signalA.number===number);
+};
+
+const signalsByNumber=getSignalsByNumber();exports.signalsByNumber=signalsByNumber;
+//# sourceMappingURL=main.js.map
+
+/***/ }),
+
+/***/ 6640:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", ({value:true}));exports.SIGRTMAX=exports.getRealtimeSignals=void 0;
+const getRealtimeSignals=function(){
+const length=SIGRTMAX-SIGRTMIN+1;
+return Array.from({length},getRealtimeSignal);
+};exports.getRealtimeSignals=getRealtimeSignals;
+
+const getRealtimeSignal=function(value,index){
+return{
+name:`SIGRT${index+1}`,
+number:SIGRTMIN+index,
+action:"terminate",
+description:"Application-specific signal (realtime)",
+standard:"posix"};
+
+};
+
+const SIGRTMIN=34;
+const SIGRTMAX=64;exports.SIGRTMAX=SIGRTMAX;
+//# sourceMappingURL=realtime.js.map
+
+/***/ }),
+
+/***/ 4872:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", ({value:true}));exports.getSignals=void 0;var _os=__nccwpck_require__(857);
+
+var _core=__nccwpck_require__(4614);
+var _realtime=__nccwpck_require__(6640);
+
+
+
+const getSignals=function(){
+const realtimeSignals=(0,_realtime.getRealtimeSignals)();
+const signals=[..._core.SIGNALS,...realtimeSignals].map(normalizeSignal);
+return signals;
+};exports.getSignals=getSignals;
+
+
+
+
+
+
+
+const normalizeSignal=function({
+name,
+number:defaultNumber,
+description,
+action,
+forced=false,
+standard})
+{
+const{
+signals:{[name]:constantSignal}}=
+_os.constants;
+const supported=constantSignal!==undefined;
+const number=supported?constantSignal:defaultNumber;
+return{name,number,description,supported,action,forced,standard};
+};
+//# sourceMappingURL=signals.js.map
 
 /***/ }),
 
@@ -10063,31 +10667,38 @@ module.exports = function(num) {
 
 /***/ }),
 
-/***/ 6156:
+/***/ 3187:
 /***/ ((module) => {
 
 "use strict";
 
 
-var isStream = module.exports = function (stream) {
-	return stream !== null && typeof stream === 'object' && typeof stream.pipe === 'function';
-};
+const isStream = stream =>
+	stream !== null &&
+	typeof stream === 'object' &&
+	typeof stream.pipe === 'function';
 
-isStream.writable = function (stream) {
-	return isStream(stream) && stream.writable !== false && typeof stream._write === 'function' && typeof stream._writableState === 'object';
-};
+isStream.writable = stream =>
+	isStream(stream) &&
+	stream.writable !== false &&
+	typeof stream._write === 'function' &&
+	typeof stream._writableState === 'object';
 
-isStream.readable = function (stream) {
-	return isStream(stream) && stream.readable !== false && typeof stream._read === 'function' && typeof stream._readableState === 'object';
-};
+isStream.readable = stream =>
+	isStream(stream) &&
+	stream.readable !== false &&
+	typeof stream._read === 'function' &&
+	typeof stream._readableState === 'object';
 
-isStream.duplex = function (stream) {
-	return isStream.writable(stream) && isStream.readable(stream);
-};
+isStream.duplex = stream =>
+	isStream.writable(stream) &&
+	isStream.readable(stream);
 
-isStream.transform = function (stream) {
-	return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
-};
+isStream.transform = stream =>
+	isStream.duplex(stream) &&
+	typeof stream._transform === 'function';
+
+module.exports = isStream;
 
 
 /***/ }),
@@ -10248,6 +10859,55 @@ function isexe (path, options, cb) {
 
 function sync (path, options) {
   return checkStat(fs.statSync(path), path, options)
+}
+
+
+/***/ }),
+
+/***/ 6072:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const { PassThrough } = __nccwpck_require__(4584);
+
+module.exports = function (/*streams...*/) {
+  var sources = []
+  var output  = new PassThrough({objectMode: true})
+
+  output.setMaxListeners(0)
+
+  output.add = add
+  output.isEmpty = isEmpty
+
+  output.on('unpipe', remove)
+
+  Array.prototype.slice.call(arguments).forEach(add)
+
+  return output
+
+  function add (source) {
+    if (Array.isArray(source)) {
+      source.forEach(add)
+      return this
+    }
+
+    sources.push(source);
+    source.once('end', remove.bind(null, source))
+    source.once('error', output.emit.bind(output, 'error'))
+    source.pipe(output, {end: false})
+    return this
+  }
+
+  function isEmpty () {
+    return sources.length == 0;
+  }
+
+  function remove (source) {
+    sources = sources.filter(function (it) { return it !== source })
+    if (!sources.length && output.readable) { output.end() }
+  }
 }
 
 
@@ -10887,65 +11547,75 @@ module.exports = micromatch;
 
 /***/ }),
 
-/***/ 5847:
+/***/ 7735:
 /***/ ((module) => {
 
 "use strict";
 
 
-/**
- * Tries to execute a function and discards any error that occurs.
- * @param {Function} fn - Function that might or might not throw an error.
- * @returns {?*} Return-value of the function when no error occurred.
- */
-module.exports = function(fn) {
+const mimicFn = (to, from) => {
+	for (const prop of Reflect.ownKeys(from)) {
+		Object.defineProperty(to, prop, Object.getOwnPropertyDescriptor(from, prop));
+	}
 
-	try { return fn() } catch (e) {}
+	return to;
+};
 
-}
+module.exports = mimicFn;
+// TODO: Remove this for the next major release
+module.exports["default"] = mimicFn;
+
 
 /***/ }),
 
-/***/ 530:
+/***/ 5541:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 const path = __nccwpck_require__(6928);
-const pathKey = __nccwpck_require__(2287);
+const pathKey = __nccwpck_require__(7979);
 
-module.exports = opts => {
-	opts = Object.assign({
+const npmRunPath = options => {
+	options = {
 		cwd: process.cwd(),
-		path: process.env[pathKey()]
-	}, opts);
+		path: process.env[pathKey()],
+		execPath: process.execPath,
+		...options
+	};
 
-	let prev;
-	let pth = path.resolve(opts.cwd);
-	const ret = [];
+	let previous;
+	let cwdPath = path.resolve(options.cwd);
+	const result = [];
 
-	while (prev !== pth) {
-		ret.push(path.join(pth, 'node_modules/.bin'));
-		prev = pth;
-		pth = path.resolve(pth, '..');
+	while (previous !== cwdPath) {
+		result.push(path.join(cwdPath, 'node_modules/.bin'));
+		previous = cwdPath;
+		cwdPath = path.resolve(cwdPath, '..');
 	}
 
-	// ensure the running `node` binary is used
-	ret.push(path.dirname(process.execPath));
+	// Ensure the running `node` binary is used
+	const execPathDir = path.resolve(options.cwd, options.execPath, '..');
+	result.push(execPathDir);
 
-	return ret.concat(opts.path).join(path.delimiter);
+	return result.concat(options.path).join(path.delimiter);
 };
 
-module.exports.env = opts => {
-	opts = Object.assign({
-		env: process.env
-	}, opts);
+module.exports = npmRunPath;
+// TODO: Remove this for the next major release
+module.exports["default"] = npmRunPath;
 
-	const env = Object.assign({}, opts.env);
+module.exports.env = options => {
+	options = {
+		env: process.env,
+		...options
+	};
+
+	const env = {...options.env};
 	const path = pathKey({env});
 
-	opts.path = env[path];
-	env[path] = module.exports(opts);
+	options.path = env[path];
+	env[path] = module.exports(options);
 
 	return env;
 };
@@ -10953,95 +11623,78 @@ module.exports.env = opts => {
 
 /***/ }),
 
-/***/ 8068:
+/***/ 602:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var wrappy = __nccwpck_require__(8092)
-module.exports = wrappy(once)
-module.exports.strict = wrappy(onceStrict)
-
-once.proto = once(function () {
-  Object.defineProperty(Function.prototype, 'once', {
-    value: function () {
-      return once(this)
-    },
-    configurable: true
-  })
-
-  Object.defineProperty(Function.prototype, 'onceStrict', {
-    value: function () {
-      return onceStrict(this)
-    },
-    configurable: true
-  })
-})
-
-function once (fn) {
-  var f = function () {
-    if (f.called) return f.value
-    f.called = true
-    return f.value = fn.apply(this, arguments)
-  }
-  f.called = false
-  return f
-}
-
-function onceStrict (fn) {
-  var f = function () {
-    if (f.called)
-      throw new Error(f.onceError)
-    f.called = true
-    return f.value = fn.apply(this, arguments)
-  }
-  var name = fn.name || 'Function wrapped with `once`'
-  f.onceError = name + " shouldn't be called more than once"
-  f.called = false
-  return f
-}
-
-
-/***/ }),
-
-/***/ 5491:
-/***/ ((module) => {
 
 "use strict";
 
-module.exports = (promise, onFinally) => {
-	onFinally = onFinally || (() => {});
+const mimicFn = __nccwpck_require__(7735);
 
-	return promise.then(
-		val => new Promise(resolve => {
-			resolve(onFinally());
-		}).then(() => val),
-		err => new Promise(resolve => {
-			resolve(onFinally());
-		}).then(() => {
-			throw err;
-		})
-	);
+const calledFunctions = new WeakMap();
+
+const onetime = (function_, options = {}) => {
+	if (typeof function_ !== 'function') {
+		throw new TypeError('Expected a function');
+	}
+
+	let returnValue;
+	let callCount = 0;
+	const functionName = function_.displayName || function_.name || '<anonymous>';
+
+	const onetime = function (...arguments_) {
+		calledFunctions.set(onetime, ++callCount);
+
+		if (callCount === 1) {
+			returnValue = function_.apply(this, arguments_);
+			function_ = null;
+		} else if (options.throw === true) {
+			throw new Error(`Function \`${functionName}\` can only be called once`);
+		}
+
+		return returnValue;
+	};
+
+	mimicFn(onetime, function_);
+	calledFunctions.set(onetime, callCount);
+
+	return onetime;
+};
+
+module.exports = onetime;
+// TODO: Remove this for the next major release
+module.exports["default"] = onetime;
+
+module.exports.callCount = function_ => {
+	if (!calledFunctions.has(function_)) {
+		throw new Error(`The given function \`${function_.name}\` is not wrapped by the \`onetime\` package`);
+	}
+
+	return calledFunctions.get(function_);
 };
 
 
 /***/ }),
 
-/***/ 2287:
+/***/ 7979:
 /***/ ((module) => {
 
 "use strict";
 
-module.exports = opts => {
-	opts = opts || {};
 
-	const env = opts.env || process.env;
-	const platform = opts.platform || process.platform;
+const pathKey = (options = {}) => {
+	const environment = options.env || process.env;
+	const platform = options.platform || process.platform;
 
 	if (platform !== 'win32') {
 		return 'PATH';
 	}
 
-	return Object.keys(env).find(x => x.toUpperCase() === 'PATH') || 'Path';
+	return Object.keys(environment).reverse().find(key => key.toUpperCase() === 'PATH') || 'Path';
 };
+
+module.exports = pathKey;
+// TODO: Remove this for the next major release
+module.exports["default"] = pathKey;
 
 
 /***/ }),
@@ -13164,99 +13817,6 @@ exports.wrapOutput = (input, state = {}, options = {}) => {
 
 /***/ }),
 
-/***/ 1653:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var once = __nccwpck_require__(8068)
-var eos = __nccwpck_require__(5859)
-var fs
-
-try {
-  fs = __nccwpck_require__(9896) // we only need fs to get the ReadStream and WriteStream prototypes
-} catch (e) {}
-
-var noop = function () {}
-var ancient = /^v?\.0/.test(process.version)
-
-var isFn = function (fn) {
-  return typeof fn === 'function'
-}
-
-var isFS = function (stream) {
-  if (!ancient) return false // newer node version do not need to care about fs is a special way
-  if (!fs) return false // browser
-  return (stream instanceof (fs.ReadStream || noop) || stream instanceof (fs.WriteStream || noop)) && isFn(stream.close)
-}
-
-var isRequest = function (stream) {
-  return stream.setHeader && isFn(stream.abort)
-}
-
-var destroyer = function (stream, reading, writing, callback) {
-  callback = once(callback)
-
-  var closed = false
-  stream.on('close', function () {
-    closed = true
-  })
-
-  eos(stream, {readable: reading, writable: writing}, function (err) {
-    if (err) return callback(err)
-    closed = true
-    callback()
-  })
-
-  var destroyed = false
-  return function (err) {
-    if (closed) return
-    if (destroyed) return
-    destroyed = true
-
-    if (isFS(stream)) return stream.close(noop) // use close for fs streams to avoid fd leaks
-    if (isRequest(stream)) return stream.abort() // request.destroy just do .end - .abort is what we want
-
-    if (isFn(stream.destroy)) return stream.destroy()
-
-    callback(err || new Error('stream was destroyed'))
-  }
-}
-
-var call = function (fn) {
-  fn()
-}
-
-var pipe = function (from, to) {
-  return from.pipe(to)
-}
-
-var pump = function () {
-  var streams = Array.prototype.slice.call(arguments)
-  var callback = isFn(streams[streams.length - 1] || noop) && streams.pop() || noop
-
-  if (Array.isArray(streams[0])) streams = streams[0]
-  if (streams.length < 2) throw new Error('pump requires two streams per minimum')
-
-  var error
-  var destroys = streams.map(function (stream, i) {
-    var reading = i < streams.length - 1
-    var writing = i > 0
-    return destroyer(stream, reading, writing, function (err) {
-      if (!error) error = err
-      if (err) destroys.forEach(call)
-      if (reading) return
-      destroys.forEach(call)
-      callback(error)
-    })
-  })
-
-  return streams.reduce(pipe)
-}
-
-module.exports = pump
-
-
-/***/ }),
-
 /***/ 9108:
 /***/ ((module) => {
 
@@ -13372,1539 +13932,7 @@ function runParallel (tasks, cb) {
 
 /***/ }),
 
-/***/ 2808:
-/***/ ((module, exports) => {
-
-exports = module.exports = SemVer
-
-var debug
-/* istanbul ignore next */
-if (typeof process === 'object' &&
-    process.env &&
-    process.env.NODE_DEBUG &&
-    /\bsemver\b/i.test(process.env.NODE_DEBUG)) {
-  debug = function () {
-    var args = Array.prototype.slice.call(arguments, 0)
-    args.unshift('SEMVER')
-    console.log.apply(console, args)
-  }
-} else {
-  debug = function () {}
-}
-
-// Note: this is the semver.org version of the spec that it implements
-// Not necessarily the package version of this code.
-exports.SEMVER_SPEC_VERSION = '2.0.0'
-
-var MAX_LENGTH = 256
-var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
-  /* istanbul ignore next */ 9007199254740991
-
-// Max safe segment length for coercion.
-var MAX_SAFE_COMPONENT_LENGTH = 16
-
-var MAX_SAFE_BUILD_LENGTH = MAX_LENGTH - 6
-
-// The actual regexps go on exports.re
-var re = exports.re = []
-var safeRe = exports.safeRe = []
-var src = exports.src = []
-var R = 0
-
-var LETTERDASHNUMBER = '[a-zA-Z0-9-]'
-
-// Replace some greedy regex tokens to prevent regex dos issues. These regex are
-// used internally via the safeRe object since all inputs in this library get
-// normalized first to trim and collapse all extra whitespace. The original
-// regexes are exported for userland consumption and lower level usage. A
-// future breaking change could export the safer regex only with a note that
-// all input should have extra whitespace removed.
-var safeRegexReplacements = [
-  ['\\s', 1],
-  ['\\d', MAX_LENGTH],
-  [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH],
-]
-
-function makeSafeRe (value) {
-  for (var i = 0; i < safeRegexReplacements.length; i++) {
-    var token = safeRegexReplacements[i][0]
-    var max = safeRegexReplacements[i][1]
-    value = value
-      .split(token + '*').join(token + '{0,' + max + '}')
-      .split(token + '+').join(token + '{1,' + max + '}')
-  }
-  return value
-}
-
-// The following Regular Expressions can be used for tokenizing,
-// validating, and parsing SemVer version strings.
-
-// ## Numeric Identifier
-// A single `0`, or a non-zero digit followed by zero or more digits.
-
-var NUMERICIDENTIFIER = R++
-src[NUMERICIDENTIFIER] = '0|[1-9]\\d*'
-var NUMERICIDENTIFIERLOOSE = R++
-src[NUMERICIDENTIFIERLOOSE] = '\\d+'
-
-// ## Non-numeric Identifier
-// Zero or more digits, followed by a letter or hyphen, and then zero or
-// more letters, digits, or hyphens.
-
-var NONNUMERICIDENTIFIER = R++
-src[NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-]' + LETTERDASHNUMBER + '*'
-
-// ## Main Version
-// Three dot-separated numeric identifiers.
-
-var MAINVERSION = R++
-src[MAINVERSION] = '(' + src[NUMERICIDENTIFIER] + ')\\.' +
-                   '(' + src[NUMERICIDENTIFIER] + ')\\.' +
-                   '(' + src[NUMERICIDENTIFIER] + ')'
-
-var MAINVERSIONLOOSE = R++
-src[MAINVERSIONLOOSE] = '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
-                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
-                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')'
-
-// ## Pre-release Version Identifier
-// A numeric identifier, or a non-numeric identifier.
-
-var PRERELEASEIDENTIFIER = R++
-src[PRERELEASEIDENTIFIER] = '(?:' + src[NUMERICIDENTIFIER] +
-                            '|' + src[NONNUMERICIDENTIFIER] + ')'
-
-var PRERELEASEIDENTIFIERLOOSE = R++
-src[PRERELEASEIDENTIFIERLOOSE] = '(?:' + src[NUMERICIDENTIFIERLOOSE] +
-                                 '|' + src[NONNUMERICIDENTIFIER] + ')'
-
-// ## Pre-release Version
-// Hyphen, followed by one or more dot-separated pre-release version
-// identifiers.
-
-var PRERELEASE = R++
-src[PRERELEASE] = '(?:-(' + src[PRERELEASEIDENTIFIER] +
-                  '(?:\\.' + src[PRERELEASEIDENTIFIER] + ')*))'
-
-var PRERELEASELOOSE = R++
-src[PRERELEASELOOSE] = '(?:-?(' + src[PRERELEASEIDENTIFIERLOOSE] +
-                       '(?:\\.' + src[PRERELEASEIDENTIFIERLOOSE] + ')*))'
-
-// ## Build Metadata Identifier
-// Any combination of digits, letters, or hyphens.
-
-var BUILDIDENTIFIER = R++
-src[BUILDIDENTIFIER] = LETTERDASHNUMBER + '+'
-
-// ## Build Metadata
-// Plus sign, followed by one or more period-separated build metadata
-// identifiers.
-
-var BUILD = R++
-src[BUILD] = '(?:\\+(' + src[BUILDIDENTIFIER] +
-             '(?:\\.' + src[BUILDIDENTIFIER] + ')*))'
-
-// ## Full Version String
-// A main version, followed optionally by a pre-release version and
-// build metadata.
-
-// Note that the only major, minor, patch, and pre-release sections of
-// the version string are capturing groups.  The build metadata is not a
-// capturing group, because it should not ever be used in version
-// comparison.
-
-var FULL = R++
-var FULLPLAIN = 'v?' + src[MAINVERSION] +
-                src[PRERELEASE] + '?' +
-                src[BUILD] + '?'
-
-src[FULL] = '^' + FULLPLAIN + '$'
-
-// like full, but allows v1.2.3 and =1.2.3, which people do sometimes.
-// also, 1.0.0alpha1 (prerelease without the hyphen) which is pretty
-// common in the npm registry.
-var LOOSEPLAIN = '[v=\\s]*' + src[MAINVERSIONLOOSE] +
-                 src[PRERELEASELOOSE] + '?' +
-                 src[BUILD] + '?'
-
-var LOOSE = R++
-src[LOOSE] = '^' + LOOSEPLAIN + '$'
-
-var GTLT = R++
-src[GTLT] = '((?:<|>)?=?)'
-
-// Something like "2.*" or "1.2.x".
-// Note that "x.x" is a valid xRange identifer, meaning "any version"
-// Only the first item is strictly required.
-var XRANGEIDENTIFIERLOOSE = R++
-src[XRANGEIDENTIFIERLOOSE] = src[NUMERICIDENTIFIERLOOSE] + '|x|X|\\*'
-var XRANGEIDENTIFIER = R++
-src[XRANGEIDENTIFIER] = src[NUMERICIDENTIFIER] + '|x|X|\\*'
-
-var XRANGEPLAIN = R++
-src[XRANGEPLAIN] = '[v=\\s]*(' + src[XRANGEIDENTIFIER] + ')' +
-                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
-                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
-                   '(?:' + src[PRERELEASE] + ')?' +
-                   src[BUILD] + '?' +
-                   ')?)?'
-
-var XRANGEPLAINLOOSE = R++
-src[XRANGEPLAINLOOSE] = '[v=\\s]*(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
-                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
-                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
-                        '(?:' + src[PRERELEASELOOSE] + ')?' +
-                        src[BUILD] + '?' +
-                        ')?)?'
-
-var XRANGE = R++
-src[XRANGE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAIN] + '$'
-var XRANGELOOSE = R++
-src[XRANGELOOSE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAINLOOSE] + '$'
-
-// Coercion.
-// Extract anything that could conceivably be a part of a valid semver
-var COERCE = R++
-src[COERCE] = '(?:^|[^\\d])' +
-              '(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '})' +
-              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
-              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
-              '(?:$|[^\\d])'
-
-// Tilde ranges.
-// Meaning is "reasonably at or greater than"
-var LONETILDE = R++
-src[LONETILDE] = '(?:~>?)'
-
-var TILDETRIM = R++
-src[TILDETRIM] = '(\\s*)' + src[LONETILDE] + '\\s+'
-re[TILDETRIM] = new RegExp(src[TILDETRIM], 'g')
-safeRe[TILDETRIM] = new RegExp(makeSafeRe(src[TILDETRIM]), 'g')
-var tildeTrimReplace = '$1~'
-
-var TILDE = R++
-src[TILDE] = '^' + src[LONETILDE] + src[XRANGEPLAIN] + '$'
-var TILDELOOSE = R++
-src[TILDELOOSE] = '^' + src[LONETILDE] + src[XRANGEPLAINLOOSE] + '$'
-
-// Caret ranges.
-// Meaning is "at least and backwards compatible with"
-var LONECARET = R++
-src[LONECARET] = '(?:\\^)'
-
-var CARETTRIM = R++
-src[CARETTRIM] = '(\\s*)' + src[LONECARET] + '\\s+'
-re[CARETTRIM] = new RegExp(src[CARETTRIM], 'g')
-safeRe[CARETTRIM] = new RegExp(makeSafeRe(src[CARETTRIM]), 'g')
-var caretTrimReplace = '$1^'
-
-var CARET = R++
-src[CARET] = '^' + src[LONECARET] + src[XRANGEPLAIN] + '$'
-var CARETLOOSE = R++
-src[CARETLOOSE] = '^' + src[LONECARET] + src[XRANGEPLAINLOOSE] + '$'
-
-// A simple gt/lt/eq thing, or just "" to indicate "any version"
-var COMPARATORLOOSE = R++
-src[COMPARATORLOOSE] = '^' + src[GTLT] + '\\s*(' + LOOSEPLAIN + ')$|^$'
-var COMPARATOR = R++
-src[COMPARATOR] = '^' + src[GTLT] + '\\s*(' + FULLPLAIN + ')$|^$'
-
-// An expression to strip any whitespace between the gtlt and the thing
-// it modifies, so that `> 1.2.3` ==> `>1.2.3`
-var COMPARATORTRIM = R++
-src[COMPARATORTRIM] = '(\\s*)' + src[GTLT] +
-                      '\\s*(' + LOOSEPLAIN + '|' + src[XRANGEPLAIN] + ')'
-
-// this one has to use the /g flag
-re[COMPARATORTRIM] = new RegExp(src[COMPARATORTRIM], 'g')
-safeRe[COMPARATORTRIM] = new RegExp(makeSafeRe(src[COMPARATORTRIM]), 'g')
-var comparatorTrimReplace = '$1$2$3'
-
-// Something like `1.2.3 - 1.2.4`
-// Note that these all use the loose form, because they'll be
-// checked against either the strict or loose comparator form
-// later.
-var HYPHENRANGE = R++
-src[HYPHENRANGE] = '^\\s*(' + src[XRANGEPLAIN] + ')' +
-                   '\\s+-\\s+' +
-                   '(' + src[XRANGEPLAIN] + ')' +
-                   '\\s*$'
-
-var HYPHENRANGELOOSE = R++
-src[HYPHENRANGELOOSE] = '^\\s*(' + src[XRANGEPLAINLOOSE] + ')' +
-                        '\\s+-\\s+' +
-                        '(' + src[XRANGEPLAINLOOSE] + ')' +
-                        '\\s*$'
-
-// Star ranges basically just allow anything at all.
-var STAR = R++
-src[STAR] = '(<|>)?=?\\s*\\*'
-
-// Compile to actual regexp objects.
-// All are flag-free, unless they were created above with a flag.
-for (var i = 0; i < R; i++) {
-  debug(i, src[i])
-  if (!re[i]) {
-    re[i] = new RegExp(src[i])
-
-    // Replace all greedy whitespace to prevent regex dos issues. These regex are
-    // used internally via the safeRe object since all inputs in this library get
-    // normalized first to trim and collapse all extra whitespace. The original
-    // regexes are exported for userland consumption and lower level usage. A
-    // future breaking change could export the safer regex only with a note that
-    // all input should have extra whitespace removed.
-    safeRe[i] = new RegExp(makeSafeRe(src[i]))
-  }
-}
-
-exports.parse = parse
-function parse (version, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  if (version instanceof SemVer) {
-    return version
-  }
-
-  if (typeof version !== 'string') {
-    return null
-  }
-
-  if (version.length > MAX_LENGTH) {
-    return null
-  }
-
-  var r = options.loose ? safeRe[LOOSE] : safeRe[FULL]
-  if (!r.test(version)) {
-    return null
-  }
-
-  try {
-    return new SemVer(version, options)
-  } catch (er) {
-    return null
-  }
-}
-
-exports.valid = valid
-function valid (version, options) {
-  var v = parse(version, options)
-  return v ? v.version : null
-}
-
-exports.clean = clean
-function clean (version, options) {
-  var s = parse(version.trim().replace(/^[=v]+/, ''), options)
-  return s ? s.version : null
-}
-
-exports.SemVer = SemVer
-
-function SemVer (version, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-  if (version instanceof SemVer) {
-    if (version.loose === options.loose) {
-      return version
-    } else {
-      version = version.version
-    }
-  } else if (typeof version !== 'string') {
-    throw new TypeError('Invalid Version: ' + version)
-  }
-
-  if (version.length > MAX_LENGTH) {
-    throw new TypeError('version is longer than ' + MAX_LENGTH + ' characters')
-  }
-
-  if (!(this instanceof SemVer)) {
-    return new SemVer(version, options)
-  }
-
-  debug('SemVer', version, options)
-  this.options = options
-  this.loose = !!options.loose
-
-  var m = version.trim().match(options.loose ? safeRe[LOOSE] : safeRe[FULL])
-
-  if (!m) {
-    throw new TypeError('Invalid Version: ' + version)
-  }
-
-  this.raw = version
-
-  // these are actually numbers
-  this.major = +m[1]
-  this.minor = +m[2]
-  this.patch = +m[3]
-
-  if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
-    throw new TypeError('Invalid major version')
-  }
-
-  if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
-    throw new TypeError('Invalid minor version')
-  }
-
-  if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
-    throw new TypeError('Invalid patch version')
-  }
-
-  // numberify any prerelease numeric ids
-  if (!m[4]) {
-    this.prerelease = []
-  } else {
-    this.prerelease = m[4].split('.').map(function (id) {
-      if (/^[0-9]+$/.test(id)) {
-        var num = +id
-        if (num >= 0 && num < MAX_SAFE_INTEGER) {
-          return num
-        }
-      }
-      return id
-    })
-  }
-
-  this.build = m[5] ? m[5].split('.') : []
-  this.format()
-}
-
-SemVer.prototype.format = function () {
-  this.version = this.major + '.' + this.minor + '.' + this.patch
-  if (this.prerelease.length) {
-    this.version += '-' + this.prerelease.join('.')
-  }
-  return this.version
-}
-
-SemVer.prototype.toString = function () {
-  return this.version
-}
-
-SemVer.prototype.compare = function (other) {
-  debug('SemVer.compare', this.version, this.options, other)
-  if (!(other instanceof SemVer)) {
-    other = new SemVer(other, this.options)
-  }
-
-  return this.compareMain(other) || this.comparePre(other)
-}
-
-SemVer.prototype.compareMain = function (other) {
-  if (!(other instanceof SemVer)) {
-    other = new SemVer(other, this.options)
-  }
-
-  return compareIdentifiers(this.major, other.major) ||
-         compareIdentifiers(this.minor, other.minor) ||
-         compareIdentifiers(this.patch, other.patch)
-}
-
-SemVer.prototype.comparePre = function (other) {
-  if (!(other instanceof SemVer)) {
-    other = new SemVer(other, this.options)
-  }
-
-  // NOT having a prerelease is > having one
-  if (this.prerelease.length && !other.prerelease.length) {
-    return -1
-  } else if (!this.prerelease.length && other.prerelease.length) {
-    return 1
-  } else if (!this.prerelease.length && !other.prerelease.length) {
-    return 0
-  }
-
-  var i = 0
-  do {
-    var a = this.prerelease[i]
-    var b = other.prerelease[i]
-    debug('prerelease compare', i, a, b)
-    if (a === undefined && b === undefined) {
-      return 0
-    } else if (b === undefined) {
-      return 1
-    } else if (a === undefined) {
-      return -1
-    } else if (a === b) {
-      continue
-    } else {
-      return compareIdentifiers(a, b)
-    }
-  } while (++i)
-}
-
-// preminor will bump the version up to the next minor release, and immediately
-// down to pre-release. premajor and prepatch work the same way.
-SemVer.prototype.inc = function (release, identifier) {
-  switch (release) {
-    case 'premajor':
-      this.prerelease.length = 0
-      this.patch = 0
-      this.minor = 0
-      this.major++
-      this.inc('pre', identifier)
-      break
-    case 'preminor':
-      this.prerelease.length = 0
-      this.patch = 0
-      this.minor++
-      this.inc('pre', identifier)
-      break
-    case 'prepatch':
-      // If this is already a prerelease, it will bump to the next version
-      // drop any prereleases that might already exist, since they are not
-      // relevant at this point.
-      this.prerelease.length = 0
-      this.inc('patch', identifier)
-      this.inc('pre', identifier)
-      break
-    // If the input is a non-prerelease version, this acts the same as
-    // prepatch.
-    case 'prerelease':
-      if (this.prerelease.length === 0) {
-        this.inc('patch', identifier)
-      }
-      this.inc('pre', identifier)
-      break
-
-    case 'major':
-      // If this is a pre-major version, bump up to the same major version.
-      // Otherwise increment major.
-      // 1.0.0-5 bumps to 1.0.0
-      // 1.1.0 bumps to 2.0.0
-      if (this.minor !== 0 ||
-          this.patch !== 0 ||
-          this.prerelease.length === 0) {
-        this.major++
-      }
-      this.minor = 0
-      this.patch = 0
-      this.prerelease = []
-      break
-    case 'minor':
-      // If this is a pre-minor version, bump up to the same minor version.
-      // Otherwise increment minor.
-      // 1.2.0-5 bumps to 1.2.0
-      // 1.2.1 bumps to 1.3.0
-      if (this.patch !== 0 || this.prerelease.length === 0) {
-        this.minor++
-      }
-      this.patch = 0
-      this.prerelease = []
-      break
-    case 'patch':
-      // If this is not a pre-release version, it will increment the patch.
-      // If it is a pre-release it will bump up to the same patch version.
-      // 1.2.0-5 patches to 1.2.0
-      // 1.2.0 patches to 1.2.1
-      if (this.prerelease.length === 0) {
-        this.patch++
-      }
-      this.prerelease = []
-      break
-    // This probably shouldn't be used publicly.
-    // 1.0.0 "pre" would become 1.0.0-0 which is the wrong direction.
-    case 'pre':
-      if (this.prerelease.length === 0) {
-        this.prerelease = [0]
-      } else {
-        var i = this.prerelease.length
-        while (--i >= 0) {
-          if (typeof this.prerelease[i] === 'number') {
-            this.prerelease[i]++
-            i = -2
-          }
-        }
-        if (i === -1) {
-          // didn't increment anything
-          this.prerelease.push(0)
-        }
-      }
-      if (identifier) {
-        // 1.2.0-beta.1 bumps to 1.2.0-beta.2,
-        // 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
-        if (this.prerelease[0] === identifier) {
-          if (isNaN(this.prerelease[1])) {
-            this.prerelease = [identifier, 0]
-          }
-        } else {
-          this.prerelease = [identifier, 0]
-        }
-      }
-      break
-
-    default:
-      throw new Error('invalid increment argument: ' + release)
-  }
-  this.format()
-  this.raw = this.version
-  return this
-}
-
-exports.inc = inc
-function inc (version, release, loose, identifier) {
-  if (typeof (loose) === 'string') {
-    identifier = loose
-    loose = undefined
-  }
-
-  try {
-    return new SemVer(version, loose).inc(release, identifier).version
-  } catch (er) {
-    return null
-  }
-}
-
-exports.diff = diff
-function diff (version1, version2) {
-  if (eq(version1, version2)) {
-    return null
-  } else {
-    var v1 = parse(version1)
-    var v2 = parse(version2)
-    var prefix = ''
-    if (v1.prerelease.length || v2.prerelease.length) {
-      prefix = 'pre'
-      var defaultResult = 'prerelease'
-    }
-    for (var key in v1) {
-      if (key === 'major' || key === 'minor' || key === 'patch') {
-        if (v1[key] !== v2[key]) {
-          return prefix + key
-        }
-      }
-    }
-    return defaultResult // may be undefined
-  }
-}
-
-exports.compareIdentifiers = compareIdentifiers
-
-var numeric = /^[0-9]+$/
-function compareIdentifiers (a, b) {
-  var anum = numeric.test(a)
-  var bnum = numeric.test(b)
-
-  if (anum && bnum) {
-    a = +a
-    b = +b
-  }
-
-  return a === b ? 0
-    : (anum && !bnum) ? -1
-    : (bnum && !anum) ? 1
-    : a < b ? -1
-    : 1
-}
-
-exports.rcompareIdentifiers = rcompareIdentifiers
-function rcompareIdentifiers (a, b) {
-  return compareIdentifiers(b, a)
-}
-
-exports.major = major
-function major (a, loose) {
-  return new SemVer(a, loose).major
-}
-
-exports.minor = minor
-function minor (a, loose) {
-  return new SemVer(a, loose).minor
-}
-
-exports.patch = patch
-function patch (a, loose) {
-  return new SemVer(a, loose).patch
-}
-
-exports.compare = compare
-function compare (a, b, loose) {
-  return new SemVer(a, loose).compare(new SemVer(b, loose))
-}
-
-exports.compareLoose = compareLoose
-function compareLoose (a, b) {
-  return compare(a, b, true)
-}
-
-exports.rcompare = rcompare
-function rcompare (a, b, loose) {
-  return compare(b, a, loose)
-}
-
-exports.sort = sort
-function sort (list, loose) {
-  return list.sort(function (a, b) {
-    return exports.compare(a, b, loose)
-  })
-}
-
-exports.rsort = rsort
-function rsort (list, loose) {
-  return list.sort(function (a, b) {
-    return exports.rcompare(a, b, loose)
-  })
-}
-
-exports.gt = gt
-function gt (a, b, loose) {
-  return compare(a, b, loose) > 0
-}
-
-exports.lt = lt
-function lt (a, b, loose) {
-  return compare(a, b, loose) < 0
-}
-
-exports.eq = eq
-function eq (a, b, loose) {
-  return compare(a, b, loose) === 0
-}
-
-exports.neq = neq
-function neq (a, b, loose) {
-  return compare(a, b, loose) !== 0
-}
-
-exports.gte = gte
-function gte (a, b, loose) {
-  return compare(a, b, loose) >= 0
-}
-
-exports.lte = lte
-function lte (a, b, loose) {
-  return compare(a, b, loose) <= 0
-}
-
-exports.cmp = cmp
-function cmp (a, op, b, loose) {
-  switch (op) {
-    case '===':
-      if (typeof a === 'object')
-        a = a.version
-      if (typeof b === 'object')
-        b = b.version
-      return a === b
-
-    case '!==':
-      if (typeof a === 'object')
-        a = a.version
-      if (typeof b === 'object')
-        b = b.version
-      return a !== b
-
-    case '':
-    case '=':
-    case '==':
-      return eq(a, b, loose)
-
-    case '!=':
-      return neq(a, b, loose)
-
-    case '>':
-      return gt(a, b, loose)
-
-    case '>=':
-      return gte(a, b, loose)
-
-    case '<':
-      return lt(a, b, loose)
-
-    case '<=':
-      return lte(a, b, loose)
-
-    default:
-      throw new TypeError('Invalid operator: ' + op)
-  }
-}
-
-exports.Comparator = Comparator
-function Comparator (comp, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  if (comp instanceof Comparator) {
-    if (comp.loose === !!options.loose) {
-      return comp
-    } else {
-      comp = comp.value
-    }
-  }
-
-  if (!(this instanceof Comparator)) {
-    return new Comparator(comp, options)
-  }
-
-  comp = comp.trim().split(/\s+/).join(' ')
-  debug('comparator', comp, options)
-  this.options = options
-  this.loose = !!options.loose
-  this.parse(comp)
-
-  if (this.semver === ANY) {
-    this.value = ''
-  } else {
-    this.value = this.operator + this.semver.version
-  }
-
-  debug('comp', this)
-}
-
-var ANY = {}
-Comparator.prototype.parse = function (comp) {
-  var r = this.options.loose ? safeRe[COMPARATORLOOSE] : safeRe[COMPARATOR]
-  var m = comp.match(r)
-
-  if (!m) {
-    throw new TypeError('Invalid comparator: ' + comp)
-  }
-
-  this.operator = m[1]
-  if (this.operator === '=') {
-    this.operator = ''
-  }
-
-  // if it literally is just '>' or '' then allow anything.
-  if (!m[2]) {
-    this.semver = ANY
-  } else {
-    this.semver = new SemVer(m[2], this.options.loose)
-  }
-}
-
-Comparator.prototype.toString = function () {
-  return this.value
-}
-
-Comparator.prototype.test = function (version) {
-  debug('Comparator.test', version, this.options.loose)
-
-  if (this.semver === ANY) {
-    return true
-  }
-
-  if (typeof version === 'string') {
-    version = new SemVer(version, this.options)
-  }
-
-  return cmp(version, this.operator, this.semver, this.options)
-}
-
-Comparator.prototype.intersects = function (comp, options) {
-  if (!(comp instanceof Comparator)) {
-    throw new TypeError('a Comparator is required')
-  }
-
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  var rangeTmp
-
-  if (this.operator === '') {
-    rangeTmp = new Range(comp.value, options)
-    return satisfies(this.value, rangeTmp, options)
-  } else if (comp.operator === '') {
-    rangeTmp = new Range(this.value, options)
-    return satisfies(comp.semver, rangeTmp, options)
-  }
-
-  var sameDirectionIncreasing =
-    (this.operator === '>=' || this.operator === '>') &&
-    (comp.operator === '>=' || comp.operator === '>')
-  var sameDirectionDecreasing =
-    (this.operator === '<=' || this.operator === '<') &&
-    (comp.operator === '<=' || comp.operator === '<')
-  var sameSemVer = this.semver.version === comp.semver.version
-  var differentDirectionsInclusive =
-    (this.operator === '>=' || this.operator === '<=') &&
-    (comp.operator === '>=' || comp.operator === '<=')
-  var oppositeDirectionsLessThan =
-    cmp(this.semver, '<', comp.semver, options) &&
-    ((this.operator === '>=' || this.operator === '>') &&
-    (comp.operator === '<=' || comp.operator === '<'))
-  var oppositeDirectionsGreaterThan =
-    cmp(this.semver, '>', comp.semver, options) &&
-    ((this.operator === '<=' || this.operator === '<') &&
-    (comp.operator === '>=' || comp.operator === '>'))
-
-  return sameDirectionIncreasing || sameDirectionDecreasing ||
-    (sameSemVer && differentDirectionsInclusive) ||
-    oppositeDirectionsLessThan || oppositeDirectionsGreaterThan
-}
-
-exports.Range = Range
-function Range (range, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  if (range instanceof Range) {
-    if (range.loose === !!options.loose &&
-        range.includePrerelease === !!options.includePrerelease) {
-      return range
-    } else {
-      return new Range(range.raw, options)
-    }
-  }
-
-  if (range instanceof Comparator) {
-    return new Range(range.value, options)
-  }
-
-  if (!(this instanceof Range)) {
-    return new Range(range, options)
-  }
-
-  this.options = options
-  this.loose = !!options.loose
-  this.includePrerelease = !!options.includePrerelease
-
-  // First reduce all whitespace as much as possible so we do not have to rely
-  // on potentially slow regexes like \s*. This is then stored and used for
-  // future error messages as well.
-  this.raw = range
-    .trim()
-    .split(/\s+/)
-    .join(' ')
-
-  // First, split based on boolean or ||
-  this.set = this.raw.split('||').map(function (range) {
-    return this.parseRange(range.trim())
-  }, this).filter(function (c) {
-    // throw out any that are not relevant for whatever reason
-    return c.length
-  })
-
-  if (!this.set.length) {
-    throw new TypeError('Invalid SemVer Range: ' + this.raw)
-  }
-
-  this.format()
-}
-
-Range.prototype.format = function () {
-  this.range = this.set.map(function (comps) {
-    return comps.join(' ').trim()
-  }).join('||').trim()
-  return this.range
-}
-
-Range.prototype.toString = function () {
-  return this.range
-}
-
-Range.prototype.parseRange = function (range) {
-  var loose = this.options.loose
-  // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
-  var hr = loose ? safeRe[HYPHENRANGELOOSE] : safeRe[HYPHENRANGE]
-  range = range.replace(hr, hyphenReplace)
-  debug('hyphen replace', range)
-  // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
-  range = range.replace(safeRe[COMPARATORTRIM], comparatorTrimReplace)
-  debug('comparator trim', range, safeRe[COMPARATORTRIM])
-
-  // `~ 1.2.3` => `~1.2.3`
-  range = range.replace(safeRe[TILDETRIM], tildeTrimReplace)
-
-  // `^ 1.2.3` => `^1.2.3`
-  range = range.replace(safeRe[CARETTRIM], caretTrimReplace)
-
-  // At this point, the range is completely trimmed and
-  // ready to be split into comparators.
-  var compRe = loose ? safeRe[COMPARATORLOOSE] : safeRe[COMPARATOR]
-  var set = range.split(' ').map(function (comp) {
-    return parseComparator(comp, this.options)
-  }, this).join(' ').split(/\s+/)
-  if (this.options.loose) {
-    // in loose mode, throw out any that are not valid comparators
-    set = set.filter(function (comp) {
-      return !!comp.match(compRe)
-    })
-  }
-  set = set.map(function (comp) {
-    return new Comparator(comp, this.options)
-  }, this)
-
-  return set
-}
-
-Range.prototype.intersects = function (range, options) {
-  if (!(range instanceof Range)) {
-    throw new TypeError('a Range is required')
-  }
-
-  return this.set.some(function (thisComparators) {
-    return thisComparators.every(function (thisComparator) {
-      return range.set.some(function (rangeComparators) {
-        return rangeComparators.every(function (rangeComparator) {
-          return thisComparator.intersects(rangeComparator, options)
-        })
-      })
-    })
-  })
-}
-
-// Mostly just for testing and legacy API reasons
-exports.toComparators = toComparators
-function toComparators (range, options) {
-  return new Range(range, options).set.map(function (comp) {
-    return comp.map(function (c) {
-      return c.value
-    }).join(' ').trim().split(' ')
-  })
-}
-
-// comprised of xranges, tildes, stars, and gtlt's at this point.
-// already replaced the hyphen ranges
-// turn into a set of JUST comparators.
-function parseComparator (comp, options) {
-  debug('comp', comp, options)
-  comp = replaceCarets(comp, options)
-  debug('caret', comp)
-  comp = replaceTildes(comp, options)
-  debug('tildes', comp)
-  comp = replaceXRanges(comp, options)
-  debug('xrange', comp)
-  comp = replaceStars(comp, options)
-  debug('stars', comp)
-  return comp
-}
-
-function isX (id) {
-  return !id || id.toLowerCase() === 'x' || id === '*'
-}
-
-// ~, ~> --> * (any, kinda silly)
-// ~2, ~2.x, ~2.x.x, ~>2, ~>2.x ~>2.x.x --> >=2.0.0 <3.0.0
-// ~2.0, ~2.0.x, ~>2.0, ~>2.0.x --> >=2.0.0 <2.1.0
-// ~1.2, ~1.2.x, ~>1.2, ~>1.2.x --> >=1.2.0 <1.3.0
-// ~1.2.3, ~>1.2.3 --> >=1.2.3 <1.3.0
-// ~1.2.0, ~>1.2.0 --> >=1.2.0 <1.3.0
-function replaceTildes (comp, options) {
-  return comp.trim().split(/\s+/).map(function (comp) {
-    return replaceTilde(comp, options)
-  }).join(' ')
-}
-
-function replaceTilde (comp, options) {
-  var r = options.loose ? safeRe[TILDELOOSE] : safeRe[TILDE]
-  return comp.replace(r, function (_, M, m, p, pr) {
-    debug('tilde', comp, _, M, m, p, pr)
-    var ret
-
-    if (isX(M)) {
-      ret = ''
-    } else if (isX(m)) {
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
-    } else if (isX(p)) {
-      // ~1.2 == >=1.2.0 <1.3.0
-      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
-    } else if (pr) {
-      debug('replaceTilde pr', pr)
-      ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-            ' <' + M + '.' + (+m + 1) + '.0'
-    } else {
-      // ~1.2.3 == >=1.2.3 <1.3.0
-      ret = '>=' + M + '.' + m + '.' + p +
-            ' <' + M + '.' + (+m + 1) + '.0'
-    }
-
-    debug('tilde return', ret)
-    return ret
-  })
-}
-
-// ^ --> * (any, kinda silly)
-// ^2, ^2.x, ^2.x.x --> >=2.0.0 <3.0.0
-// ^2.0, ^2.0.x --> >=2.0.0 <3.0.0
-// ^1.2, ^1.2.x --> >=1.2.0 <2.0.0
-// ^1.2.3 --> >=1.2.3 <2.0.0
-// ^1.2.0 --> >=1.2.0 <2.0.0
-function replaceCarets (comp, options) {
-  return comp.trim().split(/\s+/).map(function (comp) {
-    return replaceCaret(comp, options)
-  }).join(' ')
-}
-
-function replaceCaret (comp, options) {
-  debug('caret', comp, options)
-  var r = options.loose ? safeRe[CARETLOOSE] : safeRe[CARET]
-  return comp.replace(r, function (_, M, m, p, pr) {
-    debug('caret', comp, _, M, m, p, pr)
-    var ret
-
-    if (isX(M)) {
-      ret = ''
-    } else if (isX(m)) {
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
-    } else if (isX(p)) {
-      if (M === '0') {
-        ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
-      } else {
-        ret = '>=' + M + '.' + m + '.0 <' + (+M + 1) + '.0.0'
-      }
-    } else if (pr) {
-      debug('replaceCaret pr', pr)
-      if (M === '0') {
-        if (m === '0') {
-          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-                ' <' + M + '.' + m + '.' + (+p + 1)
-        } else {
-          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-                ' <' + M + '.' + (+m + 1) + '.0'
-        }
-      } else {
-        ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-              ' <' + (+M + 1) + '.0.0'
-      }
-    } else {
-      debug('no pr')
-      if (M === '0') {
-        if (m === '0') {
-          ret = '>=' + M + '.' + m + '.' + p +
-                ' <' + M + '.' + m + '.' + (+p + 1)
-        } else {
-          ret = '>=' + M + '.' + m + '.' + p +
-                ' <' + M + '.' + (+m + 1) + '.0'
-        }
-      } else {
-        ret = '>=' + M + '.' + m + '.' + p +
-              ' <' + (+M + 1) + '.0.0'
-      }
-    }
-
-    debug('caret return', ret)
-    return ret
-  })
-}
-
-function replaceXRanges (comp, options) {
-  debug('replaceXRanges', comp, options)
-  return comp.split(/\s+/).map(function (comp) {
-    return replaceXRange(comp, options)
-  }).join(' ')
-}
-
-function replaceXRange (comp, options) {
-  comp = comp.trim()
-  var r = options.loose ? safeRe[XRANGELOOSE] : safeRe[XRANGE]
-  return comp.replace(r, function (ret, gtlt, M, m, p, pr) {
-    debug('xRange', comp, ret, gtlt, M, m, p, pr)
-    var xM = isX(M)
-    var xm = xM || isX(m)
-    var xp = xm || isX(p)
-    var anyX = xp
-
-    if (gtlt === '=' && anyX) {
-      gtlt = ''
-    }
-
-    if (xM) {
-      if (gtlt === '>' || gtlt === '<') {
-        // nothing is allowed
-        ret = '<0.0.0'
-      } else {
-        // nothing is forbidden
-        ret = '*'
-      }
-    } else if (gtlt && anyX) {
-      // we know patch is an x, because we have any x at all.
-      // replace X with 0
-      if (xm) {
-        m = 0
-      }
-      p = 0
-
-      if (gtlt === '>') {
-        // >1 => >=2.0.0
-        // >1.2 => >=1.3.0
-        // >1.2.3 => >= 1.2.4
-        gtlt = '>='
-        if (xm) {
-          M = +M + 1
-          m = 0
-          p = 0
-        } else {
-          m = +m + 1
-          p = 0
-        }
-      } else if (gtlt === '<=') {
-        // <=0.7.x is actually <0.8.0, since any 0.7.x should
-        // pass.  Similarly, <=7.x is actually <8.0.0, etc.
-        gtlt = '<'
-        if (xm) {
-          M = +M + 1
-        } else {
-          m = +m + 1
-        }
-      }
-
-      ret = gtlt + M + '.' + m + '.' + p
-    } else if (xm) {
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
-    } else if (xp) {
-      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
-    }
-
-    debug('xRange return', ret)
-
-    return ret
-  })
-}
-
-// Because * is AND-ed with everything else in the comparator,
-// and '' means "any version", just remove the *s entirely.
-function replaceStars (comp, options) {
-  debug('replaceStars', comp, options)
-  // Looseness is ignored here.  star is always as loose as it gets!
-  return comp.trim().replace(safeRe[STAR], '')
-}
-
-// This function is passed to string.replace(safeRe[HYPHENRANGE])
-// M, m, patch, prerelease, build
-// 1.2 - 3.4.5 => >=1.2.0 <=3.4.5
-// 1.2.3 - 3.4 => >=1.2.0 <3.5.0 Any 3.4.x will do
-// 1.2 - 3.4 => >=1.2.0 <3.5.0
-function hyphenReplace ($0,
-  from, fM, fm, fp, fpr, fb,
-  to, tM, tm, tp, tpr, tb) {
-  if (isX(fM)) {
-    from = ''
-  } else if (isX(fm)) {
-    from = '>=' + fM + '.0.0'
-  } else if (isX(fp)) {
-    from = '>=' + fM + '.' + fm + '.0'
-  } else {
-    from = '>=' + from
-  }
-
-  if (isX(tM)) {
-    to = ''
-  } else if (isX(tm)) {
-    to = '<' + (+tM + 1) + '.0.0'
-  } else if (isX(tp)) {
-    to = '<' + tM + '.' + (+tm + 1) + '.0'
-  } else if (tpr) {
-    to = '<=' + tM + '.' + tm + '.' + tp + '-' + tpr
-  } else {
-    to = '<=' + to
-  }
-
-  return (from + ' ' + to).trim()
-}
-
-// if ANY of the sets match ALL of its comparators, then pass
-Range.prototype.test = function (version) {
-  if (!version) {
-    return false
-  }
-
-  if (typeof version === 'string') {
-    version = new SemVer(version, this.options)
-  }
-
-  for (var i = 0; i < this.set.length; i++) {
-    if (testSet(this.set[i], version, this.options)) {
-      return true
-    }
-  }
-  return false
-}
-
-function testSet (set, version, options) {
-  for (var i = 0; i < set.length; i++) {
-    if (!set[i].test(version)) {
-      return false
-    }
-  }
-
-  if (version.prerelease.length && !options.includePrerelease) {
-    // Find the set of versions that are allowed to have prereleases
-    // For example, ^1.2.3-pr.1 desugars to >=1.2.3-pr.1 <2.0.0
-    // That should allow `1.2.3-pr.2` to pass.
-    // However, `1.2.4-alpha.notready` should NOT be allowed,
-    // even though it's within the range set by the comparators.
-    for (i = 0; i < set.length; i++) {
-      debug(set[i].semver)
-      if (set[i].semver === ANY) {
-        continue
-      }
-
-      if (set[i].semver.prerelease.length > 0) {
-        var allowed = set[i].semver
-        if (allowed.major === version.major &&
-            allowed.minor === version.minor &&
-            allowed.patch === version.patch) {
-          return true
-        }
-      }
-    }
-
-    // Version has a -pre, but it's not one of the ones we like.
-    return false
-  }
-
-  return true
-}
-
-exports.satisfies = satisfies
-function satisfies (version, range, options) {
-  try {
-    range = new Range(range, options)
-  } catch (er) {
-    return false
-  }
-  return range.test(version)
-}
-
-exports.maxSatisfying = maxSatisfying
-function maxSatisfying (versions, range, options) {
-  var max = null
-  var maxSV = null
-  try {
-    var rangeObj = new Range(range, options)
-  } catch (er) {
-    return null
-  }
-  versions.forEach(function (v) {
-    if (rangeObj.test(v)) {
-      // satisfies(v, range, options)
-      if (!max || maxSV.compare(v) === -1) {
-        // compare(max, v, true)
-        max = v
-        maxSV = new SemVer(max, options)
-      }
-    }
-  })
-  return max
-}
-
-exports.minSatisfying = minSatisfying
-function minSatisfying (versions, range, options) {
-  var min = null
-  var minSV = null
-  try {
-    var rangeObj = new Range(range, options)
-  } catch (er) {
-    return null
-  }
-  versions.forEach(function (v) {
-    if (rangeObj.test(v)) {
-      // satisfies(v, range, options)
-      if (!min || minSV.compare(v) === 1) {
-        // compare(min, v, true)
-        min = v
-        minSV = new SemVer(min, options)
-      }
-    }
-  })
-  return min
-}
-
-exports.minVersion = minVersion
-function minVersion (range, loose) {
-  range = new Range(range, loose)
-
-  var minver = new SemVer('0.0.0')
-  if (range.test(minver)) {
-    return minver
-  }
-
-  minver = new SemVer('0.0.0-0')
-  if (range.test(minver)) {
-    return minver
-  }
-
-  minver = null
-  for (var i = 0; i < range.set.length; ++i) {
-    var comparators = range.set[i]
-
-    comparators.forEach(function (comparator) {
-      // Clone to avoid manipulating the comparator's semver object.
-      var compver = new SemVer(comparator.semver.version)
-      switch (comparator.operator) {
-        case '>':
-          if (compver.prerelease.length === 0) {
-            compver.patch++
-          } else {
-            compver.prerelease.push(0)
-          }
-          compver.raw = compver.format()
-          /* fallthrough */
-        case '':
-        case '>=':
-          if (!minver || gt(minver, compver)) {
-            minver = compver
-          }
-          break
-        case '<':
-        case '<=':
-          /* Ignore maximum versions */
-          break
-        /* istanbul ignore next */
-        default:
-          throw new Error('Unexpected operation: ' + comparator.operator)
-      }
-    })
-  }
-
-  if (minver && range.test(minver)) {
-    return minver
-  }
-
-  return null
-}
-
-exports.validRange = validRange
-function validRange (range, options) {
-  try {
-    // Return '*' instead of '' so that truthiness works.
-    // This will throw if it's invalid anyway
-    return new Range(range, options).range || '*'
-  } catch (er) {
-    return null
-  }
-}
-
-// Determine if version is less than all the versions possible in the range
-exports.ltr = ltr
-function ltr (version, range, options) {
-  return outside(version, range, '<', options)
-}
-
-// Determine if version is greater than all the versions possible in the range.
-exports.gtr = gtr
-function gtr (version, range, options) {
-  return outside(version, range, '>', options)
-}
-
-exports.outside = outside
-function outside (version, range, hilo, options) {
-  version = new SemVer(version, options)
-  range = new Range(range, options)
-
-  var gtfn, ltefn, ltfn, comp, ecomp
-  switch (hilo) {
-    case '>':
-      gtfn = gt
-      ltefn = lte
-      ltfn = lt
-      comp = '>'
-      ecomp = '>='
-      break
-    case '<':
-      gtfn = lt
-      ltefn = gte
-      ltfn = gt
-      comp = '<'
-      ecomp = '<='
-      break
-    default:
-      throw new TypeError('Must provide a hilo val of "<" or ">"')
-  }
-
-  // If it satisifes the range it is not outside
-  if (satisfies(version, range, options)) {
-    return false
-  }
-
-  // From now on, variable terms are as if we're in "gtr" mode.
-  // but note that everything is flipped for the "ltr" function.
-
-  for (var i = 0; i < range.set.length; ++i) {
-    var comparators = range.set[i]
-
-    var high = null
-    var low = null
-
-    comparators.forEach(function (comparator) {
-      if (comparator.semver === ANY) {
-        comparator = new Comparator('>=0.0.0')
-      }
-      high = high || comparator
-      low = low || comparator
-      if (gtfn(comparator.semver, high.semver, options)) {
-        high = comparator
-      } else if (ltfn(comparator.semver, low.semver, options)) {
-        low = comparator
-      }
-    })
-
-    // If the edge version comparator has a operator then our version
-    // isn't outside it
-    if (high.operator === comp || high.operator === ecomp) {
-      return false
-    }
-
-    // If the lowest version comparator has an operator and our version
-    // is less than it then it isn't higher than the range
-    if ((!low.operator || low.operator === comp) &&
-        ltefn(version, low.semver)) {
-      return false
-    } else if (low.operator === ecomp && ltfn(version, low.semver)) {
-      return false
-    }
-  }
-  return true
-}
-
-exports.prerelease = prerelease
-function prerelease (version, options) {
-  var parsed = parse(version, options)
-  return (parsed && parsed.prerelease.length) ? parsed.prerelease : null
-}
-
-exports.intersects = intersects
-function intersects (r1, r2, options) {
-  r1 = new Range(r1, options)
-  r2 = new Range(r2, options)
-  return r1.intersects(r2)
-}
-
-exports.coerce = coerce
-function coerce (version) {
-  if (version instanceof SemVer) {
-    return version
-  }
-
-  if (typeof version !== 'string') {
-    return null
-  }
-
-  var match = version.match(safeRe[COERCE])
-
-  if (match == null) {
-    return null
-  }
-
-  return parse(match[1] +
-    '.' + (match[2] || '0') +
-    '.' + (match[3] || '0'))
-}
-
-
-/***/ }),
-
-/***/ 6423:
+/***/ 8804:
 /***/ ((module, exports) => {
 
 exports = module.exports = SemVer
@@ -16554,8 +15582,11 @@ function coerce (version, options) {
 
 /***/ }),
 
-/***/ 1624:
+/***/ 863:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const ANY = Symbol('SemVer ANY')
 // hoisted class for cyclic dependency
@@ -16692,18 +15723,21 @@ class Comparator {
 
 module.exports = Comparator
 
-const parseOptions = __nccwpck_require__(9763)
-const { safeRe: re, t } = __nccwpck_require__(5118)
-const cmp = __nccwpck_require__(4167)
-const debug = __nccwpck_require__(2864)
-const SemVer = __nccwpck_require__(9532)
-const Range = __nccwpck_require__(4767)
+const parseOptions = __nccwpck_require__(2600)
+const { safeRe: re, t } = __nccwpck_require__(6211)
+const cmp = __nccwpck_require__(5618)
+const debug = __nccwpck_require__(7611)
+const SemVer = __nccwpck_require__(4839)
+const Range = __nccwpck_require__(8474)
 
 
 /***/ }),
 
-/***/ 4767:
+/***/ 8474:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SPACE_CHARACTERS = /\s+/g
 
@@ -16919,21 +15953,21 @@ class Range {
 
 module.exports = Range
 
-const LRU = __nccwpck_require__(5490)
+const LRU = __nccwpck_require__(2443)
 const cache = new LRU()
 
-const parseOptions = __nccwpck_require__(9763)
-const Comparator = __nccwpck_require__(1624)
-const debug = __nccwpck_require__(2864)
-const SemVer = __nccwpck_require__(9532)
+const parseOptions = __nccwpck_require__(2600)
+const Comparator = __nccwpck_require__(863)
+const debug = __nccwpck_require__(7611)
+const SemVer = __nccwpck_require__(4839)
 const {
   safeRe: re,
   t,
   comparatorTrimReplace,
   tildeTrimReplace,
   caretTrimReplace,
-} = __nccwpck_require__(5118)
-const { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = __nccwpck_require__(610)
+} = __nccwpck_require__(6211)
+const { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = __nccwpck_require__(4329)
 
 const isNullSet = c => c.value === '<0.0.0-0'
 const isAny = c => c.value === ''
@@ -17263,15 +16297,18 @@ const testSet = (set, version, options) => {
 
 /***/ }),
 
-/***/ 9532:
+/***/ 4839:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const debug = __nccwpck_require__(2864)
-const { MAX_LENGTH, MAX_SAFE_INTEGER } = __nccwpck_require__(610)
-const { safeRe: re, safeSrc: src, t } = __nccwpck_require__(5118)
+"use strict";
 
-const parseOptions = __nccwpck_require__(9763)
-const { compareIdentifiers } = __nccwpck_require__(1355)
+
+const debug = __nccwpck_require__(7611)
+const { MAX_LENGTH, MAX_SAFE_INTEGER } = __nccwpck_require__(4329)
+const { safeRe: re, t } = __nccwpck_require__(6211)
+
+const parseOptions = __nccwpck_require__(2600)
+const { compareIdentifiers } = __nccwpck_require__(6104)
 class SemVer {
   constructor (version, options) {
     options = parseOptions(options)
@@ -17450,8 +16487,7 @@ class SemVer {
       }
       // Avoid an invalid semver results
       if (identifier) {
-        const r = new RegExp(`^${this.options.loose ? src[t.PRERELEASELOOSE] : src[t.PRERELEASE]}$`)
-        const match = `-${identifier}`.match(r)
+        const match = `-${identifier}`.match(this.options.loose ? re[t.PRERELEASELOOSE] : re[t.PRERELEASE])
         if (!match || match[1] !== identifier) {
           throw new Error(`invalid identifier: ${identifier}`)
         }
@@ -17588,10 +16624,13 @@ module.exports = SemVer
 
 /***/ }),
 
-/***/ 5662:
+/***/ 2771:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const parse = __nccwpck_require__(5720)
+"use strict";
+
+
+const parse = __nccwpck_require__(893)
 const clean = (version, options) => {
   const s = parse(version.trim().replace(/^[=v]+/, ''), options)
   return s ? s.version : null
@@ -17601,15 +16640,18 @@ module.exports = clean
 
 /***/ }),
 
-/***/ 4167:
+/***/ 5618:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const eq = __nccwpck_require__(9737)
-const neq = __nccwpck_require__(7511)
-const gt = __nccwpck_require__(3460)
-const gte = __nccwpck_require__(8753)
-const lt = __nccwpck_require__(2139)
-const lte = __nccwpck_require__(5480)
+"use strict";
+
+
+const eq = __nccwpck_require__(5630)
+const neq = __nccwpck_require__(3282)
+const gt = __nccwpck_require__(5283)
+const gte = __nccwpck_require__(6064)
+const lt = __nccwpck_require__(6108)
+const lte = __nccwpck_require__(3353)
 
 const cmp = (a, op, b, loose) => {
   switch (op) {
@@ -17660,12 +16702,15 @@ module.exports = cmp
 
 /***/ }),
 
-/***/ 6402:
+/***/ 3597:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
-const parse = __nccwpck_require__(5720)
-const { safeRe: re, t } = __nccwpck_require__(5118)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
+const parse = __nccwpck_require__(893)
+const { safeRe: re, t } = __nccwpck_require__(6211)
 
 const coerce = (version, options) => {
   if (version instanceof SemVer) {
@@ -17727,10 +16772,13 @@ module.exports = coerce
 
 /***/ }),
 
-/***/ 8341:
+/***/ 3932:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
 const compareBuild = (a, b, loose) => {
   const versionA = new SemVer(a, loose)
   const versionB = new SemVer(b, loose)
@@ -17741,20 +16789,26 @@ module.exports = compareBuild
 
 /***/ }),
 
-/***/ 9387:
+/***/ 9822:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const compareLoose = (a, b) => compare(a, b, true)
 module.exports = compareLoose
 
 
 /***/ }),
 
-/***/ 9800:
+/***/ 6625:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
 const compare = (a, b, loose) =>
   new SemVer(a, loose).compare(new SemVer(b, loose))
 
@@ -17763,10 +16817,13 @@ module.exports = compare
 
 /***/ }),
 
-/***/ 4192:
+/***/ 1531:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const parse = __nccwpck_require__(5720)
+"use strict";
+
+
+const parse = __nccwpck_require__(893)
 
 const diff = (version1, version2) => {
   const v1 = parse(version1, null, true)
@@ -17828,40 +16885,52 @@ module.exports = diff
 
 /***/ }),
 
-/***/ 9737:
+/***/ 5630:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const eq = (a, b, loose) => compare(a, b, loose) === 0
 module.exports = eq
 
 
 /***/ }),
 
-/***/ 3460:
+/***/ 5283:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const gt = (a, b, loose) => compare(a, b, loose) > 0
 module.exports = gt
 
 
 /***/ }),
 
-/***/ 8753:
+/***/ 6064:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const gte = (a, b, loose) => compare(a, b, loose) >= 0
 module.exports = gte
 
 
 /***/ }),
 
-/***/ 3879:
+/***/ 2782:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
 
 const inc = (version, release, options, identifier, identifierBase) => {
   if (typeof (options) === 'string') {
@@ -17884,60 +16953,78 @@ module.exports = inc
 
 /***/ }),
 
-/***/ 2139:
+/***/ 6108:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const lt = (a, b, loose) => compare(a, b, loose) < 0
 module.exports = lt
 
 
 /***/ }),
 
-/***/ 5480:
+/***/ 3353:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const lte = (a, b, loose) => compare(a, b, loose) <= 0
 module.exports = lte
 
 
 /***/ }),
 
-/***/ 9682:
+/***/ 5251:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
 const major = (a, loose) => new SemVer(a, loose).major
 module.exports = major
 
 
 /***/ }),
 
-/***/ 5574:
+/***/ 5479:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
 const minor = (a, loose) => new SemVer(a, loose).minor
 module.exports = minor
 
 
 /***/ }),
 
-/***/ 7511:
+/***/ 3282:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const neq = (a, b, loose) => compare(a, b, loose) !== 0
 module.exports = neq
 
 
 /***/ }),
 
-/***/ 5720:
+/***/ 893:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
 const parse = (version, options, throwErrors = false) => {
   if (version instanceof SemVer) {
     return version
@@ -17957,20 +17044,26 @@ module.exports = parse
 
 /***/ }),
 
-/***/ 2405:
+/***/ 7056:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
 const patch = (a, loose) => new SemVer(a, loose).patch
 module.exports = patch
 
 
 /***/ }),
 
-/***/ 569:
+/***/ 390:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const parse = __nccwpck_require__(5720)
+"use strict";
+
+
+const parse = __nccwpck_require__(893)
 const prerelease = (version, options) => {
   const parsed = parse(version, options)
   return (parsed && parsed.prerelease.length) ? parsed.prerelease : null
@@ -17980,30 +17073,39 @@ module.exports = prerelease
 
 /***/ }),
 
-/***/ 6714:
+/***/ 9729:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compare = __nccwpck_require__(9800)
+"use strict";
+
+
+const compare = __nccwpck_require__(6625)
 const rcompare = (a, b, loose) => compare(b, a, loose)
 module.exports = rcompare
 
 
 /***/ }),
 
-/***/ 1437:
+/***/ 8828:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compareBuild = __nccwpck_require__(8341)
+"use strict";
+
+
+const compareBuild = __nccwpck_require__(3932)
 const rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose))
 module.exports = rsort
 
 
 /***/ }),
 
-/***/ 7374:
+/***/ 9751:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const Range = __nccwpck_require__(4767)
+"use strict";
+
+
+const Range = __nccwpck_require__(8474)
 const satisfies = (version, range, options) => {
   try {
     range = new Range(range, options)
@@ -18017,20 +17119,26 @@ module.exports = satisfies
 
 /***/ }),
 
-/***/ 6383:
+/***/ 6476:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const compareBuild = __nccwpck_require__(8341)
+"use strict";
+
+
+const compareBuild = __nccwpck_require__(3932)
 const sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose))
 module.exports = sort
 
 
 /***/ }),
 
-/***/ 9393:
+/***/ 5752:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const parse = __nccwpck_require__(5720)
+"use strict";
+
+
+const parse = __nccwpck_require__(893)
 const valid = (version, options) => {
   const v = parse(version, options)
   return v ? v.version : null
@@ -18040,51 +17148,54 @@ module.exports = valid
 
 /***/ }),
 
-/***/ 989:
+/***/ 2348:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 // just pre-load all the stuff that index.js lazily exports
-const internalRe = __nccwpck_require__(5118)
-const constants = __nccwpck_require__(610)
-const SemVer = __nccwpck_require__(9532)
-const identifiers = __nccwpck_require__(1355)
-const parse = __nccwpck_require__(5720)
-const valid = __nccwpck_require__(9393)
-const clean = __nccwpck_require__(5662)
-const inc = __nccwpck_require__(3879)
-const diff = __nccwpck_require__(4192)
-const major = __nccwpck_require__(9682)
-const minor = __nccwpck_require__(5574)
-const patch = __nccwpck_require__(2405)
-const prerelease = __nccwpck_require__(569)
-const compare = __nccwpck_require__(9800)
-const rcompare = __nccwpck_require__(6714)
-const compareLoose = __nccwpck_require__(9387)
-const compareBuild = __nccwpck_require__(8341)
-const sort = __nccwpck_require__(6383)
-const rsort = __nccwpck_require__(1437)
-const gt = __nccwpck_require__(3460)
-const lt = __nccwpck_require__(2139)
-const eq = __nccwpck_require__(9737)
-const neq = __nccwpck_require__(7511)
-const gte = __nccwpck_require__(8753)
-const lte = __nccwpck_require__(5480)
-const cmp = __nccwpck_require__(4167)
-const coerce = __nccwpck_require__(6402)
-const Comparator = __nccwpck_require__(1624)
-const Range = __nccwpck_require__(4767)
-const satisfies = __nccwpck_require__(7374)
-const toComparators = __nccwpck_require__(7703)
-const maxSatisfying = __nccwpck_require__(6628)
-const minSatisfying = __nccwpck_require__(4710)
-const minVersion = __nccwpck_require__(549)
-const validRange = __nccwpck_require__(6362)
-const outside = __nccwpck_require__(9819)
-const gtr = __nccwpck_require__(8859)
-const ltr = __nccwpck_require__(9750)
-const intersects = __nccwpck_require__(9140)
-const simplifyRange = __nccwpck_require__(2533)
-const subset = __nccwpck_require__(2912)
+const internalRe = __nccwpck_require__(6211)
+const constants = __nccwpck_require__(4329)
+const SemVer = __nccwpck_require__(4839)
+const identifiers = __nccwpck_require__(6104)
+const parse = __nccwpck_require__(893)
+const valid = __nccwpck_require__(5752)
+const clean = __nccwpck_require__(2771)
+const inc = __nccwpck_require__(2782)
+const diff = __nccwpck_require__(1531)
+const major = __nccwpck_require__(5251)
+const minor = __nccwpck_require__(5479)
+const patch = __nccwpck_require__(7056)
+const prerelease = __nccwpck_require__(390)
+const compare = __nccwpck_require__(6625)
+const rcompare = __nccwpck_require__(9729)
+const compareLoose = __nccwpck_require__(9822)
+const compareBuild = __nccwpck_require__(3932)
+const sort = __nccwpck_require__(6476)
+const rsort = __nccwpck_require__(8828)
+const gt = __nccwpck_require__(5283)
+const lt = __nccwpck_require__(6108)
+const eq = __nccwpck_require__(5630)
+const neq = __nccwpck_require__(3282)
+const gte = __nccwpck_require__(6064)
+const lte = __nccwpck_require__(3353)
+const cmp = __nccwpck_require__(5618)
+const coerce = __nccwpck_require__(3597)
+const Comparator = __nccwpck_require__(863)
+const Range = __nccwpck_require__(8474)
+const satisfies = __nccwpck_require__(9751)
+const toComparators = __nccwpck_require__(2258)
+const maxSatisfying = __nccwpck_require__(9269)
+const minSatisfying = __nccwpck_require__(1367)
+const minVersion = __nccwpck_require__(6950)
+const validRange = __nccwpck_require__(8733)
+const outside = __nccwpck_require__(4772)
+const gtr = __nccwpck_require__(712)
+const ltr = __nccwpck_require__(5585)
+const intersects = __nccwpck_require__(1357)
+const simplifyRange = __nccwpck_require__(7344)
+const subset = __nccwpck_require__(4837)
 module.exports = {
   parse,
   valid,
@@ -18136,8 +17247,11 @@ module.exports = {
 
 /***/ }),
 
-/***/ 610:
+/***/ 4329:
 /***/ ((module) => {
+
+"use strict";
+
 
 // Note: this is the semver.org version of the spec that it implements
 // Not necessarily the package version of this code.
@@ -18178,8 +17292,11 @@ module.exports = {
 
 /***/ }),
 
-/***/ 2864:
+/***/ 7611:
 /***/ ((module) => {
+
+"use strict";
+
 
 const debug = (
   typeof process === 'object' &&
@@ -18194,8 +17311,11 @@ module.exports = debug
 
 /***/ }),
 
-/***/ 1355:
+/***/ 6104:
 /***/ ((module) => {
+
+"use strict";
+
 
 const numeric = /^[0-9]+$/
 const compareIdentifiers = (a, b) => {
@@ -18224,8 +17344,11 @@ module.exports = {
 
 /***/ }),
 
-/***/ 5490:
+/***/ 2443:
 /***/ ((module) => {
+
+"use strict";
+
 
 class LRUCache {
   constructor () {
@@ -18271,8 +17394,11 @@ module.exports = LRUCache
 
 /***/ }),
 
-/***/ 9763:
+/***/ 2600:
 /***/ ((module) => {
+
+"use strict";
+
 
 // parse out just the options we care about
 const looseOption = Object.freeze({ loose: true })
@@ -18293,15 +17419,18 @@ module.exports = parseOptions
 
 /***/ }),
 
-/***/ 5118:
+/***/ 6211:
 /***/ ((module, exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const {
   MAX_SAFE_COMPONENT_LENGTH,
   MAX_SAFE_BUILD_LENGTH,
   MAX_LENGTH,
-} = __nccwpck_require__(610)
-const debug = __nccwpck_require__(2864)
+} = __nccwpck_require__(4329)
+const debug = __nccwpck_require__(7611)
 exports = module.exports = {}
 
 // The actual regexps go on exports.re
@@ -18374,12 +17503,14 @@ createToken('MAINVERSIONLOOSE', `(${src[t.NUMERICIDENTIFIERLOOSE]})\\.` +
 
 // ## Pre-release Version Identifier
 // A numeric identifier, or a non-numeric identifier.
+// Non-numberic identifiers include numberic identifiers but can be longer.
+// Therefore non-numberic identifiers must go first.
 
-createToken('PRERELEASEIDENTIFIER', `(?:${src[t.NUMERICIDENTIFIER]
-}|${src[t.NONNUMERICIDENTIFIER]})`)
+createToken('PRERELEASEIDENTIFIER', `(?:${src[t.NONNUMERICIDENTIFIER]
+}|${src[t.NUMERICIDENTIFIER]})`)
 
-createToken('PRERELEASEIDENTIFIERLOOSE', `(?:${src[t.NUMERICIDENTIFIERLOOSE]
-}|${src[t.NONNUMERICIDENTIFIER]})`)
+createToken('PRERELEASEIDENTIFIERLOOSE', `(?:${src[t.NONNUMERICIDENTIFIER]
+}|${src[t.NUMERICIDENTIFIERLOOSE]})`)
 
 // ## Pre-release Version
 // Hyphen, followed by one or more dot-separated pre-release version
@@ -18519,21 +17650,27 @@ createToken('GTE0PRE', '^\\s*>=\\s*0\\.0\\.0-0\\s*$')
 
 /***/ }),
 
-/***/ 8859:
+/***/ 712:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 // Determine if version is greater than all the versions possible in the range.
-const outside = __nccwpck_require__(9819)
+const outside = __nccwpck_require__(4772)
 const gtr = (version, range, options) => outside(version, range, '>', options)
 module.exports = gtr
 
 
 /***/ }),
 
-/***/ 9140:
+/***/ 1357:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const Range = __nccwpck_require__(4767)
+"use strict";
+
+
+const Range = __nccwpck_require__(8474)
 const intersects = (r1, r2, options) => {
   r1 = new Range(r1, options)
   r2 = new Range(r2, options)
@@ -18544,10 +17681,13 @@ module.exports = intersects
 
 /***/ }),
 
-/***/ 9750:
+/***/ 5585:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const outside = __nccwpck_require__(9819)
+"use strict";
+
+
+const outside = __nccwpck_require__(4772)
 // Determine if version is less than all the versions possible in the range
 const ltr = (version, range, options) => outside(version, range, '<', options)
 module.exports = ltr
@@ -18555,11 +17695,14 @@ module.exports = ltr
 
 /***/ }),
 
-/***/ 6628:
+/***/ 9269:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
-const Range = __nccwpck_require__(4767)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
+const Range = __nccwpck_require__(8474)
 
 const maxSatisfying = (versions, range, options) => {
   let max = null
@@ -18587,11 +17730,14 @@ module.exports = maxSatisfying
 
 /***/ }),
 
-/***/ 4710:
+/***/ 1367:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
-const Range = __nccwpck_require__(4767)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
+const Range = __nccwpck_require__(8474)
 const minSatisfying = (versions, range, options) => {
   let min = null
   let minSV = null
@@ -18618,12 +17764,15 @@ module.exports = minSatisfying
 
 /***/ }),
 
-/***/ 549:
+/***/ 6950:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
-const Range = __nccwpck_require__(4767)
-const gt = __nccwpck_require__(3460)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
+const Range = __nccwpck_require__(8474)
+const gt = __nccwpck_require__(5283)
 
 const minVersion = (range, loose) => {
   range = new Range(range, loose)
@@ -18686,18 +17835,21 @@ module.exports = minVersion
 
 /***/ }),
 
-/***/ 9819:
+/***/ 4772:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const SemVer = __nccwpck_require__(9532)
-const Comparator = __nccwpck_require__(1624)
+"use strict";
+
+
+const SemVer = __nccwpck_require__(4839)
+const Comparator = __nccwpck_require__(863)
 const { ANY } = Comparator
-const Range = __nccwpck_require__(4767)
-const satisfies = __nccwpck_require__(7374)
-const gt = __nccwpck_require__(3460)
-const lt = __nccwpck_require__(2139)
-const lte = __nccwpck_require__(5480)
-const gte = __nccwpck_require__(8753)
+const Range = __nccwpck_require__(8474)
+const satisfies = __nccwpck_require__(9751)
+const gt = __nccwpck_require__(5283)
+const lt = __nccwpck_require__(6108)
+const lte = __nccwpck_require__(3353)
+const gte = __nccwpck_require__(6064)
 
 const outside = (version, range, hilo, options) => {
   version = new SemVer(version, options)
@@ -18773,14 +17925,17 @@ module.exports = outside
 
 /***/ }),
 
-/***/ 2533:
+/***/ 7344:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 // given a set of versions and a range, create a "simplified" range
 // that includes the same versions that the original range does
 // If the original range is shorter than the simplified one, return that.
-const satisfies = __nccwpck_require__(7374)
-const compare = __nccwpck_require__(9800)
+const satisfies = __nccwpck_require__(9751)
+const compare = __nccwpck_require__(6625)
 module.exports = (versions, range, options) => {
   const set = []
   let first = null
@@ -18827,14 +17982,17 @@ module.exports = (versions, range, options) => {
 
 /***/ }),
 
-/***/ 2912:
+/***/ 4837:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const Range = __nccwpck_require__(4767)
-const Comparator = __nccwpck_require__(1624)
+"use strict";
+
+
+const Range = __nccwpck_require__(8474)
+const Comparator = __nccwpck_require__(863)
 const { ANY } = Comparator
-const satisfies = __nccwpck_require__(7374)
-const compare = __nccwpck_require__(9800)
+const satisfies = __nccwpck_require__(9751)
+const compare = __nccwpck_require__(6625)
 
 // Complex range `r1 || r2 || ...` is a subset of `R1 || R2 || ...` iff:
 // - Every simple range `r1, r2, ...` is a null set, OR
@@ -19081,10 +18239,13 @@ module.exports = subset
 
 /***/ }),
 
-/***/ 7703:
+/***/ 2258:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const Range = __nccwpck_require__(4767)
+"use strict";
+
+
+const Range = __nccwpck_require__(8474)
 
 // Mostly just for testing and legacy API reasons
 const toComparators = (range, options) =>
@@ -19096,10 +18257,13 @@ module.exports = toComparators
 
 /***/ }),
 
-/***/ 6362:
+/***/ 8733:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const Range = __nccwpck_require__(4767)
+"use strict";
+
+
+const Range = __nccwpck_require__(8474)
 const validRange = (range, options) => {
   try {
     // Return '*' instead of '' so that truthiness works.
@@ -19114,45 +18278,45 @@ module.exports = validRange
 
 /***/ }),
 
-/***/ 9557:
+/***/ 4260:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
-var shebangRegex = __nccwpck_require__(3891);
+const shebangRegex = __nccwpck_require__(5477);
 
-module.exports = function (str) {
-	var match = str.match(shebangRegex);
+module.exports = (string = '') => {
+	const match = string.match(shebangRegex);
 
 	if (!match) {
 		return null;
 	}
 
-	var arr = match[0].replace(/#! ?/, '').split(' ');
-	var bin = arr[0].split('/').pop();
-	var arg = arr[1];
+	const [path, argument] = match[0].replace(/#! ?/, '').split(' ');
+	const binary = path.split('/').pop();
 
-	return (bin === 'env' ?
-		arg :
-		bin + (arg ? ' ' + arg : '')
-	);
+	if (binary === 'env') {
+		return argument;
+	}
+
+	return argument ? `${binary} ${argument}` : binary;
 };
 
 
 /***/ }),
 
-/***/ 3891:
+/***/ 5477:
 /***/ ((module) => {
 
 "use strict";
 
-module.exports = /^#!.*/;
+module.exports = /^#!(.*)/;
 
 
 /***/ }),
 
-/***/ 5421:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ 2331:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 //
 // ShellJS
@@ -19162,7 +18326,9 @@ module.exports = /^#!.*/;
 // http://github.com/shelljs/shelljs
 //
 
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
+
+module.exports = common.shell;
 
 //@
 //@ All commands run synchronously, unless otherwise stated.
@@ -19178,49 +18344,49 @@ var common = __nccwpck_require__(4501);
 
 // Load all default commands. We import these for their side effect of loading
 // using the plugin architecture via `common.register()`.
-__nccwpck_require__(5198);
-__nccwpck_require__(3219);
-__nccwpck_require__(8027);
-__nccwpck_require__(3282);
-__nccwpck_require__(5367);
-__nccwpck_require__(6376);
-__nccwpck_require__(3733);
-__nccwpck_require__(3049);
-__nccwpck_require__(1834); // A hint to the bundler to keep exec-child.js
-__nccwpck_require__(5583);
-__nccwpck_require__(3772);
-__nccwpck_require__(4234);
-__nccwpck_require__(8810);
-__nccwpck_require__(8573);
-__nccwpck_require__(1605);
-__nccwpck_require__(2771);
-__nccwpck_require__(6489);
-__nccwpck_require__(2834);
-__nccwpck_require__(1709);
-__nccwpck_require__(1341);
-__nccwpck_require__(410);
-__nccwpck_require__(4122);
-__nccwpck_require__(4632);
-__nccwpck_require__(2010);
-__nccwpck_require__(1019);
-__nccwpck_require__(8804);
-__nccwpck_require__(4337);
-__nccwpck_require__(2792);
-__nccwpck_require__(7509);
-__nccwpck_require__(1677);
-__nccwpck_require__(4275);
+__nccwpck_require__(3172);
+__nccwpck_require__(333);
+__nccwpck_require__(4005);
+__nccwpck_require__(1640);
+__nccwpck_require__(6561);
+__nccwpck_require__(3022);
+__nccwpck_require__(3659);
+__nccwpck_require__(6387);
+__nccwpck_require__(5032); // A hint to the bundler to keep exec-child.js
+__nccwpck_require__(8533);
+__nccwpck_require__(4922);
+__nccwpck_require__(200);
+__nccwpck_require__(2460);
+__nccwpck_require__(8735);
+__nccwpck_require__(9567);
+__nccwpck_require__(189);
+__nccwpck_require__(5443);
+__nccwpck_require__(1240);
+__nccwpck_require__(1315);
+__nccwpck_require__(2655);
+__nccwpck_require__(1456);
+__nccwpck_require__(1936);
+__nccwpck_require__(4074);
+__nccwpck_require__(4424);
+__nccwpck_require__(9033);
+__nccwpck_require__(4910);
+__nccwpck_require__(3771);
+__nccwpck_require__(8546);
+__nccwpck_require__(1975);
+__nccwpck_require__(3255);
+__nccwpck_require__(6005);
 
 //@
 //@ ### exit(code)
 //@
 //@ Exits the current process with the given exit `code`.
-exports.exit = function exit(code) {
+module.exports.exit = function exit(code) {
   common.state.error = null;
   common.state.errorCode = 0;
   if (code) {
     common.error('exit', {
       continue: true,
-      code: code,
+      code,
       prefix: '',
       silent: true,
       fatal: false,
@@ -19232,20 +18398,20 @@ exports.exit = function exit(code) {
 };
 
 //@include ./src/error.js
-exports.error = __nccwpck_require__(2592);
+module.exports.error = __nccwpck_require__(4882);
 
 //@include ./src/errorCode.js
-exports.errorCode = __nccwpck_require__(7757);
+module.exports.errorCode = __nccwpck_require__(7383);
 
 //@include ./src/common.js
-exports.ShellString = common.ShellString;
+module.exports.ShellString = common.ShellString;
 
 //@
 //@ ### env['VAR_NAME']
 //@
 //@ Object containing environment variables (both getter and setter). Shortcut
 //@ to `process.env`.
-exports.env = process.env;
+module.exports.env = process.env;
 
 //@
 //@ ### Pipes
@@ -19266,7 +18432,7 @@ exports.env = process.env;
 //@ ## Configuration
 //@
 
-exports.config = common.config;
+module.exports.config = common.config;
 
 //@
 //@ ### config.silent
@@ -19372,11 +18538,11 @@ exports.config = common.config;
 
 /***/ }),
 
-/***/ 5198:
+/***/ 3172:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('cat', _cat, {
   canReceivePipe: true,
@@ -19455,11 +18621,11 @@ function numberedLine(n, line) {
 
 /***/ }),
 
-/***/ 3219:
+/***/ 333:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var os = __nccwpck_require__(857);
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 common.register('cd', _cd, {});
 
@@ -19502,12 +18668,12 @@ module.exports = _cd;
 
 /***/ }),
 
-/***/ 8027:
+/***/ 4005:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
+var common = __nccwpck_require__(8851);
 
 var PERMS = (function (base) {
   return {
@@ -19731,11 +18897,11 @@ module.exports = _chmod;
 
 /***/ }),
 
-/***/ 3282:
+/***/ 1640:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
-var execa = __nccwpck_require__(5823);
+var execa = __nccwpck_require__(2783);
+var common = __nccwpck_require__(8851);
 
 var DEFAULT_MAXBUFFER_SIZE = 20 * 1024 * 1024;
 var COMMAND_NOT_FOUND_ERROR_CODE = 127;
@@ -19747,14 +18913,22 @@ common.register('cmd', _cmd, {
   wrapOutput: true,
 });
 
-function commandNotFound(execaResult) {
+function isCommandNotFound(execaResult) {
   if (process.platform === 'win32') {
     var str = 'is not recognized as an internal or external command';
-    return execaResult.code && execaResult.stderr.includes(str);
-  } else {
-    return execaResult.code &&
-      execaResult.stdout === null && execaResult.stderr === null;
+    return execaResult.exitCode && execaResult.stderr.includes(str);
   }
+  return execaResult.failed && execaResult.code === 'ENOENT';
+}
+
+function isExecaInternalError(result) {
+  if (typeof result.stdout !== 'string') return true;
+  if (typeof result.stderr !== 'string') return true;
+  if (typeof result.exitCode !== 'number') return true;
+  if (result.exitCode === 0 && result.failed) return true;
+  // Otherwise assume this executed correctly. The command may still have exited
+  // with non-zero status, but that's not due to anything execa did.
+  return false;
 }
 
 //@
@@ -19821,7 +18995,7 @@ function _cmd(options, command, commandArgs, userOptions) {
   // by the user.
   var defaultOptions = {
     maxBuffer: DEFAULT_MAXBUFFER_SIZE,
-    stripEof: false, // Preserve trailing newlines for consistency with unix.
+    stripFinalNewline: false, // Preserve trailing newlines for consistency with unix.
     reject: false, // Use ShellJS's error handling system.
   };
 
@@ -19839,16 +19013,24 @@ function _cmd(options, command, commandArgs, userOptions) {
   var stdout;
   var stderr;
   var code;
-  if (commandNotFound(result)) {
+  if (isCommandNotFound(result)) {
     // This can happen if `command` is not an executable binary, or possibly
     // under other conditions.
     stdout = '';
     stderr = "'" + command + "': command not found";
     code = COMMAND_NOT_FOUND_ERROR_CODE;
+  } else if (isExecaInternalError(result)) {
+    // Catch-all: execa tried to run `command` but it encountered some error
+    // (ex. maxBuffer, timeout).
+    stdout = result.stdout || '';
+    stderr = result.stderr ||
+             `'${command}' encountered an error during execution`;
+    code = result.exitCode !== undefined && result.exitCode > 0 ? result.exitCode : 1;
   } else {
+    // Normal exit: execa was able to execute `command` and get a return value.
     stdout = result.stdout.toString();
     stderr = result.stderr.toString();
-    code = result.code;
+    code = result.exitCode;
   }
 
   // Pass `continue: true` so we can specify a value for stdout.
@@ -19860,7 +19042,7 @@ module.exports = _cmd;
 
 /***/ }),
 
-/***/ 4501:
+/***/ 8851:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -19873,7 +19055,9 @@ module.exports = _cmd;
 var os = __nccwpck_require__(857);
 var fs = __nccwpck_require__(9896);
 var glob = __nccwpck_require__(2856);
-var shell = __nccwpck_require__(5421);
+
+var shell = {};
+exports.shell = shell;
 
 var shellMethods = Object.create(shell);
 
@@ -19895,13 +19079,13 @@ var DEFAULT_CONFIG = {
 };
 
 var config = {
-  reset: function () {
+  reset() {
     Object.assign(this, DEFAULT_CONFIG);
     if (!isElectron) {
       this.execPath = process.execPath;
     }
   },
-  resetForTesting: function () {
+  resetForTesting() {
     this.reset();
     this.silent = true;
   },
@@ -19947,11 +19131,12 @@ exports.convertErrorOutput = convertErrorOutput;
 
 // An exception class to help propagate command errors (e.g., non-zero exit
 // status) up to the top-level. {@param value} should be a ShellString.
-function CommandError(value) {
-  this.returnValue = value;
+class CommandError extends Error {
+  constructor(value) {
+    super(value.toString());
+    this.returnValue = value;
+  }
 }
-CommandError.prototype = Object.create(Error.prototype);
-CommandError.prototype.constructor = CommandError;
 exports.CommandError = CommandError; // visible for testing
 
 // Shows error message. Throws if fatal is true (defaults to config.fatal, overridable with options.fatal)
@@ -20054,7 +19239,7 @@ function parseOptions(opt, map, errorOptions) {
     throw new TypeError('parseOptions() internal error: map must be an object');
   } else if (!isObject(errorOptions)) {
     throw new TypeError(
-        'parseOptions() internal error: errorOptions must be object'
+        'parseOptions() internal error: errorOptions must be object',
     );
   }
 
@@ -20410,12 +19595,12 @@ exports.register = _register;
 
 /***/ }),
 
-/***/ 5367:
+/***/ 6561:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 common.register('cp', _cp, {
   cmdOptions: {
@@ -20731,12 +19916,12 @@ module.exports = _cp;
 
 /***/ }),
 
-/***/ 6376:
+/***/ 3022:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
-var _cd = __nccwpck_require__(3219);
 var path = __nccwpck_require__(6928);
+var common = __nccwpck_require__(8851);
+var _cd = __nccwpck_require__(333);
 
 common.register('dirs', _dirs, {
   wrapOutput: false,
@@ -20948,12 +20133,12 @@ exports.dirs = _dirs;
 
 /***/ }),
 
-/***/ 3733:
+/***/ 3659:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var format = (__nccwpck_require__(9023).format);
 
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 common.register('echo', _echo, {
   allowGlobbing: false,
@@ -21017,10 +20202,10 @@ module.exports = _echo;
 
 /***/ }),
 
-/***/ 2592:
+/***/ 4882:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 //@
 //@ ### error()
@@ -21039,10 +20224,10 @@ module.exports = error;
 
 /***/ }),
 
-/***/ 7757:
+/***/ 7383:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 //@
 //@ ### errorCode()
@@ -21056,7 +20241,7 @@ module.exports = errorCode;
 
 /***/ }),
 
-/***/ 1834:
+/***/ 5032:
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var childProcess = __nccwpck_require__(5317);
@@ -21132,15 +20317,15 @@ if (false) {}
 
 /***/ }),
 
-/***/ 3049:
+/***/ 6387:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
-var _tempDir = (__nccwpck_require__(1019).tempDir);
-var _pwd = __nccwpck_require__(1709);
 var path = __nccwpck_require__(6928);
 var fs = __nccwpck_require__(9896);
 var child = __nccwpck_require__(5317);
+var common = __nccwpck_require__(8851);
+var _tempDir = (__nccwpck_require__(9033).tempDir);
+var _pwd = __nccwpck_require__(1315);
 
 var DEFAULT_MAXBUFFER_SIZE = 20 * 1024 * 1024;
 var DEFAULT_ERROR_CODE = 1;
@@ -21190,9 +20375,9 @@ function execSync(cmd, opts, pipe) {
   var paramsToSerialize = {
     command: cmd,
     execOptions: opts,
-    pipe: pipe,
-    stdoutFile: stdoutFile,
-    stderrFile: stderrFile,
+    pipe,
+    stdoutFile,
+    stderrFile,
   };
 
   // Create the files and ensure these are locked down (for read and write) to
@@ -21394,12 +20579,12 @@ module.exports = _exec;
 
 /***/ }),
 
-/***/ 5583:
+/***/ 8533:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var path = __nccwpck_require__(6928);
-var common = __nccwpck_require__(4501);
-var _ls = __nccwpck_require__(8573);
+var common = __nccwpck_require__(8851);
+var _ls = __nccwpck_require__(8735);
 
 common.register('find', _find, {
   cmdOptions: {
@@ -21467,11 +20652,11 @@ module.exports = _find;
 
 /***/ }),
 
-/***/ 3772:
+/***/ 4922:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('grep', _grep, {
   globStart: 2, // don't glob-expand the regex
@@ -21481,6 +20666,9 @@ common.register('grep', _grep, {
     'l': 'nameOnly',
     'i': 'ignoreCase',
     'n': 'lineNumber',
+    'B': 'beforeContext',
+    'A': 'afterContext',
+    'C': 'context',
   },
 });
 
@@ -21494,12 +20682,18 @@ common.register('grep', _grep, {
 //@ + `-l`: Print only filenames of matching files.
 //@ + `-i`: Ignore case.
 //@ + `-n`: Print line numbers.
+//@ + `-B <num>`: Show `<num>` lines before each result.
+//@ + `-A <num>`: Show `<num>` lines after each result.
+//@ + `-C <num>`: Show `<num>` lines before and after each result. -B and -A override this option.
 //@
 //@ Examples:
 //@
 //@ ```javascript
 //@ grep('-v', 'GLOBAL_VARIABLE', '*.js');
 //@ grep('GLOBAL_VARIABLE', '*.js');
+//@ grep('-B', 3, 'GLOBAL_VARIABLE', '*.js');
+//@ grep({ '-B': 3 }, 'GLOBAL_VARIABLE', '*.js');
+//@ grep({ '-B': 3, '-C': 2 }, 'GLOBAL_VARIABLE', '*.js');
 //@ ```
 //@
 //@ Reads input string from given files and returns a
@@ -21511,7 +20705,41 @@ function _grep(options, regex, files) {
 
   if (!files && !pipe) common.error('no paths given', 2);
 
-  files = [].slice.call(arguments, 2);
+  var idx = 2;
+  var contextError = ': invalid context length argument';
+  // If the option has been found but not read, copy value from arguments
+  if (options.beforeContext === true) {
+    idx = 3;
+    options.beforeContext = Number(arguments[1]);
+    if (options.beforeContext < 0) {
+      common.error(options.beforeContext + contextError, 2);
+    }
+  }
+  if (options.afterContext === true) {
+    idx = 3;
+    options.afterContext = Number(arguments[1]);
+    if (options.afterContext < 0) {
+      common.error(options.afterContext + contextError, 2);
+    }
+  }
+  if (options.context === true) {
+    idx = 3;
+    options.context = Number(arguments[1]);
+    if (options.context < 0) {
+      common.error(options.context + contextError, 2);
+    }
+  }
+  //  If before or after not given but context is, update values
+  if (typeof options.context === 'number') {
+    if (options.beforeContext === false) {
+      options.beforeContext = options.context;
+    }
+    if (options.afterContext === false) {
+      options.afterContext = options.context;
+    }
+  }
+  regex = arguments[idx - 1];
+  files = [].slice.call(arguments, idx);
 
   if (pipe) {
     files.unshift('-');
@@ -21534,16 +20762,79 @@ function _grep(options, regex, files) {
       }
     } else {
       var lines = contents.split('\n');
+      var matches = [];
+
       lines.forEach(function (line, index) {
         var matched = line.match(regex);
         if ((options.inverse && !matched) || (!options.inverse && matched)) {
-          var result = line;
-          if (options.lineNumber) {
-            result = '' + (index + 1) + ':' + line;
+          var lineNumber = index + 1;
+          var result = {};
+          if (matches.length > 0) {
+            // If the last result intersects, combine them
+            var last = matches[matches.length - 1];
+            var minimumLineNumber = Math.max(
+              1,
+              lineNumber - options.beforeContext - 1,
+            );
+            if (
+              last.hasOwnProperty('' + lineNumber) ||
+              last.hasOwnProperty('' + minimumLineNumber)
+            ) {
+              result = last;
+            }
           }
-          grep.push(result);
+          result[lineNumber] = {
+            line,
+            match: true,
+          };
+          if (options.beforeContext > 0) {
+            // Store the lines with their line numbers to check for overlap
+            lines
+              .slice(Math.max(index - options.beforeContext, 0), index)
+              .forEach(function (v, i, a) {
+                var lineNum = '' + (index - a.length + i + 1);
+                if (!result.hasOwnProperty(lineNum)) {
+                  result[lineNum] = { line: v, match: false };
+                }
+              });
+          }
+          if (options.afterContext > 0) {
+            // Store the lines with their line numbers to check for overlap
+            lines
+              .slice(
+                index + 1,
+                Math.min(index + options.afterContext + 1, lines.length - 1),
+              )
+              .forEach(function (v, i) {
+                var lineNum = '' + (index + 1 + i + 1);
+                if (!result.hasOwnProperty(lineNum)) {
+                  result[lineNum] = { line: v, match: false };
+                }
+              });
+          }
+          // Only add the result if it's new
+          if (!matches.includes(result)) {
+            matches.push(result);
+          }
         }
       });
+
+      // Loop through the matches and add them to the output
+      Array.prototype.push.apply(
+        grep,
+        matches.map(function (result) {
+          return Object.entries(result)
+            .map(function (entry) {
+              var lineNumber = entry[0];
+              var line = entry[1].line;
+              var match = entry[1].match;
+              return options.lineNumber
+                ? lineNumber + (match ? ':' : '-') + line
+                : line;
+            })
+            .join('\n');
+        }),
+      );
     }
   });
 
@@ -21551,18 +20842,26 @@ function _grep(options, regex, files) {
     // We didn't hit the error above, but pattern didn't match
     common.error('', { silent: true });
   }
-  return grep.join('\n') + '\n';
+
+  var separator = '\n';
+  if (
+    typeof options.beforeContext === 'number' ||
+    typeof options.afterContext === 'number'
+  ) {
+    separator = '\n--\n';
+  }
+  return grep.join(separator) + '\n';
 }
 module.exports = _grep;
 
 
 /***/ }),
 
-/***/ 4234:
+/***/ 200:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('head', _head, {
   canReceivePipe: true,
@@ -21672,12 +20971,12 @@ module.exports = _head;
 
 /***/ }),
 
-/***/ 8810:
+/***/ 2460:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 common.register('ln', _ln, {
   cmdOptions: {
@@ -21754,13 +21053,13 @@ module.exports = _ln;
 
 /***/ }),
 
-/***/ 8573:
+/***/ 8735:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var path = __nccwpck_require__(6928);
 var fs = __nccwpck_require__(9896);
-var common = __nccwpck_require__(4501);
 var glob = __nccwpck_require__(2856);
+var common = __nccwpck_require__(8851);
 
 // glob patterns use the UNIX path seperator
 var globPatternRecursive = '/**';
@@ -21916,12 +21215,12 @@ module.exports = _ls;
 
 /***/ }),
 
-/***/ 1605:
+/***/ 9567:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
+var common = __nccwpck_require__(8851);
 
 common.register('mkdir', _mkdir, {
   cmdOptions: {
@@ -22025,14 +21324,14 @@ module.exports = _mkdir;
 
 /***/ }),
 
-/***/ 2771:
+/***/ 189:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
-var common = __nccwpck_require__(4501);
-var cp = __nccwpck_require__(5367);
-var rm = __nccwpck_require__(1341);
+var common = __nccwpck_require__(8851);
+var cp = __nccwpck_require__(6561);
+var rm = __nccwpck_require__(2655);
 
 common.register('mv', _mv, {
   cmdOptions: {
@@ -22151,7 +21450,7 @@ module.exports = _mv;
 
 /***/ }),
 
-/***/ 6489:
+/***/ 5443:
 /***/ (() => {
 
 // see dirs.js
@@ -22159,7 +21458,7 @@ module.exports = _mv;
 
 /***/ }),
 
-/***/ 2834:
+/***/ 1240:
 /***/ (() => {
 
 // see dirs.js
@@ -22167,11 +21466,11 @@ module.exports = _mv;
 
 /***/ }),
 
-/***/ 1709:
+/***/ 1315:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 var path = __nccwpck_require__(6928);
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 common.register('pwd', _pwd, {
   allowGlobbing: false,
@@ -22190,11 +21489,11 @@ module.exports = _pwd;
 
 /***/ }),
 
-/***/ 1341:
+/***/ 2655:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('rm', _rm, {
   cmdOptions: {
@@ -22398,11 +21697,11 @@ module.exports = _rm;
 
 /***/ }),
 
-/***/ 410:
+/***/ 1456:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('sed', _sed, {
   globStart: 3, // don't glob-expand regexes
@@ -22500,10 +21799,10 @@ module.exports = _sed;
 
 /***/ }),
 
-/***/ 4122:
+/***/ 1936:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
+var common = __nccwpck_require__(8851);
 
 common.register('set', _set, {
   allowGlobbing: false,
@@ -22562,11 +21861,11 @@ module.exports = _set;
 
 /***/ }),
 
-/***/ 4632:
+/***/ 4074:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('sort', _sort, {
   canReceivePipe: true,
@@ -22667,11 +21966,11 @@ module.exports = _sort;
 
 /***/ }),
 
-/***/ 2010:
+/***/ 4424:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('tail', _tail, {
   canReceivePipe: true,
@@ -22764,12 +22063,12 @@ module.exports = _tail;
 
 /***/ }),
 
-/***/ 1019:
+/***/ 9033:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var os = __nccwpck_require__(857);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('tempdir', _tempDir, {
   allowGlobbing: false,
@@ -22846,11 +22145,11 @@ module.exports.clearCache = clearCache;
 
 /***/ }),
 
-/***/ 8804:
+/***/ 4910:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('test', _test, {
   cmdOptions: {
@@ -22939,12 +22238,12 @@ module.exports = _test;
 
 /***/ }),
 
-/***/ 4337:
+/***/ 3771:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
+var common = __nccwpck_require__(8851);
 
 common.register('to', _to, {
   pipeOnly: true,
@@ -22984,12 +22283,12 @@ module.exports = _to;
 
 /***/ }),
 
-/***/ 2792:
+/***/ 8546:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
+var common = __nccwpck_require__(8851);
 
 common.register('toEnd', _toEnd, {
   pipeOnly: true,
@@ -23028,11 +22327,11 @@ module.exports = _toEnd;
 
 /***/ }),
 
-/***/ 7509:
+/***/ 1975:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 common.register('touch', _touch, {
   cmdOptions: {
@@ -23152,11 +22451,11 @@ function tryStatFile(filePath) {
 
 /***/ }),
 
-/***/ 1677:
+/***/ 3255:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
+var common = __nccwpck_require__(8851);
 
 // add c spaces to the left of str
 function lpad(c, str) {
@@ -23252,12 +22551,12 @@ module.exports = _uniq;
 
 /***/ }),
 
-/***/ 4275:
+/***/ 6005:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-var common = __nccwpck_require__(4501);
 var fs = __nccwpck_require__(9896);
 var path = __nccwpck_require__(6928);
+var common = __nccwpck_require__(8851);
 
 common.register('which', _which, {
   allowGlobbing: false,
@@ -23647,24 +22946,25 @@ if (process.platform === 'linux') {
 
 /***/ }),
 
-/***/ 1717:
+/***/ 192:
 /***/ ((module) => {
 
 "use strict";
 
-module.exports = function (x) {
-	var lf = typeof x === 'string' ? '\n' : '\n'.charCodeAt();
-	var cr = typeof x === 'string' ? '\r' : '\r'.charCodeAt();
 
-	if (x[x.length - 1] === lf) {
-		x = x.slice(0, x.length - 1);
+module.exports = input => {
+	const LF = typeof input === 'string' ? '\n' : '\n'.charCodeAt();
+	const CR = typeof input === 'string' ? '\r' : '\r'.charCodeAt();
+
+	if (input[input.length - 1] === LF) {
+		input = input.slice(0, input.length - 1);
 	}
 
-	if (x[x.length - 1] === cr) {
-		x = x.slice(0, x.length - 1);
+	if (input[input.length - 1] === CR) {
+		input = input.slice(0, input.length - 1);
 	}
 
-	return x;
+	return input;
 };
 
 
@@ -24291,7 +23591,7 @@ module.exports.DecoratorHandler = DecoratorHandler
 module.exports.RedirectHandler = RedirectHandler
 module.exports.interceptors = {
   redirect: __nccwpck_require__(1225),
-  responseError: __nccwpck_require__(4329),
+  responseError: __nccwpck_require__(6710),
   retry: __nccwpck_require__(9151),
   dump: __nccwpck_require__(3223),
   dns: __nccwpck_require__(8182),
@@ -28177,7 +27477,7 @@ const net = __nccwpck_require__(7030)
 const { Blob } = __nccwpck_require__(4573)
 const nodeUtil = __nccwpck_require__(7975)
 const { stringify } = __nccwpck_require__(1792)
-const { EventEmitter: EE } = __nccwpck_require__(8474)
+const { EventEmitter: EE } = __nccwpck_require__(6093)
 const { InvalidArgumentError } = __nccwpck_require__(134)
 const { headerNameLowerCasedRecord } = __nccwpck_require__(6696)
 const { tree } = __nccwpck_require__(3937)
@@ -32637,7 +31937,7 @@ module.exports = DispatcherBase
 
 "use strict";
 
-const EventEmitter = __nccwpck_require__(8474)
+const EventEmitter = __nccwpck_require__(6093)
 const WrapHandler = __nccwpck_require__(389)
 
 const wrapInterceptor = (dispatch) => (opts, handler) => dispatch(opts, WrapHandler.wrap(handler))
@@ -34325,7 +33625,7 @@ const util = __nccwpck_require__(1593)
 const { kBodyUsed } = __nccwpck_require__(7144)
 const assert = __nccwpck_require__(4589)
 const { InvalidArgumentError } = __nccwpck_require__(134)
-const EE = __nccwpck_require__(8474)
+const EE = __nccwpck_require__(6093)
 
 const redirectableStatusCodes = [300, 301, 302, 303, 307, 308]
 
@@ -35483,7 +34783,7 @@ module.exports = (opts = {}) => {
 "use strict";
 
 const { isIP } = __nccwpck_require__(7030)
-const { lookup } = __nccwpck_require__(8229)
+const { lookup } = __nccwpck_require__(610)
 const DecoratorHandler = __nccwpck_require__(4054)
 const { InvalidArgumentError, InformationalError } = __nccwpck_require__(134)
 const maxInt = Math.pow(2, 31) - 1
@@ -36065,7 +35365,7 @@ module.exports = createRedirectInterceptor
 
 /***/ }),
 
-/***/ 4329:
+/***/ 6710:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -45182,7 +44482,7 @@ const {
   requestBodyHeader,
   subresourceSet
 } = __nccwpck_require__(8610)
-const EE = __nccwpck_require__(8474)
+const EE = __nccwpck_require__(6093)
 const { Readable, pipeline, finished, isErrored, isReadable } = __nccwpck_require__(7075)
 const { addAbortListener, bufferToLowerCasedHeaderName } = __nccwpck_require__(1593)
 const { dataURLProcessor, serializeAMimeType, minimizeSupportedMimeType } = __nccwpck_require__(7587)
@@ -47419,7 +46719,7 @@ const { webidl } = __nccwpck_require__(7858)
 const { URLSerializer } = __nccwpck_require__(7587)
 const { kConstruct } = __nccwpck_require__(7144)
 const assert = __nccwpck_require__(4589)
-const { getMaxListeners, setMaxListeners, defaultMaxListeners } = __nccwpck_require__(8474)
+const { getMaxListeners, setMaxListeners, defaultMaxListeners } = __nccwpck_require__(6093)
 
 const kAbortController = Symbol('abortController')
 
@@ -54908,126 +54208,113 @@ module.exports = {
 
 /***/ }),
 
-/***/ 5754:
+/***/ 7133:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-module.exports = which
-which.sync = whichSync
-
-var isWindows = process.platform === 'win32' ||
+const isWindows = process.platform === 'win32' ||
     process.env.OSTYPE === 'cygwin' ||
     process.env.OSTYPE === 'msys'
 
-var path = __nccwpck_require__(6928)
-var COLON = isWindows ? ';' : ':'
-var isexe = __nccwpck_require__(9964)
+const path = __nccwpck_require__(6928)
+const COLON = isWindows ? ';' : ':'
+const isexe = __nccwpck_require__(9964)
 
-function getNotFoundError (cmd) {
-  var er = new Error('not found: ' + cmd)
-  er.code = 'ENOENT'
+const getNotFoundError = (cmd) =>
+  Object.assign(new Error(`not found: ${cmd}`), { code: 'ENOENT' })
 
-  return er
-}
+const getPathInfo = (cmd, opt) => {
+  const colon = opt.colon || COLON
 
-function getPathInfo (cmd, opt) {
-  var colon = opt.colon || COLON
-  var pathEnv = opt.path || process.env.PATH || ''
-  var pathExt = ['']
+  // If it has a slash, then we don't bother searching the pathenv.
+  // just check the file itself, and that's it.
+  const pathEnv = cmd.match(/\//) || isWindows && cmd.match(/\\/) ? ['']
+    : (
+      [
+        // windows always checks the cwd first
+        ...(isWindows ? [process.cwd()] : []),
+        ...(opt.path || process.env.PATH ||
+          /* istanbul ignore next: very unusual */ '').split(colon),
+      ]
+    )
+  const pathExtExe = isWindows
+    ? opt.pathExt || process.env.PATHEXT || '.EXE;.CMD;.BAT;.COM'
+    : ''
+  const pathExt = isWindows ? pathExtExe.split(colon) : ['']
 
-  pathEnv = pathEnv.split(colon)
-
-  var pathExtExe = ''
   if (isWindows) {
-    pathEnv.unshift(process.cwd())
-    pathExtExe = (opt.pathExt || process.env.PATHEXT || '.EXE;.CMD;.BAT;.COM')
-    pathExt = pathExtExe.split(colon)
-
-
-    // Always test the cmd itself first.  isexe will check to make sure
-    // it's found in the pathExt set.
     if (cmd.indexOf('.') !== -1 && pathExt[0] !== '')
       pathExt.unshift('')
   }
 
-  // If it has a slash, then we don't bother searching the pathenv.
-  // just check the file itself, and that's it.
-  if (cmd.match(/\//) || isWindows && cmd.match(/\\/))
-    pathEnv = ['']
-
   return {
-    env: pathEnv,
-    ext: pathExt,
-    extExe: pathExtExe
+    pathEnv,
+    pathExt,
+    pathExtExe,
   }
 }
 
-function which (cmd, opt, cb) {
+const which = (cmd, opt, cb) => {
   if (typeof opt === 'function') {
     cb = opt
     opt = {}
   }
+  if (!opt)
+    opt = {}
 
-  var info = getPathInfo(cmd, opt)
-  var pathEnv = info.env
-  var pathExt = info.ext
-  var pathExtExe = info.extExe
-  var found = []
+  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
+  const found = []
 
-  ;(function F (i, l) {
-    if (i === l) {
-      if (opt.all && found.length)
-        return cb(null, found)
-      else
-        return cb(getNotFoundError(cmd))
-    }
+  const step = i => new Promise((resolve, reject) => {
+    if (i === pathEnv.length)
+      return opt.all && found.length ? resolve(found)
+        : reject(getNotFoundError(cmd))
 
-    var pathPart = pathEnv[i]
-    if (pathPart.charAt(0) === '"' && pathPart.slice(-1) === '"')
-      pathPart = pathPart.slice(1, -1)
+    const ppRaw = pathEnv[i]
+    const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw
 
-    var p = path.join(pathPart, cmd)
-    if (!pathPart && (/^\.[\\\/]/).test(cmd)) {
-      p = cmd.slice(0, 2) + p
-    }
-    ;(function E (ii, ll) {
-      if (ii === ll) return F(i + 1, l)
-      var ext = pathExt[ii]
-      isexe(p + ext, { pathExt: pathExtExe }, function (er, is) {
-        if (!er && is) {
-          if (opt.all)
-            found.push(p + ext)
-          else
-            return cb(null, p + ext)
-        }
-        return E(ii + 1, ll)
-      })
-    })(0, pathExt.length)
-  })(0, pathEnv.length)
+    const pCmd = path.join(pathPart, cmd)
+    const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd
+      : pCmd
+
+    resolve(subStep(p, i, 0))
+  })
+
+  const subStep = (p, i, ii) => new Promise((resolve, reject) => {
+    if (ii === pathExt.length)
+      return resolve(step(i + 1))
+    const ext = pathExt[ii]
+    isexe(p + ext, { pathExt: pathExtExe }, (er, is) => {
+      if (!er && is) {
+        if (opt.all)
+          found.push(p + ext)
+        else
+          return resolve(p + ext)
+      }
+      return resolve(subStep(p, i, ii + 1))
+    })
+  })
+
+  return cb ? step(0).then(res => cb(null, res), cb) : step(0)
 }
 
-function whichSync (cmd, opt) {
+const whichSync = (cmd, opt) => {
   opt = opt || {}
 
-  var info = getPathInfo(cmd, opt)
-  var pathEnv = info.env
-  var pathExt = info.ext
-  var pathExtExe = info.extExe
-  var found = []
+  const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt)
+  const found = []
 
-  for (var i = 0, l = pathEnv.length; i < l; i ++) {
-    var pathPart = pathEnv[i]
-    if (pathPart.charAt(0) === '"' && pathPart.slice(-1) === '"')
-      pathPart = pathPart.slice(1, -1)
+  for (let i = 0; i < pathEnv.length; i ++) {
+    const ppRaw = pathEnv[i]
+    const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw
 
-    var p = path.join(pathPart, cmd)
-    if (!pathPart && /^\.[\\\/]/.test(cmd)) {
-      p = cmd.slice(0, 2) + p
-    }
-    for (var j = 0, ll = pathExt.length; j < ll; j ++) {
-      var cur = p + pathExt[j]
-      var is
+    const pCmd = path.join(pathPart, cmd)
+    const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd
+      : pCmd
+
+    for (let j = 0; j < pathExt.length; j ++) {
+      const cur = p + pathExt[j]
       try {
-        is = isexe.sync(cur, { pathExt: pathExtExe })
+        const is = isexe.sync(cur, { pathExt: pathExtExe })
         if (is) {
           if (opt.all)
             found.push(cur)
@@ -55047,45 +54334,8 @@ function whichSync (cmd, opt) {
   throw getNotFoundError(cmd)
 }
 
-
-/***/ }),
-
-/***/ 8092:
-/***/ ((module) => {
-
-// Returns a wrapper function that returns a wrapped callback
-// The wrapper function should do some stuff, and return a
-// presumably different callback function.
-// This makes sure that own properties are retained, so that
-// decorations and such are not lost along the way.
-module.exports = wrappy
-function wrappy (fn, cb) {
-  if (fn && cb) return wrappy(fn)(cb)
-
-  if (typeof fn !== 'function')
-    throw new TypeError('need wrapper function')
-
-  Object.keys(fn).forEach(function (k) {
-    wrapper[k] = fn[k]
-  })
-
-  return wrapper
-
-  function wrapper() {
-    var args = new Array(arguments.length)
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i]
-    }
-    var ret = fn.apply(this, args)
-    var cb = args[args.length-1]
-    if (typeof ret === 'function' && ret !== cb) {
-      Object.keys(cb).forEach(function (k) {
-        ret[k] = cb[k]
-      })
-    }
-    return ret
-  }
-}
+module.exports = which
+which.sync = whichSync
 
 
 /***/ }),
@@ -55145,8 +54395,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const shelljs_1 = __importDefault(__nccwpck_require__(5421));
-const semver_1 = __importDefault(__nccwpck_require__(989));
+const shelljs_1 = __importDefault(__nccwpck_require__(2331));
+const semver_1 = __importDefault(__nccwpck_require__(2348));
 const core = __importStar(__nccwpck_require__(9999));
 const setup = __importStar(__nccwpck_require__(3404));
 const plugins_1 = __nccwpck_require__(3289);
@@ -55212,8 +54462,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.registerPlugins = registerPlugins;
-const shelljs_1 = __importDefault(__nccwpck_require__(5421));
-const semver_1 = __importDefault(__nccwpck_require__(989));
+const shelljs_1 = __importDefault(__nccwpck_require__(2331));
+const semver_1 = __importDefault(__nccwpck_require__(2348));
 const node_fs_1 = __nccwpck_require__(3024);
 const nu = String.raw;
 const pluginRegisterScript = nu `
@@ -55367,7 +54617,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkOrInstallTool = checkOrInstallTool;
 const globby_1 = __nccwpck_require__(1224);
-const semver = __importStar(__nccwpck_require__(989));
+const semver = __importStar(__nccwpck_require__(2348));
 const path = __importStar(__nccwpck_require__(6760));
 const core = __importStar(__nccwpck_require__(9999));
 const tc = __importStar(__nccwpck_require__(1631));
@@ -55612,6 +54862,14 @@ module.exports = require("assert");
 
 /***/ }),
 
+/***/ 181:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("buffer");
+
+/***/ }),
+
 /***/ 5317:
 /***/ ((module) => {
 
@@ -55716,7 +54974,7 @@ module.exports = require("node:diagnostics_channel");
 
 /***/ }),
 
-/***/ 8229:
+/***/ 610:
 /***/ ((module) => {
 
 "use strict";
@@ -55724,7 +54982,7 @@ module.exports = require("node:dns");
 
 /***/ }),
 
-/***/ 8474:
+/***/ 6093:
 /***/ ((module) => {
 
 "use strict";
@@ -59840,7 +59098,7 @@ var external_node_fs_ = __nccwpck_require__(3024);
 // EXTERNAL MODULE: external "node:path"
 var external_node_path_ = __nccwpck_require__(6760);
 // EXTERNAL MODULE: external "node:events"
-var external_node_events_ = __nccwpck_require__(8474);
+var external_node_events_ = __nccwpck_require__(6093);
 // EXTERNAL MODULE: external "node:stream"
 var external_node_stream_ = __nccwpck_require__(7075);
 ;// CONCATENATED MODULE: external "node:stream/promises"
