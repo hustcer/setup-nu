@@ -24,13 +24,13 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@actions/tool-cache": "^2.0.2",
-    "@octokit/rest": "^21.1.1",
+    "@octokit/rest": "^22.0.0",
     "globby": "^14.1.0",
     "shelljs": "^0.10.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.15.21",
+    "@types/node": "^22.15.23",
     "@types/semver": "^7.7.0",
     "@types/shelljs": "^0.8.16",
     "@vercel/ncc": "^0.38.3",
