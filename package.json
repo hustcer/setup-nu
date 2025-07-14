@@ -35,7 +35,7 @@
     "@types/shelljs": "^0.8.16",
     "@vercel/ncc": "^0.38.3",
     "cspell": "^9.1.1",
-    "lefthook": "^1.11.13",
+    "lefthook": "^1.12.2",
     "semver": "^7.7.2",
     "typescript": "^5.8.3"
   },
