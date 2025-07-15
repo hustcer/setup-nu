@@ -34,7 +34,7 @@ def main [
       $allPlugins
     } else {
       $allPlugins | reduce -f [] {|it, acc|
-        # `split row . | first` used to handle binary with .exe extension
+        # "split row . | first" used to handle binary with .exe extension
         if $enablePlugins =~ ($it.name | path basename | split row . | first) {
           $acc | append $it
         } else {

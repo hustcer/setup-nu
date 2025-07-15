@@ -21,11 +21,11 @@ def main [
 ] {
 
   let useRegister = if $is_legacy { true } else { false }
-  let nuDir = (which nu | get 0.path | path dirname)
+  let nuDir = $nu.current-exe | path dirname
   print $'enablePlugins: ($enablePlugins) of Nu version: ($version)'
 
   if $debug {
-    print 'Output of (which nu):'; print (which nu)
+    print 'Output of ($nu.current-exe):'; print $nu.current-exe
     print 'Directory contents:'; ls $nuDir | print
   }
 
@@ -40,7 +40,14 @@ def main [
   let filteredPlugins = if $enablePlugins == "'true'" or $enablePlugins == 'true' {
       $allPlugins
     } else {
-      $allPlugins | filter {|it| $enablePlugins =~ ($it.name | path basename | split row . | first)}
+      $allPlugins | reduce -f [] {|it, acc|
+        # "split row . | first" used to handle binary with .exe extension
+        if $enablePlugins =~ ($it.name | path basename | split row . | first) {
+          $acc | append $it
+        } else {
+          $acc
+        }
+      }
     }
 
   if $debug {
