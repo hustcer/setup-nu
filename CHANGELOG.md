@@ -1,6 +1,30 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.20] - 2025-07-15
+
+### Features
+
+- Use public GitHub API for Nushell assets query, try to make it work for GitHub Enterprise (#140)
+- Update setup-nu for future versions of Nu( >= 0.106) (#157)
+
+### Miscellaneous Tasks
+
+- Test Nu on Windows arm64 runner (#147)
+
+### Deps
+
+- Upgrade `cspell`,`lefthook` and `typescript` (#144)
+- Upgrade `cspell`,`lefthook`,`semver`, etc. (#148)
+- Upgrade `@octokit/rest` and `@types/node` (#150)
+- Upgrade `@biomejs/biome` and `cspell` (#154)
+- Upgrade `@biomejs/biome`,`@types/shelljs`,`cspell` and `lefthook` (#158)
+- Bump `@types/node` from 22.13.14 to 22.14.0 (#141)
+- Bump `cspell` from 8.18.1 to 8.19.2 (#142)
+- Bump `@types/node` from 22.14.0 to 22.15.3 (#143)
+- Bump `cspell` from 8.19.3 to 9.0.0 (#145)
+- Bump `shelljs` from 0.9.2 to 0.10.0 (#146)
+
 ## [3.19] - 2025-03-30
 
 ### Bug Fixes
