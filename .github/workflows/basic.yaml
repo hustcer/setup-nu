@@ -21,7 +21,7 @@ jobs:
       with:
         version: '*'
         enable-plugins: true
-    - run: print (version); print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+    - run: print (version); print $"(char nl)Dir contents:(char nl)"; ls ($nu.current-exe | path dirname)
     - run: |
         print $'Current env:(char nl)'
         print $env
@@ -55,7 +55,7 @@ jobs:
         print 'Current NU_LIB_DIRS:'
         print $env.NU_LIB_DIRS
         print $'Nu path:(which nu)(char nl)'
-        print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
+        print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))
         def greeting [name: string] {
           print $'Hello ($name)'
         }
