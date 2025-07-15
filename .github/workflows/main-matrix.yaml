@@ -37,4 +37,4 @@ jobs:
     - name: Show Nu Binary Path
       run: print $'Nu path:(which nu)(char nl)'
     - name: Show Nu Package Contents
-      run: print $"(char nl)Dir contents:(char nl)"; print (ls ((which nu).path.0 | path dirname))
+      run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))

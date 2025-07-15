@@ -52,7 +52,7 @@ jobs:
       - uses: hustcer/setup-nu@main
         with:
           version: "*"
-      - run: version; print $"(char nl)Dir contents:(char nl)"; ls ((which nu).path.0 | path dirname)
+      - run: version; print $"(char nl)Dir contents:(char nl)"; ls ($nu.current-exe | path dirname)
       - run: |
           print $'Current env:(char nl)'
           print $env
