@@ -1,10 +1,12 @@
 name: Latest Main Check
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
       - develop
+      - feature/tests
     paths-ignore:
       - '**.md'
 
@@ -15,9 +17,10 @@ defaults:
 jobs:
   test-matrix:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-22.04, ubuntu-22.04-arm, macos-latest]
-        ver: [0.103.0, 0.101.0, 0.98.0, 0.97.1, 0.96.1, 0.95.0, 0.93.0, 0.92.2, 0.91.0, 0.90.1]
+        ver: [0.106.0, 0.105.1, 0.103.0, 0.102.0, 0.101.0, 0.98.0, 0.97.1, 0.96.1, 0.95.0, 0.93.0, 0.92.2, 0.91.0, 0.90.1]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
@@ -38,3 +41,10 @@ jobs:
       run: print $'Nu path:(which nu)(char nl)'
     - name: Show Nu Package Contents
       run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))
+    - name: Run Tests
+      shell: nu {0}
+      run: |
+        def run [--fn: closure] { do ($fn | default {||}) }
+        let fn = {|| print 'FOO' }
+        run --fn $fn
+        run
