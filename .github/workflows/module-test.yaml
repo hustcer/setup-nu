@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-latest]
-        ver: [0.103.0, 0.101.0, 0.98.0, 0.97.1, 0.96.1, 0.93.0, 0.92.2, 0.91.0, 0.90.1]
+        ver: [0.106.0, 0.105.1, 0.103.0, 0.101.0, 0.98.0, 0.97.1, 0.96.1, 0.93.0, 0.92.2, 0.91.0, 0.90.1]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
