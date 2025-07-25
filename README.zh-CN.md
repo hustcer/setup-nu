@@ -74,7 +74,7 @@ jobs:
     const NU_LIB_DIRS = [ ${{ github.workspace }}/nu ]
     use module.nu *
     print 'Use module by NU_LIB_DIRS Constant'
-    print (get-env 'ABC-XYZ' 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
+    print (get-env-abc 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
 ```
 
 2. 通过 `nu -c` 使用模块
@@ -89,7 +89,7 @@ jobs:
 - name: Use Your Nu Modules
   shell: nu {0}
   run: |
-    nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+    nu -c "use nu/module.nu *; print (get-env-abc 'DEFAULT-ABC')"
 ```
 
 你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.69` 及以上。
@@ -108,7 +108,7 @@ jobs:
   run: |
     use ${{ github.workspace }}/nu/module.nu *
     print 'Use module from: ${{ github.workspace }}/nu/module.nu'
-    print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
+    print (get-env-abc 'DEFAULT-ABC-ABSOLUTE-PATH')
 ```
 
 同样，要求你使用的 Nu 版本在 `0.69` 及以上。

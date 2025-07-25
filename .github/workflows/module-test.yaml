@@ -38,12 +38,12 @@ jobs:
         const NU_LIB_DIRS = [ ${{ github.workspace }}/nu ]
         use module.nu *
         print 'Use module by NU_LIB_DIRS Constant'
-        print (get-env 'ABC-XYZ' 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
+        print (get-env-abc 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
     - name: Use Your Nu Modules
       run: |
-        nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+        nu -c "use nu/module.nu *; print (get-env-abc 'DEFAULT-ABC-XYZ')"
     - name: Use Your Nu Modules by Absolute Path
       run: |
         use ${{ github.workspace }}/nu/module.nu *
         print 'Use module from: ${{ github.workspace }}/nu/module.nu'
-        print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
+        print (get-env-abc 'DEFAULT-ABC-ABSOLUTE-PATH')

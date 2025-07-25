@@ -6,10 +6,9 @@
 
 
 # Get the specified env key's value or ''
-export def 'get-env' [
-  key: string       # The key to get it's env value
+export def 'get-env-abc' [
   default?: string  # The default value for an empty env
 ] {
-  $env | get -i $key | default $default
+  $env | get ABC? | default $default
 }
 

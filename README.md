@@ -78,7 +78,7 @@ To use modules in `Nu`, please refer to the following examples:
     const NU_LIB_DIRS = [ ${{ github.workspace }}/nu ]
     use module.nu *
     print 'Use module by NU_LIB_DIRS Constant'
-    print (get-env 'ABC-XYZ' 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
+    print (get-env-abc 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
 ```
 
 2. Use Nu modules in `nu -c`
@@ -93,7 +93,7 @@ To use modules in `Nu`, please refer to the following examples:
 - name: Use Your Nu Modules
   shell: nu {0}
   run: |
-    nu -c "use nu/module.nu *; print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ')"
+    nu -c "use nu/module.nu *; print (get-env-abc 'DEFAULT-ABC')"
 ```
 
 You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal to or above `0.69`.
@@ -112,7 +112,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
   run: |
     use ${{ github.workspace }}/nu/module.nu *
     print 'Use module from: ${{ github.workspace }}/nu/module.nu'
-    print (get-env 'ABC-XYZ' 'DEFAULT-ABC-XYZ-ABSOLUTE-PATH')
+    print (get-env-abc 'DEFAULT-ABC-ABSOLUTE-PATH')
 ```
 
 Again, the nu version should be equal to or above `0.69`.
