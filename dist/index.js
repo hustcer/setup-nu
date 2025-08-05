@@ -54628,7 +54628,7 @@ const semver = __importStar(__nccwpck_require__(2348));
 const path = __importStar(__nccwpck_require__(6760));
 const core = __importStar(__nccwpck_require__(9999));
 const tc = __importStar(__nccwpck_require__(1631));
-const rest_1 = __nccwpck_require__(7019);
+const rest_1 = __nccwpck_require__(2375);
 const node_fs_1 = __nccwpck_require__(3024);
 const PLATFORM_DEFAULT_MAP = {
     darwin_x64: ['x86_64-apple-darwin', 'macOS.zip'],
@@ -55351,7 +55351,7 @@ __webpack_unused_export__ = defaultContentType
 
 /***/ }),
 
-/***/ 7019:
+/***/ 2375:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -56842,12 +56842,12 @@ function paginateRest(octokit) {
 paginateRest.VERSION = plugin_paginate_rest_dist_bundle_VERSION;
 
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/version.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/version.js
 const plugin_rest_endpoint_methods_dist_src_version_VERSION = "16.0.0";
 
 //# sourceMappingURL=version.js.map
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/generated/endpoints.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/generated/endpoints.js
 const Endpoints = {
   actions: {
     addCustomLabelsToSelfHostedRunnerForOrg: [
@@ -58954,7 +58954,7 @@ var endpoints_default = Endpoints;
 
 //# sourceMappingURL=endpoints.js.map
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/endpoints-to-methods.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/endpoints-to-methods.js
 
 const endpointMethodsMap = /* @__PURE__ */ new Map();
 for (const [scope, endpoints] of Object.entries(endpoints_default)) {
@@ -59080,7 +59080,7 @@ function decorate(octokit, scope, methodName, defaults, decorations) {
 
 //# sourceMappingURL=endpoints-to-methods.js.map
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/index.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/index.js
 
 
 function restEndpointMethods(octokit) {
