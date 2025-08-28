@@ -9,7 +9,7 @@ let input = lines # reads from the input, stdin when run with `nu --stdin`
   | first
   | {local_ref: $in.0, local_oid: $in.1, remote_ref: $in.2, remote_oid: $in.3}
 
-  print 'Pushing to remote...'
+  print 'Pushing to remote from Nu...'
   print $input.local_ref
   print $input.local_oid
   print $input.remote_ref
