@@ -12,8 +12,8 @@ skip_output:
   - execution_info    # Skips printing `EXECUTE > ...` logging
 pre-push:
   scripts:
-    'sync.sh':
-      runner: sh
+    'sync.nu':
+      runner: nu
       use_stdin: true
 
 pre-commit:
