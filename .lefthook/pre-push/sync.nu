@@ -7,17 +7,18 @@
 let all_lines = (lines | collect)
 
 if ($all_lines | length) > 0 {
-  let valid_input = $all_lines
-    | each { split row " " }
+  let input = $all_lines
+    | each { split row ' ' }
     | where { |row| ($row | length) >= 4 }
     | first
+    | { local_ref: $in.0, local_oid: $in.1, remote_ref: $in.2, remote_oid: $in.3 }
 
-  if ($valid_input | is-not-empty) {
+  if ($input | is-not-empty) {
     print 'Pushing to remote from Nu...'
-    print $valid_input.0
-    print $valid_input.1
-    print $valid_input.2
-    print $valid_input.3
+    print $input.local_ref
+    print $input.local_oid
+    print $input.remote_ref
+    print $input.remote_oid
     print '----------------------------------'
   }
 }
