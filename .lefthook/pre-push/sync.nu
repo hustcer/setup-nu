@@ -6,6 +6,10 @@
 # 安全地读取标准输入，处理可能为空的情况
 let all_lines = (lines | collect)
 
+print '****************************************************'
+print $all_lines
+print '****************************************************'
+
 if ($all_lines | length) > 0 {
   let input = $all_lines
     | each { split row ' ' }
