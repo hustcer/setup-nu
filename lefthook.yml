@@ -13,7 +13,7 @@ skip_output:
 pre-push:
   scripts:
     'sync.nu':
-      runner: nu
+      runner: nu --stdin
       use_stdin: true
 
 pre-commit:
