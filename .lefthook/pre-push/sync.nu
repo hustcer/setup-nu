@@ -13,7 +13,7 @@ let all_lines = (lines | collect)
 if ($all_lines | length) > 0 {
   let input = $all_lines
     | each { split row ' ' }
-    | where { |row| ($row | length) >= 4 }
+    | where { |row| ($row | length) > 3 }
     | first
     | { local_ref: $in.0, local_oid: $in.1, remote_ref: $in.2, remote_oid: $in.3 }
 
