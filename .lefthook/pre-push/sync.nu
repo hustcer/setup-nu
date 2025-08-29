@@ -1,14 +1,14 @@
 #!/usr/bin/env nu
 # Author: hustcer <hustcer@outlook.com>
-# Date:   2021/09/29 17:52:58 +0800
+# Date:   2025/08/29 08:52:58 +0800
 # Git pre push hooks, need just/nu and related nu scripts to run.
 
-# 安全地读取标准输入，处理可能为空的情况
+# Read stdin safely and handle empty cases
 let all_lines = (lines | collect)
 
-print '****************************************************'
-print $all_lines
-print '****************************************************'
+# print '****************************************************'
+# print $all_lines
+# print '****************************************************'
 
 if ($all_lines | length) > 0 {
   let input = $all_lines
