@@ -9671,7 +9671,7 @@ return{name,number,description,supported,action,forced,standard};
 
 /***/ }),
 
-/***/ 2007:
+/***/ 4877:
 /***/ ((module) => {
 
 // A simple implementation of make-array
@@ -9699,7 +9699,7 @@ const REGEX_SPLITALL_CRLF = /\r?\n/g
 // - ..
 // Valid:
 // - .foo
-const REGEX_TEST_INVALID_PATH = /^\.*\/|^\.+$/
+const REGEX_TEST_INVALID_PATH = /^\.{0,2}\/|^\.{1,2}$/
 
 const REGEX_TEST_TRAILING_SLASH = /\/$/
 
@@ -10415,18 +10415,8 @@ const factory = options => new Ignore(options)
 const isPathValid = path =>
   checkPath(path && checkPath.convert(path), path, RETURN_FALSE)
 
-
-// Windows
-// --------------------------------------------------------------
 /* istanbul ignore next */
-if (
-  // Detect `process` so that it can run in browsers.
-  typeof process !== 'undefined'
-  && (
-    process.env && process.env.IGNORE_TEST_WIN32
-    || process.platform === 'win32'
-  )
-) {
+const setupWindows = () => {
   /* eslint no-control-regex: "off" */
   const makePosix = str => /^\\\\\?\\/.test(str)
   || /["<>|\u0000-\u001F]+/u.test(str)
@@ -10443,6 +10433,18 @@ if (
     || isNotRelative(path)
 }
 
+
+// Windows
+// --------------------------------------------------------------
+/* istanbul ignore next */
+if (
+  // Detect `process` so that it can run in browsers.
+  typeof process !== 'undefined'
+  && process.platform === 'win32'
+) {
+  setupWindows()
+}
+
 // COMMONJS_EXPORTS ////////////////////////////////////////////////////////////
 
 module.exports = factory
@@ -10453,6 +10455,9 @@ module.exports = factory
 factory.default = factory
 
 module.exports.isPathValid = isPathValid
+
+// For testing purposes
+define(module.exports, Symbol.for('setupWindows'), setupWindows)
 
 
 /***/ }),
@@ -54623,12 +54628,12 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkOrInstallTool = checkOrInstallTool;
-const globby_1 = __nccwpck_require__(3092);
+const globby_1 = __nccwpck_require__(3293);
 const semver = __importStar(__nccwpck_require__(1441));
 const path = __importStar(__nccwpck_require__(6760));
 const core = __importStar(__nccwpck_require__(6966));
 const tc = __importStar(__nccwpck_require__(5440));
-const rest_1 = __nccwpck_require__(9841);
+const rest_1 = __nccwpck_require__(8090);
 const node_fs_1 = __nccwpck_require__(3024);
 const PLATFORM_DEFAULT_MAP = {
     darwin_x64: ['x86_64-apple-darwin', 'macOS.zip'],
@@ -55351,7 +55356,7 @@ __webpack_unused_export__ = defaultContentType
 
 /***/ }),
 
-/***/ 9841:
+/***/ 8090:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -56842,12 +56847,12 @@ function paginateRest(octokit) {
 paginateRest.VERSION = plugin_paginate_rest_dist_bundle_VERSION;
 
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/version.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/version.js
 const plugin_rest_endpoint_methods_dist_src_version_VERSION = "16.0.0";
 
 //# sourceMappingURL=version.js.map
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/generated/endpoints.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/generated/endpoints.js
 const Endpoints = {
   actions: {
     addCustomLabelsToSelfHostedRunnerForOrg: [
@@ -58954,7 +58959,7 @@ var endpoints_default = Endpoints;
 
 //# sourceMappingURL=endpoints.js.map
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/endpoints-to-methods.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/endpoints-to-methods.js
 
 const endpointMethodsMap = /* @__PURE__ */ new Map();
 for (const [scope, endpoints] of Object.entries(endpoints_default)) {
@@ -59080,7 +59085,7 @@ function decorate(octokit, scope, methodName, defaults, decorations) {
 
 //# sourceMappingURL=endpoints-to-methods.js.map
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoi_d07dc5ce47086f65c164bc9f2a06f62e/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/index.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@octokit+plugin-rest-endpoint-methods@16.0.0_@octokit+core@7.0.2/node_modules/@octokit/plugin-rest-endpoint-methods/dist-src/index.js
 
 
 function restEndpointMethods(octokit) {
@@ -59121,7 +59126,7 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 
 /***/ }),
 
-/***/ 3092:
+/***/ 3293:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -59149,13 +59154,13 @@ const external_node_process_namespaceObject = require("node:process");
 var external_node_fs_ = __nccwpck_require__(3024);
 // EXTERNAL MODULE: external "node:path"
 var external_node_path_ = __nccwpck_require__(6760);
-// EXTERNAL MODULE: external "node:events"
-var external_node_events_ = __nccwpck_require__(8474);
 // EXTERNAL MODULE: external "node:stream"
 var external_node_stream_ = __nccwpck_require__(7075);
+// EXTERNAL MODULE: external "node:events"
+var external_node_events_ = __nccwpck_require__(8474);
 ;// CONCATENATED MODULE: external "node:stream/promises"
 const promises_namespaceObject = require("node:stream/promises");
-;// CONCATENATED MODULE: ./node_modules/.pnpm/@sindresorhus+merge-streams@2.3.0/node_modules/@sindresorhus/merge-streams/index.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/@sindresorhus+merge-streams@4.0.0/node_modules/@sindresorhus/merge-streams/index.js
 
 
 
@@ -59181,17 +59186,12 @@ function mergeStreams(streams) {
 		passThroughStream.add(stream);
 	}
 
-	if (streams.length === 0) {
-		endStream(passThroughStream);
-	}
-
 	return passThroughStream;
 }
 
 const getHighWaterMark = (streams, objectMode) => {
 	if (streams.length === 0) {
-		// @todo Use `node:stream` `getDefaultHighWaterMark(objectMode)` in next major release
-		return 16_384;
+		return (0,external_node_stream_.getDefaultHighWaterMark)(objectMode);
 	}
 
 	const highWaterMarks = streams
@@ -59205,6 +59205,8 @@ class MergedStream extends external_node_stream_.PassThrough {
 	#ended = new Set([]);
 	#aborted = new Set([]);
 	#onFinished;
+	#unpipeEvent = Symbol('unpipe');
+	#streamPromises = new WeakMap();
 
 	add(stream) {
 		validateStream(stream);
@@ -59215,39 +59217,49 @@ class MergedStream extends external_node_stream_.PassThrough {
 
 		this.#streams.add(stream);
 
-		this.#onFinished ??= onMergedStreamFinished(this, this.#streams);
-		endWhenStreamsDone({
+		this.#onFinished ??= onMergedStreamFinished(this, this.#streams, this.#unpipeEvent);
+		const streamPromise = endWhenStreamsDone({
 			passThroughStream: this,
 			stream,
 			streams: this.#streams,
 			ended: this.#ended,
 			aborted: this.#aborted,
 			onFinished: this.#onFinished,
+			unpipeEvent: this.#unpipeEvent,
 		});
+		this.#streamPromises.set(stream, streamPromise);
 
 		stream.pipe(this, {end: false});
 	}
 
-	remove(stream) {
+	async remove(stream) {
 		validateStream(stream);
 
 		if (!this.#streams.has(stream)) {
 			return false;
 		}
 
+		const streamPromise = this.#streamPromises.get(stream);
+		if (streamPromise === undefined) {
+			return false;
+		}
+
+		this.#streamPromises.delete(stream);
+
 		stream.unpipe(this);
+		await streamPromise;
 		return true;
 	}
 }
 
-const onMergedStreamFinished = async (passThroughStream, streams) => {
+const onMergedStreamFinished = async (passThroughStream, streams, unpipeEvent) => {
 	updateMaxListeners(passThroughStream, PASSTHROUGH_LISTENERS_COUNT);
 	const controller = new AbortController();
 
 	try {
 		await Promise.race([
 			onMergedStreamEnd(passThroughStream, controller),
-			onInputStreamsUnpipe(passThroughStream, streams, controller),
+			onInputStreamsUnpipe(passThroughStream, streams, unpipeEvent, controller),
 		]);
 	} finally {
 		controller.abort();
@@ -59256,10 +59268,15 @@ const onMergedStreamFinished = async (passThroughStream, streams) => {
 };
 
 const onMergedStreamEnd = async (passThroughStream, {signal}) => {
-	await (0,promises_namespaceObject.finished)(passThroughStream, {signal, cleanup: true});
+	try {
+		await (0,promises_namespaceObject.finished)(passThroughStream, {signal, cleanup: true});
+	} catch (error) {
+		errorOrAbortStream(passThroughStream, error);
+		throw error;
+	}
 };
 
-const onInputStreamsUnpipe = async (passThroughStream, streams, {signal}) => {
+const onInputStreamsUnpipe = async (passThroughStream, streams, unpipeEvent, {signal}) => {
 	for await (const [unpipedStream] of (0,external_node_events_.on)(passThroughStream, 'unpipe', {signal})) {
 		if (streams.has(unpipedStream)) {
 			unpipedStream.emit(unpipeEvent);
@@ -59273,22 +59290,36 @@ const validateStream = stream => {
 	}
 };
 
-const endWhenStreamsDone = async ({passThroughStream, stream, streams, ended, aborted, onFinished}) => {
+const endWhenStreamsDone = async ({passThroughStream, stream, streams, ended, aborted, onFinished, unpipeEvent}) => {
 	updateMaxListeners(passThroughStream, PASSTHROUGH_LISTENERS_PER_STREAM);
 	const controller = new AbortController();
 
 	try {
 		await Promise.race([
-			afterMergedStreamFinished(onFinished, stream),
-			onInputStreamEnd({passThroughStream, stream, streams, ended, aborted, controller}),
-			onInputStreamUnpipe({stream, streams, ended, aborted, controller}),
+			afterMergedStreamFinished(onFinished, stream, controller),
+			onInputStreamEnd({
+				passThroughStream,
+				stream,
+				streams,
+				ended,
+				aborted,
+				controller,
+			}),
+			onInputStreamUnpipe({
+				stream,
+				streams,
+				ended,
+				aborted,
+				unpipeEvent,
+				controller,
+			}),
 		]);
 	} finally {
 		controller.abort();
 		updateMaxListeners(passThroughStream, -PASSTHROUGH_LISTENERS_PER_STREAM);
 	}
 
-	if (streams.size === ended.size + aborted.size) {
+	if (streams.size > 0 && streams.size === ended.size + aborted.size) {
 		if (ended.size === 0 && aborted.size > 0) {
 			abortStream(passThroughStream);
 		} else {
@@ -59297,25 +59328,27 @@ const endWhenStreamsDone = async ({passThroughStream, stream, streams, ended, ab
 	}
 };
 
-// This is the error thrown by `finished()` on `stream.destroy()`
-const isAbortError = error => error?.code === 'ERR_STREAM_PREMATURE_CLOSE';
-
-const afterMergedStreamFinished = async (onFinished, stream) => {
+const afterMergedStreamFinished = async (onFinished, stream, {signal}) => {
 	try {
 		await onFinished;
-		abortStream(stream);
-	} catch (error) {
-		if (isAbortError(error)) {
+		if (!signal.aborted) {
 			abortStream(stream);
-		} else {
-			errorStream(stream, error);
+		}
+	} catch (error) {
+		if (!signal.aborted) {
+			errorOrAbortStream(stream, error);
 		}
 	}
 };
 
 const onInputStreamEnd = async ({passThroughStream, stream, streams, ended, aborted, controller: {signal}}) => {
 	try {
-		await (0,promises_namespaceObject.finished)(stream, {signal, cleanup: true, readable: true, writable: false});
+		await (0,promises_namespaceObject.finished)(stream, {
+			signal,
+			cleanup: true,
+			readable: true,
+			writable: false,
+		});
 		if (streams.has(stream)) {
 			ended.add(stream);
 		}
@@ -59332,20 +59365,34 @@ const onInputStreamEnd = async ({passThroughStream, stream, streams, ended, abor
 	}
 };
 
-const onInputStreamUnpipe = async ({stream, streams, ended, aborted, controller: {signal}}) => {
+const onInputStreamUnpipe = async ({stream, streams, ended, aborted, unpipeEvent, controller: {signal}}) => {
 	await (0,external_node_events_.once)(stream, unpipeEvent, {signal});
+
+	if (!stream.readable) {
+		return (0,external_node_events_.once)(signal, 'abort', {signal});
+	}
+
 	streams.delete(stream);
 	ended.delete(stream);
 	aborted.delete(stream);
 };
-
-const unpipeEvent = Symbol('unpipe');
 
 const endStream = stream => {
 	if (stream.writable) {
 		stream.end();
 	}
 };
+
+const errorOrAbortStream = (stream, error) => {
+	if (isAbortError(error)) {
+		abortStream(stream);
+	} else {
+		errorStream(stream, error);
+	}
+};
+
+// This is the error thrown by `finished()` on `stream.destroy()`
+const isAbortError = error => error?.code === 'ERR_STREAM_PREMATURE_CLOSE';
 
 const abortStream = stream => {
 	if (stream.readable || stream.writable) {
@@ -59485,8 +59532,8 @@ function execFileSync(file, arguments_ = [], options = {}) {
 
 
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/ignore@7.0.3/node_modules/ignore/index.js
-var ignore = __nccwpck_require__(2007);
+// EXTERNAL MODULE: ./node_modules/.pnpm/ignore@7.0.5/node_modules/ignore/index.js
+var ignore = __nccwpck_require__(4877);
 ;// CONCATENATED MODULE: ./node_modules/.pnpm/slash@5.1.0/node_modules/slash/index.js
 function slash(path) {
 	const isExtendedLengthPath = path.startsWith('\\\\?\\');
@@ -59498,10 +59545,10 @@ function slash(path) {
 	return path.replace(/\\/g, '/');
 }
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/globby@14.1.0/node_modules/globby/utilities.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/globby@15.0.0/node_modules/globby/utilities.js
 const isNegativePattern = pattern => pattern[0] === '!';
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/globby@14.1.0/node_modules/globby/ignore.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/globby@15.0.0/node_modules/globby/ignore.js
 
 
 
@@ -59525,9 +59572,41 @@ const ignoreFilesGlobOptions = {
 
 const GITIGNORE_FILES_PATTERN = '**/.gitignore';
 
-const applyBaseToPattern = (pattern, base) => isNegativePattern(pattern)
-	? '!' + external_node_path_.posix.join(base, pattern.slice(1))
-	: external_node_path_.posix.join(base, pattern);
+// Apply base path to gitignore patterns based on .gitignore spec 2.22.1
+// https://git-scm.com/docs/gitignore#_pattern_format
+// See also https://github.com/sindresorhus/globby/issues/146
+const applyBaseToPattern = (pattern, base) => {
+	if (!base) {
+		return pattern;
+	}
+
+	const isNegative = isNegativePattern(pattern);
+	const cleanPattern = isNegative ? pattern.slice(1) : pattern;
+
+	// Check if pattern has non-trailing slashes
+	const slashIndex = cleanPattern.indexOf('/');
+	const hasNonTrailingSlash = slashIndex !== -1 && slashIndex !== cleanPattern.length - 1;
+
+	let result;
+	if (!hasNonTrailingSlash) {
+		// "If there is no separator at the beginning or middle of the pattern,
+		// then the pattern may also match at any level below the .gitignore level."
+		// So patterns like '*.log' or 'temp' or 'build/' (trailing slash) match recursively.
+		result = external_node_path_.posix.join(base, '**', cleanPattern);
+	} else if (cleanPattern.startsWith('/')) {
+		// "If there is a separator at the beginning [...] of the pattern,
+		// then the pattern is relative to the directory level of the particular .gitignore file itself."
+		// Leading slash anchors the pattern to the .gitignore's directory.
+		result = external_node_path_.posix.join(base, cleanPattern.slice(1));
+	} else {
+		// "If there is a separator [...] middle [...] of the pattern,
+		// then the pattern is relative to the directory level of the particular .gitignore file itself."
+		// Patterns like 'src/foo' are relative to the .gitignore's directory.
+		result = external_node_path_.posix.join(base, cleanPattern);
+	}
+
+	return isNegative ? '!' + result : result;
+};
 
 const parseIgnoreFile = (file, cwd) => {
 	const base = slash(external_node_path_.relative(cwd, external_node_path_.dirname(file.filePath)));
@@ -59548,6 +59627,20 @@ const toRelativePath = (fileOrDirectory, cwd) => {
 		throw new Error(`Path ${fileOrDirectory} is not in cwd ${cwd}`);
 	}
 
+	// Normalize relative paths:
+	// - Git treats './foo' as 'foo' when checking against patterns
+	// - Patterns starting with './' in .gitignore are invalid and don't match anything
+	// - The ignore library expects normalized paths without './' prefix
+	if (fileOrDirectory.startsWith('./')) {
+		return fileOrDirectory.slice(2);
+	}
+
+	// Paths with ../ point outside cwd and cannot match patterns from this directory
+	// Return undefined to indicate this path is outside scope
+	if (fileOrDirectory.startsWith('../')) {
+		return undefined;
+	}
+
 	return fileOrDirectory;
 };
 
@@ -59558,6 +59651,11 @@ const getIsIgnoredPredicate = (files, cwd) => {
 	return fileOrDirectory => {
 		fileOrDirectory = toPath(fileOrDirectory);
 		fileOrDirectory = toRelativePath(fileOrDirectory, cwd);
+		// If path is outside cwd (undefined), it can't be ignored by patterns in cwd
+		if (fileOrDirectory === undefined) {
+			return false;
+		}
+
 		return fileOrDirectory ? ignores.ignores(slash(fileOrDirectory)) : false;
 	};
 };
@@ -59580,12 +59678,10 @@ const isIgnoredByIgnoreFiles = async (patterns, options) => {
 		...ignoreFilesGlobOptions,
 	});
 
-	const files = await Promise.all(
-		paths.map(async filePath => ({
-			filePath,
-			content: await external_node_fs_promises_namespaceObject.readFile(filePath, 'utf8'),
-		})),
-	);
+	const files = await Promise.all(paths.map(async filePath => ({
+		filePath,
+		content: await external_node_fs_promises_namespaceObject.readFile(filePath, 'utf8'),
+	})));
 
 	return getIsIgnoredPredicate(files, cwd);
 };
@@ -59612,7 +59708,8 @@ const isIgnoredByIgnoreFilesSync = (patterns, options) => {
 const isGitIgnored = options => isIgnoredByIgnoreFiles(GITIGNORE_FILES_PATTERN, options);
 const isGitIgnoredSync = options => isIgnoredByIgnoreFilesSync(GITIGNORE_FILES_PATTERN, options);
 
-;// CONCATENATED MODULE: ./node_modules/.pnpm/globby@14.1.0/node_modules/globby/index.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/globby@15.0.0/node_modules/globby/index.js
+
 
 
 
@@ -59634,6 +59731,19 @@ const normalizePathForDirectoryGlob = (filePath, cwd) => {
 	return external_node_path_.isAbsolute(path) ? path : external_node_path_.join(cwd, path);
 };
 
+const shouldExpandGlobstarDirectory = pattern => {
+	const match = pattern?.match(/\*\*\/([^/]+)$/);
+	if (!match) {
+		return false;
+	}
+
+	const dirname = match[1];
+	const hasWildcards = /[*?[\]{}]/.test(dirname);
+	const hasExtension = external_node_path_.extname(dirname) && !dirname.startsWith('.');
+
+	return !hasWildcards && !hasExtension;
+};
+
 const getDirectoryGlob = ({directoryPath, files, extensions}) => {
 	const extensionGlob = extensions?.length > 0 ? `.${extensions.length > 1 ? `{${extensions.join(',')}}` : extensions[0]}` : '';
 	return files
@@ -59646,9 +59756,19 @@ const directoryToGlob = async (directoryPaths, {
 	files,
 	extensions,
 } = {}) => {
-	const globs = await Promise.all(directoryPaths.map(async directoryPath =>
-		(await isDirectory(normalizePathForDirectoryGlob(directoryPath, cwd))) ? getDirectoryGlob({directoryPath, files, extensions}) : directoryPath),
-	);
+	const globs = await Promise.all(directoryPaths.map(async directoryPath => {
+		// Check pattern without negative prefix
+		const checkPattern = isNegativePattern(directoryPath) ? directoryPath.slice(1) : directoryPath;
+
+		// Expand globstar directory patterns like **/dirname to **/dirname/**
+		if (shouldExpandGlobstarDirectory(checkPattern)) {
+			return getDirectoryGlob({directoryPath, files, extensions});
+		}
+
+		// Original logic for checking actual directories
+		const pathToCheck = normalizePathForDirectoryGlob(directoryPath, cwd);
+		return (await isDirectory(pathToCheck)) ? getDirectoryGlob({directoryPath, files, extensions}) : directoryPath;
+	}));
 
 	return globs.flat();
 };
@@ -59657,7 +59777,19 @@ const directoryToGlobSync = (directoryPaths, {
 	cwd = external_node_process_namespaceObject.cwd(),
 	files,
 	extensions,
-} = {}) => directoryPaths.flatMap(directoryPath => isDirectorySync(normalizePathForDirectoryGlob(directoryPath, cwd)) ? getDirectoryGlob({directoryPath, files, extensions}) : directoryPath);
+} = {}) => directoryPaths.flatMap(directoryPath => {
+	// Check pattern without negative prefix
+	const checkPattern = isNegativePattern(directoryPath) ? directoryPath.slice(1) : directoryPath;
+
+	// Expand globstar directory patterns like **/dirname to **/dirname/**
+	if (shouldExpandGlobstarDirectory(checkPattern)) {
+		return getDirectoryGlob({directoryPath, files, extensions});
+	}
+
+	// Original logic for checking actual directories
+	const pathToCheck = normalizePathForDirectoryGlob(directoryPath, cwd);
+	return isDirectorySync(pathToCheck) ? getDirectoryGlob({directoryPath, files, extensions}) : directoryPath;
+});
 
 const toPatternsArray = patterns => {
 	patterns = [...new Set([patterns].flat())];
@@ -59711,16 +59843,12 @@ const getIgnoreFilesPatterns = options => {
 
 const getFilter = async options => {
 	const ignoreFilesPatterns = getIgnoreFilesPatterns(options);
-	return createFilterFunction(
-		ignoreFilesPatterns.length > 0 && await isIgnoredByIgnoreFiles(ignoreFilesPatterns, options),
-	);
+	return createFilterFunction(ignoreFilesPatterns.length > 0 && await isIgnoredByIgnoreFiles(ignoreFilesPatterns, options));
 };
 
 const getFilterSync = options => {
 	const ignoreFilesPatterns = getIgnoreFilesPatterns(options);
-	return createFilterFunction(
-		ignoreFilesPatterns.length > 0 && isIgnoredByIgnoreFilesSync(ignoreFilesPatterns, options),
-	);
+	return createFilterFunction(ignoreFilesPatterns.length > 0 && isIgnoredByIgnoreFilesSync(ignoreFilesPatterns, options));
 };
 
 const createFilterFunction = isIgnored => {
@@ -59793,21 +59921,19 @@ const generateTasks = async (patterns, options) => {
 
 	const directoryToGlobOptions = normalizeExpandDirectoriesOption(expandDirectories, cwd);
 
-	return Promise.all(
-		globTasks.map(async task => {
-			let {patterns, options} = task;
+	return Promise.all(globTasks.map(async task => {
+		let {patterns, options} = task;
 
-			[
-				patterns,
-				options.ignore,
-			] = await Promise.all([
-				directoryToGlob(patterns, directoryToGlobOptions),
-				directoryToGlob(options.ignore, {cwd}),
-			]);
+		[
+			patterns,
+			options.ignore,
+		] = await Promise.all([
+			directoryToGlob(patterns, directoryToGlobOptions),
+			directoryToGlob(options.ignore, {cwd}),
+		]);
 
-			return {patterns, options};
-		}),
-	);
+		return {patterns, options};
+	}));
 };
 
 const generateTasksSync = (patterns, options) => {
@@ -59852,17 +59978,20 @@ const globbyStream = normalizeArgumentsSync((patterns, options) => {
 	const tasks = generateTasksSync(patterns, options);
 	const filter = getFilterSync(options);
 	const streams = tasks.map(task => out.stream(task.patterns, task.options));
+
+	if (streams.length === 0) {
+		return external_node_stream_.Readable.from([]);
+	}
+
 	const stream = mergeStreams(streams).filter(fastGlobResult => filter(fastGlobResult));
 
-	// TODO: Make it return a web stream at some point.
+	// Returning a web stream will require revisiting once Readable.toWeb integration is viable.
 	// return Readable.toWeb(stream);
 
 	return stream;
 });
 
-const isDynamicPattern = normalizeArgumentsSync(
-	(patterns, options) => patterns.some(pattern => out.isDynamicPattern(pattern, options)),
-);
+const isDynamicPattern = normalizeArgumentsSync((patterns, options) => patterns.some(pattern => out.isDynamicPattern(pattern, options)));
 
 const generateGlobTasks = normalizeArguments(generateTasks);
 const generateGlobTasksSync = normalizeArgumentsSync(generateTasksSync);
