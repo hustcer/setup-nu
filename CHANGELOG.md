@@ -1,6 +1,35 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.21] - 2025-10-25
+
+### Bug Fixes
+
+- Fix for Nu 0.106 and later versions
+- Update full matrix check
+
+### Features
+
+- Rewrite git pre push hook from bash to nu (#169)
+
+### Miscellaneous Tasks
+
+- Update test workflows
+- Bump `actions/checkout` from 4 to 5 (#164)
+- Bump `actions/setup-node` from 4 to 5 (#170)
+- Bump `actions/setup-node` from 5 to 6 (#181)
+- Add `nu` 0.108 to test matrix (#182)
+
+### Deps
+
+- Upgrade typescript,cspell, and @biomejs/biome (#163)
+- Upgrade @biomejs/biome, @types/node and lefthook (#167)
+- Upgrade Node engine to 24 (#168)
+- Upgrade @biomejs/biome,@vercel/ncc & cspell (#173)
+- Upgrade globby, typescript, and @biomejs/biome (#176)
+- Upgrade semver & @types/node
+- Upgrade @biomejs/biome,@types/node,cspell & lefthook
+
 ## [3.20] - 2025-07-15
 
 ### Features
