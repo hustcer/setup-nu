@@ -29,8 +29,8 @@ devDependencies:
     specifier: ^2.3.0
     version: 2.3.0
   '@types/node':
-    specifier: ^24.9.1
-    version: 24.9.1
+    specifier: ^24.10.0
+    version: 24.10.0
   '@types/semver':
     specifier: ^7.7.1
     version: 7.7.1
@@ -690,8 +690,8 @@ packages:
     engines: {node: '>=18'}
     dev: false
 
-  /@types/node@24.9.1:
-    resolution: {integrity: sha512-QoiaXANRkSXK6p0Duvt56W208du4P9Uye9hWLWgGMDTEoKPhuenzNcC4vGUmrNkiOKTlIrBoyNQYNpSwfEZXSg==}
+  /@types/node@24.10.0:
+    resolution: {integrity: sha512-qzQZRBqkFsYyaSWXuEHc2WR9c0a0CXwiE5FWUvn7ZM+vdy1uZLfCunD38UzhuB7YN/J11ndbDBcTmOdxJo9Q7A==}
     dependencies:
       undici-types: 7.16.0
     dev: true
@@ -703,7 +703,7 @@ packages:
   /@types/shelljs@0.8.17:
     resolution: {integrity: sha512-IDksKYmQA2W9MkQjiyptbMmcQx+8+Ol6b7h6dPU5S05JyiQDSb/nZKnrMrZqGwgV6VkVdl6/SPCKPDlMRvqECg==}
     dependencies:
-      '@types/node': 24.9.1
+      '@types/node': 24.10.0
       glob: 11.0.3
     dev: true
 
