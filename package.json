@@ -39,6 +39,10 @@
     "semver": "^7.7.3",
     "typescript": "^5.9.3"
   },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10"
+  },
   "pnpm": {
     "overrides": {
       "undici@>=4.5.0 <5.28.5": ">=5.28.5"
