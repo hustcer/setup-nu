@@ -16,13 +16,17 @@ async function main() {
     console.log(`versionSpec: ${versionSpec}`);
     const checkLatest = (core.getInput('check-latest') || 'false').toUpperCase() === 'TRUE';
     const enablePlugins = (core.getInput('enable-plugins') || 'false').toLowerCase();
-    const features = core.getInput('features') || 'default';
+    const rawFeatures = (core.getInput('features') || 'default').toLowerCase();
+    if (rawFeatures !== 'default' && rawFeatures !== 'full') {
+      throw new Error(`Invalid features input: ${rawFeatures}`);
+    }
+    const features = rawFeatures as 'default' | 'full';
     const githubToken = core.getInput('github-token');
     const version = ['*', 'nightly'].includes(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
     console.log(`coerce version: ${version}`);
     const ver = version === null ? undefined : version;
     if (!ver) {
-      core.setFailed(`Invalid version: ${versionSpec}`);
+      throw new Error(`Invalid version input: ${versionSpec}`);
     }
 
     const tool = await setup.checkOrInstallTool({
@@ -39,8 +43,9 @@ async function main() {
     // version: * --> 0.95.0; nightly --> nightly-56ed69a; 0.95 --> 0.95.0
     core.info(`Successfully setup Nu ${tool.version}, with ${features} features.`);
 
-    // Change to workspace directory so that the register-plugins.nu script can be found.
-    shell.cd(process.env.GITHUB_WORKSPACE);
+    // Change to workspace directory (fallback to current dir for local runs).
+    const workspaceDir = process.env.GITHUB_WORKSPACE || process.cwd();
+    shell.cd(workspaceDir);
     console.log(`Current directory: ${process.cwd()}`);
     await registerPlugins(enablePlugins, tool.version);
   } catch (err) {
