@@ -52,15 +52,12 @@ function getTargets(features: 'default' | 'full'): string[] {
   const selector = `${platform}_${arch}`;
 
   core.info(`Try to get assets for Nu: arch = ${arch}, platform = ${platform}, feature = ${features}`);
-  if (features === 'default') {
-    return PLATFORM_DEFAULT_MAP[selector as Platform];
+  const platformMap = features === 'default' ? PLATFORM_DEFAULT_MAP : PLATFORM_FULL_MAP;
+  const targets = platformMap[selector as Platform];
+  if (!targets) {
+    throw new Error(`Unsupported Nu target combination: arch = ${arch}, platform = ${platform}, feature = ${features}`);
   }
-  if (features === 'full') {
-    return PLATFORM_FULL_MAP[selector as Platform];
-  }
-  throw new Error(
-    `Failed to determine any valid targets: arch = ${arch}, platform = ${platform}, feature = ${features}`
-  );
+  return targets;
 }
 
 /**
@@ -305,7 +302,11 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
         absolute: true,
       }
     );
-    dir = await tc.cacheDir(path.dirname(paths[0]), name, version);
+    const cacheSource = paths.length > 0 ? path.dirname(paths[0]) : extractDir;
+    if (paths.length === 0) {
+      core.warning('No nu_plugin_* binaries found; caching extracted directory instead.');
+    }
+    dir = await tc.cacheDir(cacheSource, name, version);
 
     // handle bad binary permissions, the binary needs to be executable!
     await handleBadBinaryPermissions(tool, dir);
