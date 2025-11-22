@@ -4,7 +4,7 @@
 
 [![Latest Main Check](https://github.com/hustcer/setup-nu/actions/workflows/main-matrix.yaml/badge.svg)](https://github.com/hustcer/setup-nu/actions/workflows/main-matrix.yaml)
 
-This GitHub Action will setup a [Nushell](https://github.com/nushell/nushell) environment for you.
+This GitHub Action will set up a [Nushell](https://github.com/nushell/nushell) environment for you.
 
 ## Usage
 
@@ -149,7 +149,7 @@ They aren't perfect yet, but they do work. By the way, if you discover a better 
 Or, check the following examples:
 
 1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
-2. Advanced example: How Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
+2. Advanced example: How Does Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
 If you'd like to use the latest version of nushell, you can do so by setting `check-latest` to `true`
 (this is functionally identical to using `version: '*'`, but it's more readable). For example, the
@@ -168,11 +168,11 @@ following command installs the latest version:
 
 | Name             | Type   | Description    |
 | ---------------- | ------ | -------------- |
-| `version`        | `string` | Optional, A valid NPM-style semver specification, such as `0.86.0`, etc. and `nightly`. Default `*`        |
-| `check-latest`   | `bool`   | Optional, Set to `true` if you want to use the latest version, default `false`   |
-| `enable-plugins` | `bool \| string`  | Optional, Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`, Nu v0.86 and above is required, default `false` |
-| `features`       | `string` | Optional, Available choice: `default` or `full`, and the `full` features will include the commands from `extra` and `dataframe`. `full` can be used for `Nu` from `v0.86` to `v0.93` and was removed after `v0.93.1`, default: `default` |
-| `github-token`   | `string` | Optional, Your GitHub token or PAT token, default: `${{ github.token }}`   |
+| `version`        | `string` | Optional. A valid NPM-style semver specification, such as `0.86.0`, etc. and `nightly`. Default: `*`        |
+| `check-latest`   | `bool`   | Optional. Set to `true` if you want to use the latest version. Default: `false`   |
+| `enable-plugins` | `bool | string`  | Optional. Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`. Nu v0.86 and above is required. Default: `false` |
+| `features`       | `string` | Optional. Available choices: `default` or `full`. The `full` features will include the commands from `extra` and `dataframe`. `full` can be used for `Nu` from `v0.86` to `v0.93` and was removed after `v0.93.1`. Default: `default` |
+| `github-token`   | `string` | Optional. Your GitHub token or PAT token. Default: `${{ github.token }}`   |
 
 The semver specification is passed directly to NPM's [semver package](https://www.npmjs.com/package/semver).
 This GitHub Action will install the latest matching release.
