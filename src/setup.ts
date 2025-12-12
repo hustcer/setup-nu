@@ -213,10 +213,7 @@ async function getRelease(tool: Tool): Promise<Release> {
   const proxyFetch = (url: string, opts: any) => {
     return undiciFetch(url, {
       ...opts,
-      dispatcher: new EnvHttpProxyAgent({
-        keepAliveTimeout: 10,
-        keepAliveMaxTimeout: 10,
-      }),
+      dispatcher: new EnvHttpProxyAgent(),
     });
   };
 
