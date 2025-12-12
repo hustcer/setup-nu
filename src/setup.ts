@@ -9,6 +9,7 @@ import * as path from 'node:path';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import { Octokit } from '@octokit/rest';
+import { EnvHttpProxyAgent, fetch as undiciFetch } from 'undici';
 import { promises as fs, constants as fs_constants } from 'node:fs';
 
 // REF: https://nodejs.org/api/process.html#processarch
@@ -209,8 +210,22 @@ async function getRelease(tool: Tool): Promise<Release> {
   const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
   const isNightly = versionSpec === 'nightly';
 
-  // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
-  const octokit = new Octokit({ auth: tool.githubToken, baseUrl: 'https://api.github.com' });
+  const proxyFetch = (url: string, opts: any) => {
+    return undiciFetch(url, {
+      ...opts,
+      dispatcher: new EnvHttpProxyAgent({
+        keepAliveTimeout: 10,
+        keepAliveMaxTimeout: 10,
+      }),
+    });
+  };
+
+  const octokit = new Octokit({
+    auth: tool.githubToken,
+    // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
+    baseUrl: 'https://api.github.com',
+    request: { fetch: proxyFetch },
+  });
 
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
