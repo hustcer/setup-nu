@@ -9,7 +9,12 @@ import * as path from 'node:path';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import { Octokit } from '@octokit/rest';
-import { EnvHttpProxyAgent, fetch as undiciFetch, type RequestInit as UndiciRequestInit, type Response as UndiciResponse } from 'undici';
+import {
+  EnvHttpProxyAgent,
+  fetch as undiciFetch,
+  type RequestInit as UndiciRequestInit,
+  type Response as UndiciResponse,
+} from 'undici';
 import { promises as fs, constants as fs_constants } from 'node:fs';
 
 // REF: https://nodejs.org/api/process.html#processarch

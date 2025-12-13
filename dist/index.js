@@ -83258,6 +83258,7 @@ const path = __importStar(__nccwpck_require__(6760));
 const core = __importStar(__nccwpck_require__(1359));
 const tc = __importStar(__nccwpck_require__(8053));
 const rest_1 = __nccwpck_require__(5930);
+const undici_1 = __nccwpck_require__(2218);
 const node_fs_1 = __nccwpck_require__(3024);
 const PLATFORM_DEFAULT_MAP = {
     darwin_x64: ['x86_64-apple-darwin', 'macOS.zip'],
@@ -83279,6 +83280,8 @@ const PLATFORM_FULL_MAP = {
     linux_loong64: ['loongarch64-unknown-linux-gnu-full'],
     linux_x64: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
 };
+// Singleton to ensure efficient use of connection pooling, resources, etc.
+const proxyAgent = new undici_1.EnvHttpProxyAgent();
 /**
  * @returns {string[]} possible nushell target specifiers for the current platform.
  */
@@ -83376,8 +83379,12 @@ function getRelease(tool) {
     return __awaiter(this, void 0, void 0, function* () {
         const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
         const isNightly = versionSpec === 'nightly';
-        // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
-        const octokit = new rest_1.Octokit({ auth: tool.githubToken, baseUrl: 'https://api.github.com' });
+        const octokit = new rest_1.Octokit({
+            auth: tool.githubToken,
+            // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
+            baseUrl: 'https://api.github.com',
+            request: { fetch: proxyFetch },
+        });
         return octokit
             .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
             const nightlyReleases = isNightly ? filterLatestNightly(response, features) : [];
@@ -83401,6 +83408,9 @@ function getRelease(tool) {
             return release;
         });
     });
+}
+function proxyFetch(url, opts) {
+    return (0, undici_1.fetch)(url, Object.assign(Object.assign({}, opts), { dispatcher: proxyAgent }));
 }
 function handleBadBinaryPermissions(tool, dir) {
     return __awaiter(this, void 0, void 0, function* () {
