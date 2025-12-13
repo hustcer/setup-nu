@@ -26,6 +26,9 @@ importers:
       shelljs:
         specifier: ^0.10.0
         version: 0.10.0
+      undici:
+        specifier: ^7.16.0
+        version: 7.16.0
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.3.8

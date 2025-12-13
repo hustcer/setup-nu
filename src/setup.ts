@@ -9,6 +9,7 @@ import * as path from 'node:path';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import { Octokit } from '@octokit/rest';
+import { EnvHttpProxyAgent, fetch as undiciFetch, type RequestInit as UndiciRequestInit, type Response as UndiciResponse } from 'undici';
 import { promises as fs, constants as fs_constants } from 'node:fs';
 
 // REF: https://nodejs.org/api/process.html#processarch
@@ -43,6 +44,9 @@ const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
   linux_loong64: ['loongarch64-unknown-linux-gnu-full'],
   linux_x64: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
 };
+
+// Singleton to ensure efficient use of connection pooling, resources, etc.
+const proxyAgent = new EnvHttpProxyAgent();
 
 /**
  * @returns {string[]} possible nushell target specifiers for the current platform.
@@ -209,8 +213,12 @@ async function getRelease(tool: Tool): Promise<Release> {
   const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
   const isNightly = versionSpec === 'nightly';
 
-  // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
-  const octokit = new Octokit({ auth: tool.githubToken, baseUrl: 'https://api.github.com' });
+  const octokit = new Octokit({
+    auth: tool.githubToken,
+    // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
+    baseUrl: 'https://api.github.com',
+    request: { fetch: proxyFetch },
+  });
 
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
@@ -235,6 +243,13 @@ async function getRelease(tool: Tool): Promise<Release> {
       }
       return release;
     });
+}
+
+function proxyFetch(url: string | URL, opts?: UndiciRequestInit): Promise<UndiciResponse> {
+  return undiciFetch(url, {
+    ...opts,
+    dispatcher: proxyAgent,
+  });
 }
 
 async function handleBadBinaryPermissions(tool: Tool, dir: string): Promise<void> {
