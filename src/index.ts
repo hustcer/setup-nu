@@ -49,7 +49,7 @@ async function main() {
     console.log(`Current directory: ${process.cwd()}`);
     await registerPlugins(enablePlugins, tool.version);
   } catch (err) {
-    core.setFailed(err.message);
+    core.setFailed(err instanceof Error ? err.message : String(err));
   }
 }
 
