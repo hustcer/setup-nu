@@ -18,7 +18,7 @@ jobs:
   test-matrix:
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-22.04, ubuntu-22.04-arm, macos-13, macos-latest]
+        os: [windows-latest, ubuntu-22.04, ubuntu-22.04-arm, macos-15, macos-latest]
         ver: [0.108.0]
 
     runs-on: ${{ matrix.os }}
