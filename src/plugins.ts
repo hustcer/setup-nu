@@ -2,6 +2,31 @@ import shell from 'shelljs';
 import semver from 'semver';
 import { promises as fs, constants as fs_constants } from 'node:fs';
 
+/**
+ * Validates enablePlugins input to prevent command injection.
+ * Allows: 'true', 'false', or comma-separated plugin names (alphanumeric, underscore only).
+ */
+function validatePluginInput(input: string): void {
+  // Allow 'true', 'false', or comma-separated identifiers (word characters only)
+  if (!/^(true|false|[\w]+(,[\w]+)*)$/i.test(input)) {
+    throw new Error(
+      `Invalid enable-plugins input: "${input}". Only alphanumeric characters, underscores, and commas are allowed.`
+    );
+  }
+}
+
+/**
+ * Validates version string to prevent command injection.
+ * Allows: alphanumeric, dots, hyphens (e.g., "0.95.0", "nightly-56ed69a").
+ */
+function validateVersion(version: string): void {
+  if (!/^[\w.-]+$/.test(version)) {
+    throw new Error(
+      `Invalid version format: "${version}". Only alphanumeric characters, dots, and hyphens are allowed.`
+    );
+  }
+}
+
 const nu = String.raw;
 
 const pluginRegisterScript = nu`
@@ -72,6 +97,11 @@ export async function registerPlugins(enablePlugins: string, version: string) {
   if (enablePlugins === '' || enablePlugins === 'false') {
     return;
   }
+
+  // Validate inputs to prevent command injection
+  validatePluginInput(enablePlugins);
+  validateVersion(version);
+
   const LEGACY_VERSION = '0.92.3';
   const script = 'register-plugins.nu';
   const isLegacyVersion = !version.includes('nightly') && semver.lte(version, LEGACY_VERSION);

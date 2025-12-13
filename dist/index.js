@@ -83059,7 +83059,7 @@ function main() {
             yield (0, plugins_1.registerPlugins)(enablePlugins, tool.version);
         }
         catch (err) {
-            core.setFailed(err.message);
+            core.setFailed(err instanceof Error ? err.message : String(err));
         }
     });
 }
@@ -83090,6 +83090,25 @@ exports.registerPlugins = registerPlugins;
 const shelljs_1 = __importDefault(__nccwpck_require__(1271));
 const semver_1 = __importDefault(__nccwpck_require__(2597));
 const node_fs_1 = __nccwpck_require__(3024);
+/**
+ * Validates enablePlugins input to prevent command injection.
+ * Allows: 'true', 'false', or comma-separated plugin names (alphanumeric, underscore only).
+ */
+function validatePluginInput(input) {
+    // Allow 'true', 'false', or comma-separated identifiers (word characters only)
+    if (!/^(true|false|[\w]+(,[\w]+)*)$/i.test(input)) {
+        throw new Error(`Invalid enable-plugins input: "${input}". Only alphanumeric characters, underscores, and commas are allowed.`);
+    }
+}
+/**
+ * Validates version string to prevent command injection.
+ * Allows: alphanumeric, dots, hyphens (e.g., "0.95.0", "nightly-56ed69a").
+ */
+function validateVersion(version) {
+    if (!/^[\w.-]+$/.test(version)) {
+        throw new Error(`Invalid version format: "${version}". Only alphanumeric characters, dots, and hyphens are allowed.`);
+    }
+}
 const nu = String.raw;
 const pluginRegisterScript = nu `
 #!/usr/bin/env nu
@@ -83159,6 +83178,9 @@ function registerPlugins(enablePlugins, version) {
         if (enablePlugins === '' || enablePlugins === 'false') {
             return;
         }
+        // Validate inputs to prevent command injection
+        validatePluginInput(enablePlugins);
+        validateVersion(version);
         const LEGACY_VERSION = '0.92.3';
         const script = 'register-plugins.nu';
         const isLegacyVersion = !version.includes('nightly') && semver_1.default.lte(version, LEGACY_VERSION);
