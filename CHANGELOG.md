@@ -1,6 +1,37 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.22] - 2025-12-13
+
+### Bug Fixes
+
+- Added input validation for plugin registration to prevent injection vulnerabilities (#195)
+
+### Features
+
+- Add strict input validation and robust plugin registration; improve target selection and caching (#190)
+- Support proxies (#194)
+
+### Miscellaneous Tasks
+
+- Update .lefthook/pre-push/sync.nu
+- Update README.md
+- Bump actions/checkout from 5 to 6 (#191)
+- Drop 0.88.1 check
+- Update README
+- Update lefthook.yml
+- Upgrade runner os from macos-13 to macos-15
+- Update dist & format code
+
+### Deps
+
+- Upgrade @octokit/rest,lefthook,@types/node, and @biomejs/biome
+- Upgrade pnpm to v10
+- Upgrade @biomejs/biome,cspell & lefthook
+- Upgrade globby, @biomejs/biome & cspell
+- Upgrade @biomejs/biome,lefthook & cspell (#193)
+- Upgrade @actions/core & lefthook
+
 ## [3.21] - 2025-10-25
 
 ### Bug Fixes
