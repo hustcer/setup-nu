@@ -25,7 +25,7 @@
     "@actions/core": "^2.0.1",
     "@actions/tool-cache": "^2.0.2",
     "@octokit/rest": "^22.0.1",
-    "globby": "^16.0.0",
+    "globby": "^16.1.0",
     "shelljs": "^0.10.0",
     "undici": "^7.16.0"
   },
