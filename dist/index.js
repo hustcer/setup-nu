@@ -83274,7 +83274,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkOrInstallTool = checkOrInstallTool;
-const globby_1 = __nccwpck_require__(4621);
+const globby_1 = __nccwpck_require__(8716);
 const semver = __importStar(__nccwpck_require__(2597));
 const path = __importStar(__nccwpck_require__(6760));
 const core = __importStar(__nccwpck_require__(1359));
@@ -89727,7 +89727,7 @@ const dist_src_Octokit = Octokit.plugin(requestLog, legacyRestEndpointMethods, p
 
 /***/ }),
 
-/***/ 4621:
+/***/ 8716:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
@@ -90116,13 +90116,24 @@ function slash(path) {
 	return path.replace(/\\/g, '/');
 }
 
-;// CONCATENATED MODULE: ../../../.pnpm-store/v10/links/globby/16.0.0/eb2f01de3612dc7fa4ce43cfe755ce7e2bdeeee36b01ca08b9cdc8c8bdb03b21/node_modules/globby/utilities.js
+;// CONCATENATED MODULE: ../../../.pnpm-store/v10/links/globby/16.1.0/8cec30d1bf47f1dfb131d0e49665fbdbc84b2d4aef8d003714a8813a775fb3cd/node_modules/globby/utilities.js
 
 
 
 
 
 const isNegativePattern = pattern => pattern[0] === '!';
+
+/**
+Normalize an absolute pattern to be relative.
+
+On Unix, patterns starting with `/` are interpreted as absolute paths from the filesystem root. This causes inconsistent behavior across platforms since Windows uses different path roots (like `C:\`).
+
+This function strips leading `/` to make patterns relative to cwd, ensuring consistent cross-platform behavior.
+
+@param {string} pattern - The pattern to normalize.
+*/
+const normalizeAbsolutePatternToRelative = pattern => pattern.startsWith('/') ? pattern.slice(1) : pattern;
 
 const bindFsMethod = (object, methodName) => {
 	const method = object?.[methodName];
@@ -90406,7 +90417,7 @@ const convertPatternsForFastGlob = (patterns, usingGitRoot, normalizeDirectoryPa
 	return hasNegations ? [] : result;
 };
 
-;// CONCATENATED MODULE: ../../../.pnpm-store/v10/links/globby/16.0.0/eb2f01de3612dc7fa4ce43cfe755ce7e2bdeeee36b01ca08b9cdc8c8bdb03b21/node_modules/globby/ignore.js
+;// CONCATENATED MODULE: ../../../.pnpm-store/v10/links/globby/16.1.0/8cec30d1bf47f1dfb131d0e49665fbdbc84b2d4aef8d003714a8813a775fb3cd/node_modules/globby/ignore.js
 
 
 
@@ -90738,7 +90749,7 @@ const getIgnorePatternsAndPredicateSync = (patterns, options, includeParentIgnor
 const isGitIgnored = options => isIgnoredByIgnoreFiles(GITIGNORE_FILES_PATTERN, options);
 const isGitIgnoredSync = options => isIgnoredByIgnoreFilesSync(GITIGNORE_FILES_PATTERN, options);
 
-;// CONCATENATED MODULE: ../../../.pnpm-store/v10/links/globby/16.0.0/eb2f01de3612dc7fa4ce43cfe755ce7e2bdeeee36b01ca08b9cdc8c8bdb03b21/node_modules/globby/index.js
+;// CONCATENATED MODULE: ../../../.pnpm-store/v10/links/globby/16.1.0/8cec30d1bf47f1dfb131d0e49665fbdbc84b2d4aef8d003714a8813a775fb3cd/node_modules/globby/index.js
 
 
 
@@ -91019,11 +91030,20 @@ const createFilterFunction = (isIgnored, cwd) => {
 const unionFastGlobResults = (results, filter) => results.flat().filter(fastGlobResult => filter(fastGlobResult));
 
 const convertNegativePatterns = (patterns, options) => {
-	// If all patterns are negative, prepend a positive catch-all pattern
-	// This makes negation-only patterns work intuitively (e.g., '!*.json' matches all files except JSON)
+	// If all patterns are negative and expandNegationOnlyPatterns is enabled (default),
+	// prepend a positive catch-all pattern to make negation-only patterns work intuitively
+	// (e.g., '!*.json' matches all files except JSON)
 	if (patterns.length > 0 && patterns.every(pattern => isNegativePattern(pattern))) {
+		if (options.expandNegationOnlyPatterns === false) {
+			return [];
+		}
+
 		patterns = ['**/*', ...patterns];
 	}
+
+	patterns = patterns.map(pattern => isNegativePattern(pattern)
+		? `!${normalizeAbsolutePatternToRelative(pattern.slice(1))}`
+		: pattern);
 
 	const tasks = [];
 
