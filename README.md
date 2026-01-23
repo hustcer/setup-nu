@@ -71,7 +71,7 @@ To use modules in `Nu`, please refer to the following examples:
 - name: Setup nu
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.109.1
+    version: 0.110.0
 - name: Use Your Nu Modules by NU_LIB_DIRS Constant
   shell: nu {0}
   run: |
@@ -87,7 +87,7 @@ To use modules in `Nu`, please refer to the following examples:
 - name: Setup nu
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.109.1
+    version: 0.110.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules
@@ -104,7 +104,7 @@ You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal
 - name: Setup nu
   uses: hustcer/setup-nu@v3
   with:
-    version: 0.109.1
+    version: 0.110.0
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 - name: Use Your Nu Modules by Absolute Path
