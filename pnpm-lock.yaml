@@ -27,8 +27,8 @@ importers:
         specifier: ^0.10.0
         version: 0.10.0
       undici:
-        specifier: ^7.19.0
-        version: 7.19.0
+        specifier: ^7.20.0
+        version: 7.20.0
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.3.11
@@ -804,8 +804,8 @@ packages:
     resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
     engines: {node: '>=14.0'}
 
-  undici@7.19.0:
-    resolution: {integrity: sha512-Heho1hJD81YChi+uS2RkSjcVO+EQLmLSyUlHyp7Y/wFbxQaGb4WXVKD073JytrjXJVkSZVzoE2MCSOKugFGtOQ==}
+  undici@7.20.0:
+    resolution: {integrity: sha512-MJZrkjyd7DeC+uPZh+5/YaMDxFiiEEaDgbUSVMXayofAkDWF1088CDo+2RPg7B1BuS1qf1vgNE7xqwPxE0DuSQ==}
     engines: {node: '>=20.18.1'}
 
   unicorn-magic@0.4.0:
@@ -1548,7 +1548,7 @@ snapshots:
     dependencies:
       '@fastify/busboy': 2.1.1
 
-  undici@7.19.0: {}
+  undici@7.20.0: {}
 
   unicorn-magic@0.4.0: {}
 
