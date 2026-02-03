@@ -23,7 +23,7 @@
   "homepage": "https://github.com/hustcer/setup-nu#readme",
   "dependencies": {
     "@actions/core": "^2.0.2",
-    "@actions/tool-cache": "^3.0.0",
+    "@actions/tool-cache": "^4.0.0",
     "@octokit/rest": "^22.0.1",
     "globby": "^16.1.0",
     "shelljs": "^0.10.0",
