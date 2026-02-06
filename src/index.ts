@@ -7,8 +7,8 @@ import shell from 'shelljs';
 import semver from 'semver';
 import * as core from '@actions/core';
 
-import * as setup from './setup';
-import { registerPlugins } from './plugins';
+import * as setup from './setup.js';
+import { registerPlugins } from './plugins.js';
 
 async function main() {
   try {

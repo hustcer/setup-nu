@@ -313,9 +313,7 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
       [
         `${extractDir}/**/nu_plugin_*`,
         // For nu v0.61~0.63 on Windows OS
-        path
-          .join(extractDir, '**', 'nu_plugin_*')
-          .replace(/\\/g, '/'),
+        path.join(extractDir, '**', 'nu_plugin_*').replace(/\\/g, '/'),
       ],
       {
         unique: true,

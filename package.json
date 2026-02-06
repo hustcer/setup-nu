@@ -3,12 +3,13 @@
   "version": "3.22.0",
   "actionVer": "v3.22",
   "description": "A Github Action to Setup a Nushell Environment to Run Nu Scripts or Commands",
+  "type": "module",
   "main": "dist/index.js",
   "private": true,
   "scripts": {
     "fmt": "biome format . --write",
     "lint": "biome lint **/*.ts",
-    "build": "rm -rf dist/ && ncc build src/index.ts --minify",
+    "build": "rm -rf dist/ && ncc build src/index.ts --minify && mv dist/exec-child.js dist/exec-child.cjs && node -e \"const fs=require('fs');const f='dist/index.js';fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/exec-child\\.js/g,'exec-child.cjs'))\"",
     "run": "pnpm run build && RUNNER_TOOL_CACHE=./runner/cache RUNNER_TEMP=./runner/temp node dist/index.js"
   },
   "repository": {
@@ -22,22 +23,22 @@
   },
   "homepage": "https://github.com/hustcer/setup-nu#readme",
   "dependencies": {
-    "@actions/core": "^2.0.2",
-    "@actions/tool-cache": "^3.0.0",
+    "@actions/core": "^3.0.0",
+    "@actions/tool-cache": "^4.0.0",
     "@octokit/rest": "^22.0.1",
     "globby": "^16.1.0",
     "shelljs": "^0.10.0",
-    "undici": "^7.19.0"
+    "undici": "^7.20.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
-    "@types/node": "^25.0.10",
+    "@biomejs/biome": "^2.3.14",
+    "@types/node": "^25.2.1",
     "@types/semver": "^7.7.1",
     "@types/shelljs": "^0.10.0",
     "@vercel/ncc": "^0.38.4",
-    "cspell": "^9.6.0",
-    "lefthook": "^2.0.15",
-    "semver": "^7.7.3",
+    "cspell": "^9.6.4",
+    "lefthook": "^2.1.0",
+    "semver": "^7.7.4",
     "typescript": "^5.9.3"
   },
   "engines": {
