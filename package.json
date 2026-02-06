@@ -9,7 +9,7 @@
   "scripts": {
     "fmt": "biome format . --write",
     "lint": "biome lint **/*.ts",
-    "build": "rm -rf dist/ && ncc build src/index.ts --minify && mv dist/exec-child.js dist/exec-child.cjs && node -e \"const fs=require('fs');const f='dist/index.js';fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/exec-child\\.js/g,'exec-child.cjs'))\"",
+    "build": "nu nu/build.nu",
     "run": "pnpm run build && RUNNER_TOOL_CACHE=./runner/cache RUNNER_TEMP=./runner/temp node dist/index.js"
   },
   "repository": {
