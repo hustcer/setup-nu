@@ -3,6 +3,7 @@
   "version": "3.22.0",
   "actionVer": "v3.22",
   "description": "A Github Action to Setup a Nushell Environment to Run Nu Scripts or Commands",
+  "type": "module",
   "main": "dist/index.js",
   "private": true,
   "scripts": {
