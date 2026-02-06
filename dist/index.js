@@ -13640,7 +13640,7 @@ function execSync(cmd, opts, pipe) {
   writeFileLockedDown(paramsFile, JSON.stringify(paramsToSerialize));
 
   var execArgs = [
-    __nccwpck_require__.ab + "exec-child.js",
+    __nccwpck_require__.ab + "exec-child.cjs",
     paramsFile,
   ];
 
