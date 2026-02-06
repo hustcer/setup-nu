@@ -69,6 +69,8 @@ build:
   rm -rf dist/*; \
   open src/plugins-tpl.ts | str replace __PLUGIN_REGISTER_SCRIPT__ (open nu/register-plugins.nu) | save -rf src/plugins.ts; \
   npx ncc build src/index.ts --minify --no-cache; \
+  mv dist/exec-child.js dist/exec-child.cjs; \
+  open dist/index.js | str replace 'exec-child.js' 'exec-child.cjs' | save -rf dist/index.js; \
   $'(ansi g)The `build` task finished!(ansi reset)(char nl)';
 
 # Test action locally

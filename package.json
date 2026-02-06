@@ -9,7 +9,7 @@
   "scripts": {
     "fmt": "biome format . --write",
     "lint": "biome lint **/*.ts",
-    "build": "rm -rf dist/ && ncc build src/index.ts --minify",
+    "build": "rm -rf dist/ && ncc build src/index.ts --minify && mv dist/exec-child.js dist/exec-child.cjs && sed -i '' 's/exec-child.js/exec-child.cjs/g' dist/index.js",
     "run": "pnpm run build && RUNNER_TOOL_CACHE=./runner/cache RUNNER_TEMP=./runner/temp node dist/index.js"
   },
   "repository": {

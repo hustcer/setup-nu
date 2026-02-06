@@ -11593,7 +11593,7 @@ __nccwpck_require__(1642);
 __nccwpck_require__(473);
 __nccwpck_require__(2016);
 __nccwpck_require__(1927);
-__nccwpck_require__(2107); // A hint to the bundler to keep exec-child.js
+__nccwpck_require__(2107); // A hint to the bundler to keep exec-child.cjs
 __nccwpck_require__(9638);
 __nccwpck_require__(573);
 __nccwpck_require__(1787);
