@@ -83997,7 +83997,8 @@ function slash(path) {
 	return path.replace(/\\/g, '/');
 }
 
-;// CONCATENATED MODULE: ../../../Library/pnpm/store/v10/links/@/globby/16.1.0/6bc516675ca718c332e5255dae86ad14f61b2538e1af28896d50d60441df5c38/node_modules/globby/utilities.js
+;// CONCATENATED MODULE: ../../../Library/pnpm/store/v10/links/@/globby/16.1.1/987df1f4ba8d462454b988ac8a7ababe1dd889502e18f89590fcd7ee340b05ad/node_modules/globby/utilities.js
+
 
 
 
@@ -84006,15 +84007,97 @@ function slash(path) {
 const isNegativePattern = pattern => pattern[0] === '!';
 
 /**
-Normalize an absolute pattern to be relative.
+Normalize a root-anchored pattern to be relative.
 
 On Unix, patterns starting with `/` are interpreted as absolute paths from the filesystem root. This causes inconsistent behavior across platforms since Windows uses different path roots (like `C:\`).
 
-This function strips leading `/` to make patterns relative to cwd, ensuring consistent cross-platform behavior.
+This function strips leading `/` only for root-anchored glob patterns (e.g., `/**`, `/*.txt`, `/foo`), not for real absolute filesystem paths (e.g., `/Users/foo/bar`, `/home/user/project`).
+
+The heuristic: if the pattern has multiple path segments and the first segment contains no glob characters, it's treated as a real absolute path and left unchanged.
 
 @param {string} pattern - The pattern to normalize.
 */
-const normalizeAbsolutePatternToRelative = pattern => pattern.startsWith('/') ? pattern.slice(1) : pattern;
+const normalizeAbsolutePatternToRelative = pattern => {
+	if (!pattern.startsWith('/')) {
+		return pattern;
+	}
+
+	const inner = pattern.slice(1);
+	const firstSlashIndex = inner.indexOf('/');
+	const firstSegment = firstSlashIndex > 0 ? inner.slice(0, firstSlashIndex) : inner;
+
+	// Preserve real absolute paths (multi-segment, non-glob first component like /Users/foo/bar)
+	if (firstSlashIndex > 0 && !out.isDynamicPattern(firstSegment)) {
+		return pattern;
+	}
+
+	// Strip leading / from root-anchored globs (/**, /*.txt, /foo, /{src,dist}/**)
+	return inner;
+};
+
+const absolutePrefixesMatch = (positivePrefix, negativePrefix) => negativePrefix === positivePrefix;
+
+/**
+Get the leading static prefix from an absolute pattern.
+
+@param {string} pattern - The pattern to inspect.
+@returns {string|undefined} Static absolute prefix, for example `/tmp/project`.
+*/
+const getStaticAbsolutePathPrefix = pattern => {
+	if (!external_node_path_.isAbsolute(pattern)) {
+		return undefined;
+	}
+
+	const staticSegments = [];
+	for (const segment of pattern.split('/')) {
+		if (!segment) {
+			continue;
+		}
+
+		if (out.isDynamicPattern(segment)) {
+			break;
+		}
+
+		staticSegments.push(segment);
+	}
+
+	return staticSegments.length === 0 ? undefined : `/${staticSegments.join('/')}`;
+};
+
+/**
+Normalize a negative pattern while preserving true absolute paths when needed.
+
+@param {string} pattern - A negative pattern without the leading `!`.
+@param {string[]} [positiveAbsolutePathPrefixes] - Static prefixes from previous positive absolute patterns.
+@param {boolean} [hasRelativePositivePattern] - Whether a relative positive pattern has been seen before this negation.
+@returns {string} Normalized pattern.
+*/
+const normalizeNegativePattern = (pattern, positiveAbsolutePathPrefixes = [], hasRelativePositivePattern = false) => {
+	// Non-absolute patterns pass through unchanged.
+	if (!pattern.startsWith('/')) {
+		return pattern;
+	}
+
+	const normalizedPattern = normalizeAbsolutePatternToRelative(pattern);
+
+	// Dynamic root-anchored patterns (e.g. `/{src,dist}/**`) are always normalized to relative.
+	if (normalizedPattern !== pattern) {
+		return normalizedPattern;
+	}
+
+	// In mixed relative/absolute pattern sets, keep root-anchored literals cwd-relative.
+	if (hasRelativePositivePattern) {
+		return pattern.slice(1);
+	}
+
+	// Literal absolute patterns are treated as cwd-relative unless they clearly target
+	// the same absolute filesystem area as a positive absolute pattern seen so far.
+	const negativeAbsolutePathPrefix = getStaticAbsolutePathPrefix(pattern);
+	const preserveAsAbsolutePattern = negativeAbsolutePathPrefix !== undefined
+		&& positiveAbsolutePathPrefixes.some(positiveAbsolutePathPrefix => absolutePrefixesMatch(positiveAbsolutePathPrefix, negativeAbsolutePathPrefix));
+
+	return preserveAsAbsolutePattern ? pattern : pattern.slice(1);
+};
 
 const bindFsMethod = (object, methodName) => {
 	const method = object?.[methodName];
@@ -84298,7 +84381,7 @@ const convertPatternsForFastGlob = (patterns, usingGitRoot, normalizeDirectoryPa
 	return hasNegations ? [] : result;
 };
 
-;// CONCATENATED MODULE: ../../../Library/pnpm/store/v10/links/@/globby/16.1.0/6bc516675ca718c332e5255dae86ad14f61b2538e1af28896d50d60441df5c38/node_modules/globby/ignore.js
+;// CONCATENATED MODULE: ../../../Library/pnpm/store/v10/links/@/globby/16.1.1/987df1f4ba8d462454b988ac8a7ababe1dd889502e18f89590fcd7ee340b05ad/node_modules/globby/ignore.js
 
 
 
@@ -84630,7 +84713,7 @@ const getIgnorePatternsAndPredicateSync = (patterns, options, includeParentIgnor
 const isGitIgnored = options => isIgnoredByIgnoreFiles(GITIGNORE_FILES_PATTERN, options);
 const isGitIgnoredSync = options => isIgnoredByIgnoreFilesSync(GITIGNORE_FILES_PATTERN, options);
 
-;// CONCATENATED MODULE: ../../../Library/pnpm/store/v10/links/@/globby/16.1.0/6bc516675ca718c332e5255dae86ad14f61b2538e1af28896d50d60441df5c38/node_modules/globby/index.js
+;// CONCATENATED MODULE: ../../../Library/pnpm/store/v10/links/@/globby/16.1.1/987df1f4ba8d462454b988ac8a7ababe1dd889502e18f89590fcd7ee340b05ad/node_modules/globby/index.js
 
 
 
@@ -84922,9 +85005,28 @@ const convertNegativePatterns = (patterns, options) => {
 		patterns = ['**/*', ...patterns];
 	}
 
-	patterns = patterns.map(pattern => isNegativePattern(pattern)
-		? `!${normalizeAbsolutePatternToRelative(pattern.slice(1))}`
-		: pattern);
+	const positiveAbsolutePathPrefixes = [];
+	let hasRelativePositivePattern = false;
+	const normalizedPatterns = [];
+
+	for (const pattern of patterns) {
+		if (isNegativePattern(pattern)) {
+			normalizedPatterns.push(`!${normalizeNegativePattern(pattern.slice(1), positiveAbsolutePathPrefixes, hasRelativePositivePattern)}`);
+			continue;
+		}
+
+		normalizedPatterns.push(pattern);
+
+		const staticAbsolutePathPrefix = getStaticAbsolutePathPrefix(pattern);
+		if (staticAbsolutePathPrefix === undefined) {
+			hasRelativePositivePattern = true;
+			continue;
+		}
+
+		positiveAbsolutePathPrefixes.push(staticAbsolutePathPrefix);
+	}
+
+	patterns = normalizedPatterns;
 
 	const tasks = [];
 
