@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-22.04, macos-latest]
         # The "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.
-        ver: [0.93.0, 0.92.2, 0.91.0]
+        ver: [0.93.0, 0.92.2]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
