@@ -27,7 +27,7 @@ jobs:
         pnpm i
         pnpm run lint
         pnpm run build
-        npx skills add -yg hustcer/nushell-craft
+        npx skills add -y -g hustcer/nushell-pro --agent claude-code
 
   test:
     strategy:
