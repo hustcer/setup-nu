@@ -28,7 +28,7 @@
     "@octokit/rest": "^22.0.1",
     "globby": "^16.1.1",
     "shelljs": "^0.10.0",
-    "undici": "^7.22.0"
+    "undici": "^7.24.4"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
