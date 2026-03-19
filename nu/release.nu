@@ -37,7 +37,7 @@ export def make-release [
   let commitMsg = $'A new release for version: ($releaseVer) created by Release command of setup-nu'
   git tag $releaseVer -am $commitMsg
   # Remove local major version tag if exists and ignore errors
-  do -i { git tag -d $majorTag | complete | ignore }
+  do -i { git tag -d $majorTag } | complete 
   git checkout $releaseVer; git tag $majorTag
   git push origin $majorTag $releaseVer --force
 }
