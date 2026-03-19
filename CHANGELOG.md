@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.23] - 2026-03-19
+
+### Features
+
+- Add nu/build.nu for assets building (#206)
+
+### Deps
+
+- Upgrade globby,@biomejs/biome & lefthook
+- Upgrade lefthook,cspell,@biomejs/biome,undici & @actions/*
+- Upgrade undici to 7.19.0
+- Upgrade @actions/core,@actions/tool-cache,undici,lefthook & semver (#205)
+- Upgrade undici,@biomejs/biome,@types/node & lefthook
+- Upgrade globby, @biomejs/biome & cspell (#212)
+- Upgrade @biomejs/biome,lefthook & undici
+
 ## [3.22] - 2025-12-13
 
 ### Bug Fixes
