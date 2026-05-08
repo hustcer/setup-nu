@@ -23,7 +23,7 @@ jobs:
       uses: hustcer/setup-nu@v3
     - name: Build Setup Script
       run: |
-        npm i -g pnpm
+        npm i -g pnpm@10
         pnpm i
         pnpm run lint
         pnpm run build
