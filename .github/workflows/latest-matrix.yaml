@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-22.04, ubuntu-22.04-arm, macos-15, macos-latest]
-        ver: [0.111.0]
+        ver: [0.113.1]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
