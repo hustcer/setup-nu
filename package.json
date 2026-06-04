@@ -31,14 +31,14 @@
     "undici": "^8.3.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.15",
+    "@biomejs/biome": "^2.4.16",
     "@types/node": "^25.9.1",
     "@types/semver": "^7.7.1",
     "@types/shelljs": "^0.10.0",
     "@vercel/ncc": "^0.38.4",
-    "cspell": "^10.0.0",
-    "lefthook": "^2.1.8",
-    "semver": "^7.8.1",
+    "cspell": "^10.0.1",
+    "lefthook": "^2.1.9",
+    "semver": "^7.8.2",
     "typescript": "^6.0.3"
   },
   "engines": {
