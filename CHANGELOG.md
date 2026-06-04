@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.25] - 2026-06-03
+
+### Miscellaneous Tasks
+
+- Pin pnpm to v10 in workflows
+- Update Nu version matrix for workflows
+
+### Deps
+
+- Upgrade globby, typescript & undici
+- Upgrade typescript,lefthook,@types/node,@biomejs/biome,undici & @actions/core
+- Upgrade undici,semver,lefthook,@types/node & @biomejs/biome
+- Upgrade @biomejs/biome,cspell,lefthook & semver
+
 ## [3.23] - 2026-03-19
 
 ### Features
