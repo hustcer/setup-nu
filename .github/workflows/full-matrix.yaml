@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Setup nu@${{matrix.ver}}
       uses: hustcer/setup-nu@develop
       with:
