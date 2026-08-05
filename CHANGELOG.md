@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.26] - 2026-08-05
+
+### Miscellaneous Tasks
+
+- Bump undici from 6.23.0 to 8.7.0 (#217)
+
+### Deps
+
+- Upgrade undici,semver, & @vercel/ncc
+- Upgrade globby,undici,@vercel/ncc & semver
+- Bump actions/checkout to v7 (#216)
+- Upgrade lefthook,@types/node & @biomejs/biome
+- Upgrade globby,undici & @biomejs/biome
+
 ## [3.25] - 2026-06-03
 
 ### Miscellaneous Tasks
