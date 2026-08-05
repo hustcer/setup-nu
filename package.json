@@ -26,14 +26,14 @@
     "@actions/core": "^3.0.1",
     "@actions/tool-cache": "^4.0.0",
     "@octokit/rest": "^22.0.1",
-    "globby": "^16.2.1",
+    "globby": "^16.2.2",
     "shelljs": "^0.10.0",
-    "undici": "^8.7.0"
+    "undici": "^8.10.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.3",
-    "@types/node": "^26.1.1",
-    "@types/semver": "^7.7.1",
+    "@biomejs/biome": "^2.5.7",
+    "@types/node": "^26.1.2",
+    "@types/semver": "^7.8.0",
     "@types/shelljs": "^0.10.0",
     "@vercel/ncc": "^0.44.1",
     "cspell": "^10.0.1",
