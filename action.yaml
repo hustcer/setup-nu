@@ -19,7 +19,7 @@ inputs:
   version:
     default: '*'
     required: false
-    description: 'A valid semver specifier of nushell version to install.'
+    description: 'A valid Nushell semantic version specifier, nightly, or commit SHA for a stable or nightly release.'
   features:
     default: 'default'
     required: false
