@@ -456,7 +456,13 @@ async function getRelease(tool: Tool): Promise<Release> {
     const release = stableRelease ?? (await getNightlyReleaseByCommit(octokit, owner, commitSha, features));
     if (!release) {
       warnIfFullFeature(features);
-      throw new Error(`No published Nushell release found for commit SHA ${commitSha} with ${features} features.`);
+      // The commit itself exists, `commitExists` above made sure of that, so it is simply not the
+      // target of any installable release. A pruned nightly is the most common reason.
+      throw new Error(
+        `No published Nushell release found for commit SHA ${commitSha} with ${features} features. ` +
+          'Only a commit that a stable tag or a nightly release points at can be installed, and ' +
+          `${owner}/${NIGHTLY_REPO} keeps just its most recent builds, so older nightly SHAs stop resolving.`
+      );
     }
     return release;
   }

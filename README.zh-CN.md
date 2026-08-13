@@ -139,7 +139,7 @@ jobs:
 > 请谨慎使用 `Nushell` `nightly` 版本: nu 的二进制文件每天都可能发生变化，可能会导致你的工作流无法正常工作。
 > 而且只有最新的 `nightly` 版本会被下载并配置好, 同时它的版本只能被指定为 `nightly` 而不能是其它值。
 
-如果你想锁定某个已发布的固定构建，可以把 `version` 设置为 stable 或者 nightly 发布所对应的完整或缩写
+如果你想锁定某个已发布的构建，可以把 `version` 设置为 stable 或者 nightly 发布所对应的完整或缩写
 commit SHA。此时 Action 会直接下载已有的二进制包，而不会去编译 Nushell。
 
 ```yaml
@@ -149,6 +149,11 @@ commit SHA。此时 Action 会直接下载已有的二进制包，而不会去�
 ```
 
 nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为 commit SHA 时，`check-latest` 会被忽略。
+
+> **Warning**
+> stable 的 commit SHA 是永久有效的，nightly 则不是：`nushell/nightly` 仓库只保留最近若干个构建
+> （约 10 个），一旦对应构建被清理，锁定的 nightly SHA 就会解析失败。所以 nightly SHA 适合用来复现
+> 某一次具体构建，不适合长期锁定版本。
 
 #### 其它
 

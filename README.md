@@ -144,8 +144,8 @@ They aren't perfect yet, but they do work. By the way, if you discover a better 
 > which may disrupt your workflow. Only the latest nightly version will be downloaded and set up,
 > and the version requirement is `nightly`.
 
-To select an immutable published build, set `version` to the full or abbreviated commit SHA for a
-stable release tag or a nightly release tag. The action downloads the existing binary asset. It
+To pin a published build, set `version` to the full or abbreviated commit SHA of a stable release
+tag or a nightly release tag. The action downloads the existing binary asset. It
 does not compile Nushell.
 
 ```yaml
@@ -156,6 +156,11 @@ does not compile Nushell.
 
 For a nightly release, use its commit SHA in the same way. Note that `check-latest` is ignored
 when the version is a commit SHA.
+
+> **Warning**
+> A stable release SHA is permanent, a nightly one is not. The `nushell/nightly` repo only keeps
+> its most recent builds (about ten), and a pinned nightly SHA stops resolving once its build is
+> pruned. Use a nightly SHA to reproduce one specific build, not to pin a version long term.
 
 #### Others
 

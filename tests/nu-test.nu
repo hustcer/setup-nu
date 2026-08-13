@@ -91,11 +91,11 @@ $failures += (if (check 'contains no backtick (breaks the JS template literal)' 
 
 print $'(ansi pb)common.nu(ansi reset)'
 $failures += (if (check 'compare-ver: higher major' 1 (compare-ver '1.0.0' '0.9.9')) { 0 } else { 1 })
-$failures += (if (check 'compare-ver: equal' 0 (compare-ver '0.114.1' '0.114.1')) { 0 } else { 1 })
-$failures += (if (check 'compare-ver: lower patch' (-1) (compare-ver '0.114.0' '0.114.1')) { 0 } else { 1 })
-$failures += (if (check 'compare-ver: tolerates a v prefix' 0 (compare-ver 'v0.114.1' '0.114.1')) { 0 } else { 1 })
-$failures += (if (check 'compare-ver: ignores pre-release suffix' 0 (compare-ver '0.114.1-nightly.3' '0.114.1')) { 0 } else { 1 })
-$failures += (if (check 'is-lower-ver' true (is-lower-ver '0.113.1' '0.114.0')) { 0 } else { 1 })
+$failures += (if (check 'compare-ver: equal' 0 (compare-ver '0.112.1' '0.112.1')) { 0 } else { 1 })
+$failures += (if (check 'compare-ver: lower patch' (-1) (compare-ver '0.112.0' '0.112.1')) { 0 } else { 1 })
+$failures += (if (check 'compare-ver: tolerates a v prefix' 0 (compare-ver 'v0.112.1' '0.112.1')) { 0 } else { 1 })
+$failures += (if (check 'compare-ver: ignores pre-release suffix' 0 (compare-ver '0.112.1-nightly.3' '0.112.1')) { 0 } else { 1 })
+$failures += (if (check 'is-lower-ver' true (is-lower-ver '0.111.1' '0.112.0')) { 0 } else { 1 })
 
 rm -rf $WORK
 print ''

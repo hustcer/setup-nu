@@ -81,7 +81,7 @@ describe('isCommitSha', () => {
   });
 
   test('rejects version specs and too short hex strings', () => {
-    assert.equal(isCommitSha('0.114.1'), false);
+    assert.equal(isCommitSha('0.112.1'), false);
     assert.equal(isCommitSha('nightly'), false);
     assert.equal(isCommitSha('*'), false);
     assert.equal(isCommitSha('0df4ca'), false);
@@ -137,7 +137,7 @@ describe('findAsset', () => {
 describe('filterMatch', () => {
   test('drops releases without an asset for this platform', () => {
     // Keeping them non-empty stopped the pagination before older releases were ever fetched
-    const result = filterMatch(page(release('0.114.1', [otherAsset])), undefined, 'default');
+    const result = filterMatch(page(release('0.112.1', [otherAsset])), undefined, 'default');
     assert.deepEqual(result, []);
   });
 
@@ -172,7 +172,7 @@ describe('filterLatest', () => {
   test('skips a newer release whose asset is missing', () => {
     // The newest release used to win the election and then resolve to nothing, which failed the
     // run instead of falling back to a release that is actually installable
-    const result = filterLatest(page(release('0.114.1', [otherAsset]), release('0.113.1', [localAsset])), 'default');
+    const result = filterLatest(page(release('0.112.1', [otherAsset]), release('0.113.1', [localAsset])), 'default');
     assert.deepEqual(
       result.map((r) => r.version),
       ['0.113.1']
@@ -181,14 +181,14 @@ describe('filterLatest', () => {
 
   test('elects the highest version, not the first entry', () => {
     const result = filterLatest(
-      page(release('0.99.0', [localAsset]), release('0.114.1', [localAsset]), release('0.100.0', [localAsset])),
+      page(release('0.99.0', [localAsset]), release('0.112.1', [localAsset]), release('0.100.0', [localAsset])),
       'default'
     );
-    assert.equal(result[0].version, '0.114.1');
+    assert.equal(result[0].version, '0.112.1');
   });
 
   test('returns an empty page result so pagination continues', () => {
-    assert.deepEqual(filterLatest(page(release('0.114.1', [otherAsset])), 'default'), []);
+    assert.deepEqual(filterLatest(page(release('0.112.1', [otherAsset])), 'default'), []);
   });
 
   test('ignores tags that are no valid semver, semver.rsort would throw on them', () => {
