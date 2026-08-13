@@ -68,10 +68,26 @@ export function isCommitSha(value: string): boolean {
 }
 
 /**
+ * Resolves the `version` input to something `semver.satisfies` understands.
+ *
+ * Valid ranges are kept as they are, so `^0.98`, `>=0.95 <0.100` and `0.90` all keep their range
+ * semantics. Coercing them would collapse `0.90` to the exact `0.90.0` and skip `0.90.1`. Anything
+ * that is no valid range still gets coerced, e.g. `v0.98-x64` becomes `0.98.0`.
+ *
+ * @returns the resolved spec, or `null` when the input is no usable version at all.
+ */
+export function resolveVersionSpec(versionSpec: string): string | null {
+  if (['*', 'nightly'].includes(versionSpec)) {
+    return versionSpec;
+  }
+  return semver.validRange(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
+}
+
+/**
  * Tests whether two commit SHAs point to the same commit, the shorter one is compared as a
  * prefix so that abbreviated SHAs of any length match on both sides.
  */
-function matchesSha(candidate: string, commitSha: string): boolean {
+export function matchesSha(candidate: string, commitSha: string): boolean {
   const length = Math.min(candidate.length, commitSha.length);
   return candidate.slice(0, length).toLowerCase() === commitSha.slice(0, length).toLowerCase();
 }
@@ -82,7 +98,7 @@ const proxyAgent = new EnvHttpProxyAgent();
 /**
  * @returns {string[]} possible nushell target specifiers for the current platform.
  */
-function getTargets(features: 'default' | 'full'): string[] {
+export function getTargets(features: 'default' | 'full'): string[] {
   const { arch, platform } = process;
   const selector = `${platform}_${arch}`;
 
@@ -97,7 +113,7 @@ function getTargets(features: 'default' | 'full'): string[] {
 /**
  * @returns the first release asset matching one of the given target specifiers, if any.
  */
-function findAsset(assets: ReleaseAsset[], targets: string[]): ReleaseAsset | undefined {
+export function findAsset(assets: ReleaseAsset[], targets: string[]): ReleaseAsset | undefined {
   return assets.find((asset) => targets.some((target) => asset.name.includes(target)));
 }
 
@@ -180,7 +196,11 @@ function warnIfFullFeature(features: 'default' | 'full'): void {
  * @param response the response to filter a release from with the given versionSpec.
  * @returns {Release[]} a single GitHub release.
  */
-function filterMatch(response: ReleasePage, versionSpec: string | undefined, features: 'default' | 'full'): Release[] {
+export function filterMatch(
+  response: ReleasePage,
+  versionSpec: string | undefined,
+  features: 'default' | 'full'
+): Release[] {
   const targets = getTargets(features);
   return (
     response.data
@@ -200,7 +220,7 @@ function filterMatch(response: ReleasePage, versionSpec: string | undefined, fea
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-function filterLatest(response: ReleasePage, features: 'default' | 'full'): Release[] {
+export function filterLatest(response: ReleasePage, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   // Only releases that carry an asset for the current platform may take part in the `latest`
   // election. Electing one without a usable asset yields `[undefined]`, which still counts as a
@@ -223,7 +243,7 @@ function filterLatest(response: ReleasePage, features: 'default' | 'full'): Rele
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-function filterLatestNightly(response: ReleasePage, features: 'default' | 'full'): Release[] {
+export function filterLatestNightly(response: ReleasePage, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   // Same reasoning as in `filterLatest`: a nightly release is created before its assets finish
   // uploading, so the newest one regularly has no asset for some platform yet. Skip those and
@@ -249,7 +269,11 @@ function filterLatestNightly(response: ReleasePage, features: 'default' | 'full'
  * @param commitSha The full or abbreviated commit SHA to match.
  * @returns A matching GitHub release, if one exists.
  */
-function filterNightlyByCommit(response: ReleasePage, commitSha: string, features: 'default' | 'full'): Release[] {
+export function filterNightlyByCommit(
+  response: ReleasePage,
+  commitSha: string,
+  features: 'default' | 'full'
+): Release[] {
   const targets = getTargets(features);
   const release = response.data.find((candidate) => {
     const releaseCommitSha = candidate.tag_name.match(/(?:\+|nightly-)([0-9a-f]{7,40})$/i)?.[1];

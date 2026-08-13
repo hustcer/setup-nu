@@ -9,6 +9,7 @@
   "scripts": {
     "fmt": "biome format . --write",
     "lint": "biome lint **/*.ts",
+    "test": "nu nu/test.nu",
     "build": "nu nu/build.nu",
     "run": "pnpm run build && RUNNER_TOOL_CACHE=./runner/cache RUNNER_TEMP=./runner/temp node dist/index.js"
   },
