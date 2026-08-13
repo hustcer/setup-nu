@@ -17,6 +17,8 @@ export def make-release [
 
   cd $env.SETUP_NU_PATH
   let releaseVer = (open package.json | get actionVer)
+  # Remembered before any checkout, `git checkout <tag>` below leaves a detached HEAD otherwise
+  let originBranch = git rev-parse --abbrev-ref HEAD | str trim
 
   if (has-ref $releaseVer) {
   	print $'The version ($releaseVer) already exists, Please choose another version.(char nl)'
@@ -38,6 +40,20 @@ export def make-release [
   git tag $releaseVer -am $commitMsg
   # Remove local major version tag if exists and ignore errors
   do -i { git tag -d $majorTag } | complete 
-  git checkout $releaseVer; git tag $majorTag
-  git push origin $majorTag $releaseVer --force
+  # A failure anywhere between the tag checkout and the push would abort the script and leave the
+  # repo on a detached HEAD, so the restore below has to run on the error path as well.
+  let failure = try {
+    git checkout $releaseVer
+    git tag $majorTag
+    git push origin $majorTag $releaseVer --force
+    null
+  } catch {|err| $err }
+  # Leave the repo on the branch the release was started from instead of a detached HEAD
+  if $originBranch != 'HEAD' {
+    git checkout $originBranch
+    print $'(char nl)Switched back to ($originBranch).'
+  }
+  if $failure != null {
+    error make {msg: $'Release of ($releaseVer) failed: ($failure.msg)'}
+  }
 }

@@ -25,8 +25,10 @@ def main [
   # print $nu
   # Create Nu config directory if it does not exist
   if not ($nu.default-config-dir | path exists) { mkdir $nu.default-config-dir }
-  config env --default | save -f $nu.env-path
-  config nu --default | save -f $nu.config-path
+  # Only fill in the config files when they are missing. Overwriting them would silently discard a
+  # config that the runner image or an earlier step of the workflow had set up.
+  if not ($nu.env-path | path exists) { config env --default | save -f $nu.env-path }
+  if not ($nu.config-path | path exists) { config nu --default | save -f $nu.config-path }
   # print (ls $nu.default-config-dir)
 
   let allPlugins = ls $nuDir | where name =~ nu_plugin
@@ -61,5 +63,5 @@ def main [
         [$'print ($msg)' $cmd] | str join "\n"
       }
     | str join "\n"
-    | save -rf do-register.nu
+    | save -rf ($env.FILE_PWD | path join do-register.nu)
 }
