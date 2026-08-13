@@ -44,8 +44,12 @@ i:
   pnpm install
 
 # Run lint, fmt and build task all in one time
-all: lint fmt build
+all: lint fmt test build
   @$'(ansi pb)All done!(ansi reset)'
+
+# Run tests
+test:
+  @pnpm test
 
 # Format code
 fmt:

@@ -28,6 +28,8 @@ jobs:
         pnpm run lint
         pnpm run build
         npx skills add -y -g hustcer/nushell-pro --agent claude-code
+    - name: Run Tests
+      run: pnpm test
 
   test:
     strategy:
