@@ -29,6 +29,32 @@ jobs:
       run: pwd && ls -la
       shell: bash
 
+  # Pinning by commit SHA, and a version older than the newest page of releases
+  test-pinned-version:
+    strategy:
+      matrix:
+        include:
+          - ver: '0df4ca2'  # Commit SHA of the 0.114.1 stable release
+            expected: '0.114.1'
+          - ver: '0.86.0'
+            expected: '0.86.0'
+
+    runs-on: ubuntu-22.04
+    name: test (ubuntu-22.04, nu@${{matrix.ver}})
+    steps:
+    - uses: actions/checkout@v7
+    - name: Setup nu@${{matrix.ver}}
+      uses: hustcer/setup-nu@develop
+      with:
+        version: ${{matrix.ver}}
+    - name: Check the resolved Nu version
+      run: |
+        let current = (version).version
+        print $'Nu version: ($current)'
+        if $current != '${{matrix.expected}}' {
+          error make {msg: $'Expected ${{matrix.expected}}, but got ($current)'}
+        }
+
   test-dev-matrix:
     strategy:
       matrix:

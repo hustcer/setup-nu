@@ -151,10 +151,11 @@ does not compile Nushell.
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: 0df4ca2 # Install stable release 0.114.1.
+    version: '0df4ca2' # Install stable release 0.114.1, quote it to keep YAML from parsing it as a number.
 ```
 
-For a nightly release, use its commit SHA in the same way.
+For a nightly release, use its commit SHA in the same way. Note that `check-latest` is ignored
+when the version is a commit SHA.
 
 #### Others
 

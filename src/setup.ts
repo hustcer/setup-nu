@@ -52,11 +52,24 @@ const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
 
 const COMMIT_SHA_PATTERN = /^[0-9a-f]{7,40}$/i;
 
+// The repos that publish Nushell binaries, they are also used as tool cache names.
+const STABLE_REPO = 'nushell';
+const NIGHTLY_REPO = 'nightly';
+
 /**
  * Tests whether a value is a full or abbreviated Git commit SHA.
  */
 export function isCommitSha(value: string): boolean {
   return COMMIT_SHA_PATTERN.test(value);
+}
+
+/**
+ * Tests whether two commit SHAs point to the same commit, the shorter one is compared as a
+ * prefix so that abbreviated SHAs of any length match on both sides.
+ */
+function matchesSha(candidate: string, commitSha: string): boolean {
+  const length = Math.min(candidate.length, commitSha.length);
+  return candidate.slice(0, length).toLowerCase() === commitSha.slice(0, length).toLowerCase();
 }
 
 // Singleton to ensure efficient use of connection pooling, resources, etc.
@@ -76,6 +89,14 @@ function getTargets(features: 'default' | 'full'): string[] {
     throw new Error(`Unsupported Nu target combination: arch = ${arch}, platform = ${platform}, feature = ${features}`);
   }
   return targets;
+}
+
+/**
+ * @returns the first release asset matching one of the given target specifiers, if any.
+ */
+// biome-ignore lint: Ignore
+function findAsset(assets: any[], targets: string[]) {
+  return assets.find((asset: { name: string }) => targets.some((target) => asset.name.includes(target)));
 }
 
 /**
@@ -124,6 +145,8 @@ interface Release {
   version: string;
   /** The asset download URL. */
   downloadUrl: string;
+  /** The tool cache name to store the release under, defaults to {@link Tool.name}. */
+  name?: string;
 }
 
 interface GitHubRelease {
@@ -146,6 +169,15 @@ function hasHttpStatus(error: unknown, status: number): boolean {
 }
 
 /**
+ * Warns that the `full` feature no longer exists, it's a common cause of a missing release.
+ */
+function warnIfFullFeature(features: 'default' | 'full'): void {
+  if (features === 'full') {
+    core.warning('The "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.');
+  }
+}
+
+/**
  * Filter the matching release for the given tool with the specified versionSpec.
  *
  * @param response the response to filter a release from with the given versionSpec.
@@ -158,9 +190,7 @@ function filterMatch(response: any, versionSpec: string | undefined, features: '
     response.data
       // biome-ignore lint: Ignore
       .map((rel: { assets: any[]; tag_name: string }) => {
-        const asset = rel.assets.find((ass: { name: string | string[] }) =>
-          targets.some((target) => ass.name.includes(target))
-        );
+        const asset = findAsset(rel.assets, targets);
         if (asset) {
           return {
             version: rel.tag_name.replace(/^v/, ''),
@@ -168,9 +198,9 @@ function filterMatch(response: any, versionSpec: string | undefined, features: '
           };
         }
       })
-      .filter((rel: { version: string | semver.SemVer }) =>
-        rel && versionSpec ? semver.satisfies(rel.version, versionSpec) : true
-      )
+      // Releases without a matching asset have to be dropped here, otherwise they keep the
+      // result non-empty and stop the pagination before older releases were ever fetched.
+      .filter((rel: Release | undefined) => rel != null && (!versionSpec || semver.satisfies(rel.version, versionSpec)))
   );
 }
 
@@ -190,9 +220,7 @@ function filterLatest(response: any, features: 'default' | 'full'): Release[] {
       .filter((rel: { tag_name: string | semver.SemVer | undefined }) => rel && rel.tag_name === latest)
       // biome-ignore lint: Ignore
       .map((rel: { assets: any[]; tag_name: string }) => {
-        const asset = rel.assets.find((ass: { name: string | string[] }) =>
-          targets.some((target) => ass.name.includes(target))
-        );
+        const asset = findAsset(rel.assets, targets);
         if (asset) {
           return {
             version: rel.tag_name.replace(/^v/, ''),
@@ -222,9 +250,7 @@ function filterLatestNightly(response: any, features: 'default' | 'full'): Relea
       .filter((rel: { published_at: string | Date }) => rel && rel.published_at === latest)
       // biome-ignore lint: Ignore
       .map((rel: { assets: any[]; tag_name: string }) => {
-        const asset = rel.assets.find((ass: { name: string | string[] }) =>
-          targets.some((target) => ass.name.includes(target))
-        );
+        const asset = findAsset(rel.assets, targets);
         if (asset) {
           return {
             version: rel.tag_name.replace(/^v/, ''),
@@ -250,22 +276,23 @@ function filterNightlyByCommit(
   const targets = getTargets(features);
   const release = response.data.find((candidate) => {
     const releaseCommitSha = candidate.tag_name.match(/(?:\+|nightly-)([0-9a-f]{7,40})$/i)?.[1];
-    if (releaseCommitSha === undefined || !commitSha.toLowerCase().startsWith(releaseCommitSha.toLowerCase())) {
+    if (releaseCommitSha === undefined || !matchesSha(releaseCommitSha, commitSha)) {
       return false;
     }
-    return candidate.assets.some((asset) => targets.some((target) => asset.name.includes(target)));
+    return findAsset(candidate.assets, targets) !== undefined;
   });
 
   if (!release) {
     return [];
   }
 
-  const asset = release.assets.find((candidate) => targets.some((target) => candidate.name.includes(target)));
+  const asset = findAsset(release.assets, targets);
   return asset
     ? [
         {
           version: release.tag_name.replace(/^v/, ''),
           downloadUrl: asset.browser_download_url,
+          name: NIGHTLY_REPO,
         },
       ]
     : [];
@@ -282,38 +309,36 @@ async function getStableReleaseByCommit(
 ): Promise<Release | undefined> {
   const tags = await octokit.paginate(
     octokit.repos.listTags,
-    { owner, per_page: 100, repo: 'nushell' },
+    { owner, per_page: 100, repo: STABLE_REPO },
     (response, done) => {
-      const matchingTags = response.data.filter((tag) =>
-        tag.commit.sha.toLowerCase().startsWith(commitSha.toLowerCase())
-      );
+      const matchingTags = response.data.filter((tag) => matchesSha(tag.commit.sha, commitSha));
       if (matchingTags.length > 0) {
         done();
       }
       return matchingTags;
     }
   );
-  const tag = tags[0];
-  if (!tag) {
-    return undefined;
-  }
 
-  try {
-    const response = await octokit.repos.getReleaseByTag({ owner, repo: 'nushell', tag: tag.name });
-    const targets = getTargets(features);
-    const asset = response.data.assets.find((candidate) => targets.some((target) => candidate.name.includes(target)));
-    return asset
-      ? {
+  const targets = getTargets(features);
+  // A commit may carry more than one tag, e.g. `a80dfe8` is tagged both `v0.96.0` and `0.96.0`
+  // while only the latter has a release, so every matching tag has to be tried.
+  for (const tag of tags) {
+    try {
+      const response = await octokit.repos.getReleaseByTag({ owner, repo: STABLE_REPO, tag: tag.name });
+      const asset = findAsset(response.data.assets, targets);
+      if (asset) {
+        return {
           version: response.data.tag_name.replace(/^v/, ''),
           downloadUrl: asset.browser_download_url,
-        }
-      : undefined;
-  } catch (error) {
-    if (hasHttpStatus(error, 404)) {
-      return undefined;
+        };
+      }
+    } catch (error) {
+      if (!hasHttpStatus(error, 404)) {
+        throw error;
+      }
     }
-    throw error;
   }
+  return undefined;
 }
 
 /**
@@ -327,7 +352,7 @@ async function getNightlyReleaseByCommit(
 ): Promise<Release | undefined> {
   const releases = await octokit.paginate(
     octokit.repos.listReleases,
-    { owner, per_page: 100, repo: 'nightly' },
+    { owner, per_page: 100, repo: NIGHTLY_REPO },
     (response, done) => {
       const matches = filterNightlyByCommit(response, commitSha, features);
       if (matches.length > 0) {
@@ -359,9 +384,13 @@ async function getRelease(tool: Tool): Promise<Release> {
   });
 
   if (commitSha) {
+    if (checkLatest) {
+      core.warning('The "check-latest" input is ignored when the version is a commit SHA.');
+    }
     const stableRelease = await getStableReleaseByCommit(octokit, owner, commitSha, features);
     const release = stableRelease ?? (await getNightlyReleaseByCommit(octokit, owner, commitSha, features));
     if (!release) {
+      warnIfFullFeature(features);
       throw new Error(`No published Nushell release found for commit SHA ${commitSha} with ${features} features.`);
     }
     return release;
@@ -383,9 +412,7 @@ async function getRelease(tool: Tool): Promise<Release> {
     .then((releases) => {
       const release = releases.find((release) => release != null);
       if (release === undefined) {
-        if (features === 'full') {
-          core.warning('The "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.');
-        }
+        warnIfFullFeature(features);
         throw new Error(`No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`);
       }
       return release;
@@ -434,14 +461,18 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
 
   // first check if we have previously downloaded the tool
   let dir = tc.find(name, versionSpec || '*');
+  // a release resolved by commit SHA may come from the nightly repo, cache it under that name
+  let cacheName = name;
 
   if (!dir) {
     // find the latest release by querying GitHub API
-    const { version, downloadUrl } = await getRelease(tool);
-    dir = tc.find(name, version);
+    const release = await getRelease(tool);
+    const { version, downloadUrl } = release;
+    cacheName = release.name ?? name;
+    dir = tc.find(cacheName, version);
 
     if (dir) {
-      return { version: path.basename(path.dirname(dir)), dir, ...tool };
+      return { ...tool, name: cacheName, version: path.basename(path.dirname(dir)), dir };
     }
 
     // download, extract, and cache the tool
@@ -471,7 +502,7 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
     if (paths.length === 0) {
       core.warning('No nu_plugin_* binaries found; caching extracted directory instead.');
     }
-    dir = await tc.cacheDir(cacheSource, name, version);
+    dir = await tc.cacheDir(cacheSource, cacheName, version);
 
     // handle bad binary permissions, the binary needs to be executable!
     await handleBadBinaryPermissions(tool, dir);
@@ -480,5 +511,5 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
   // is there a better way to get the version?
   const version = path.basename(path.dirname(dir));
 
-  return { version, dir, ...tool };
+  return { ...tool, name: cacheName, version, dir };
 }
