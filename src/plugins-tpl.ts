@@ -5,8 +5,10 @@ import { promises as fs, constants as fs_constants } from 'node:fs';
 /**
  * Validates enablePlugins input to prevent command injection.
  * Allows: 'true', 'false', or comma-separated plugin names (alphanumeric, underscore only).
+ *
+ * Exported so the entry point can reject a bad value before anything is downloaded.
  */
-function validatePluginInput(input: string): void {
+export function validatePluginInput(input: string): void {
   // Allow 'true', 'false', or comma-separated identifiers (word characters only)
   if (!/^(true|false|[\w]+(,[\w]+)*)$/i.test(input)) {
     throw new Error(

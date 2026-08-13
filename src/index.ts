@@ -8,7 +8,7 @@ import semver from 'semver';
 import * as core from '@actions/core';
 
 import * as setup from './setup.js';
-import { registerPlugins } from './plugins.js';
+import { registerPlugins, validatePluginInput } from './plugins.js';
 
 /**
  * Resolves the `version` input to something `semver.satisfies` understands.
@@ -30,6 +30,11 @@ async function main() {
     console.log(`versionSpec: ${versionSpec}`);
     const checkLatest = (core.getInput('check-latest') || 'false').toUpperCase() === 'TRUE';
     const enablePlugins = (core.getInput('enable-plugins') || 'false').toLowerCase();
+    // Reject a malformed plugin list before anything is downloaded, the registration itself only
+    // happens after the install and a typo there would waste the whole download.
+    if (enablePlugins !== 'false') {
+      validatePluginInput(enablePlugins);
+    }
     const rawFeatures = (core.getInput('features') || 'default').toLowerCase();
     if (rawFeatures !== 'default' && rawFeatures !== 'full') {
       throw new Error(`Invalid features input: ${rawFeatures}`);

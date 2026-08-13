@@ -56,6 +56,10 @@ const COMMIT_SHA_PATTERN = /^[0-9a-f]{7,40}$/i;
 const STABLE_REPO = 'nushell';
 const NIGHTLY_REPO = 'nightly';
 
+// Nushell binaries are always published on public GitHub, even when the workflow itself runs on
+// GitHub Enterprise Server, so every API request goes to this host.
+const PUBLIC_GITHUB_API = 'https://api.github.com';
+
 /**
  * Tests whether a value is a full or abbreviated Git commit SHA.
  */
@@ -298,6 +302,64 @@ function filterNightlyByCommit(
 }
 
 /**
+ * Verifies that the token is accepted by public GitHub and drops it when it is not.
+ *
+ * On GitHub Enterprise Server the default `github.token` belongs to the GHES instance, github.com
+ * answers 401 for it and every release query would fail. Falling back to an unauthenticated request
+ * keeps the action working there, the same applies to an expired or revoked PAT. The `/rate_limit`
+ * probe does not count against the rate limit itself.
+ */
+async function resolveToken(githubToken: string | undefined): Promise<string | undefined> {
+  if (!githubToken) {
+    return undefined;
+  }
+
+  const probe = new Octokit({ auth: githubToken, baseUrl: PUBLIC_GITHUB_API, request: { fetch: proxyFetch } });
+  try {
+    await probe.rateLimit.get();
+    return githubToken;
+  } catch (error) {
+    if (hasHttpStatus(error, 401)) {
+      core.warning(
+        'The provided GitHub token was rejected by github.com and is ignored, continuing without ' +
+          'authentication. On GitHub Enterprise Server the default `github.token` is only valid for ' +
+          'your own instance, pass a public GitHub PAT via the `github-token` input to avoid the ' +
+          'much lower anonymous rate limit.'
+      );
+      return undefined;
+    }
+    // Anything else (a network hiccup, a 403 while rate limited, ...) is no verdict on the token.
+    // Keep it and let the actual release request surface the problem, a failing probe must never
+    // be the reason the whole action fails.
+    core.debug(`Could not verify the GitHub token, using it anyway: ${error}`);
+    return githubToken;
+  }
+}
+
+/**
+ * Tests whether a commit SHA exists in the given repo.
+ *
+ * Checking this up front keeps a typo from paging through the entire tag list of the repository,
+ * which costs one API request per 100 tags and finds nothing.
+ */
+async function commitExists(octokit: Octokit, owner: string, commitSha: string): Promise<boolean> {
+  try {
+    await octokit.request('HEAD /repos/{owner}/{repo}/commits/{ref}', {
+      owner,
+      repo: STABLE_REPO,
+      ref: commitSha,
+    });
+    return true;
+  } catch (error) {
+    // 404 for an unknown commit, 422 for a SHA that cannot be resolved at all.
+    if (hasHttpStatus(error, 404) || hasHttpStatus(error, 422)) {
+      return false;
+    }
+    throw error;
+  }
+}
+
+/**
  * Finds a stable release whose tag points to the specified commit SHA.
  */
 async function getStableReleaseByCommit(
@@ -371,15 +433,18 @@ async function getRelease(tool: Tool): Promise<Release> {
   const commitSha = versionSpec && isCommitSha(versionSpec) ? versionSpec : undefined;
 
   const octokit = new Octokit({
-    auth: tool.githubToken,
+    auth: await resolveToken(tool.githubToken),
     // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
-    baseUrl: 'https://api.github.com',
+    baseUrl: PUBLIC_GITHUB_API,
     request: { fetch: proxyFetch },
   });
 
   if (commitSha) {
     if (checkLatest) {
       core.warning('The "check-latest" input is ignored when the version is a commit SHA.');
+    }
+    if (!(await commitExists(octokit, owner, commitSha))) {
+      throw new Error(`Commit SHA ${commitSha} does not exist in ${owner}/${STABLE_REPO}.`);
     }
     const stableRelease = await getStableReleaseByCommit(octokit, owner, commitSha, features);
     const release = stableRelease ?? (await getNightlyReleaseByCommit(octokit, owner, commitSha, features));
@@ -391,7 +456,7 @@ async function getRelease(tool: Tool): Promise<Release> {
   }
 
   return octokit
-    .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
+    .paginate(octokit.repos.listReleases, { owner, per_page: 100, repo: name }, (response, done) => {
       const nightlyReleases = isNightly ? filterLatestNightly(response, features) : [];
       const officialReleases = checkLatest
         ? filterLatest(response, features)
@@ -422,22 +487,26 @@ function proxyFetch(url: string | URL, opts?: UndiciRequestInit): Promise<Undici
 
 async function handleBadBinaryPermissions(tool: Tool, dir: string): Promise<void> {
   const { name, bin } = tool;
-  if (process.platform !== 'win32') {
-    const findBin = async () => {
-      const files = await fs.readdir(dir);
-      for await (const file of files) {
-        if (file.toLowerCase() === name.toLowerCase()) {
-          return file;
-        }
-      }
-      return name;
-    };
-    const binary = path.join(dir, bin ? bin : await findBin());
+  if (process.platform === 'win32') {
+    return;
+  }
+
+  const files = await fs.readdir(dir);
+  const mainBinary = bin ?? files.find((file) => file.toLowerCase() === name.toLowerCase());
+  // The plugin binaries need the executable bit just as much as `nu` itself, `plugin add` fails
+  // with a permission error otherwise.
+  const binaries = new Set([
+    ...(mainBinary && files.includes(mainBinary) ? [mainBinary] : []),
+    ...files.filter((file) => file.startsWith('nu_plugin_')),
+  ]);
+
+  for (const binary of binaries) {
+    const binaryPath = path.join(dir, binary);
     try {
-      await fs.access(binary, fs_constants.X_OK);
+      await fs.access(binaryPath, fs_constants.X_OK);
     } catch {
-      await fs.chmod(binary, '755');
-      core.debug(`Fixed file permissions (-> 0o755) for ${binary}`);
+      await fs.chmod(binaryPath, '755');
+      core.debug(`Fixed file permissions (-> 0o755) for ${binaryPath}`);
     }
   }
 }
