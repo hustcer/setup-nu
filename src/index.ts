@@ -22,10 +22,11 @@ async function main() {
     }
     const features = rawFeatures as 'default' | 'full';
     const githubToken = core.getInput('github-token');
-    const version = ['*', 'nightly'].includes(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
+    const commitSha = setup.isCommitSha(versionSpec) ? versionSpec.toLowerCase() : undefined;
+    const version: string | null =
+      commitSha ?? (['*', 'nightly'].includes(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec)));
     console.log(`coerce version: ${version}`);
-    const ver = version === null ? undefined : version;
-    if (!ver) {
+    if (version === null) {
       throw new Error(`Invalid version input: ${versionSpec}`);
     }
 
@@ -35,7 +36,7 @@ async function main() {
       enablePlugins,
       bin: 'nu',
       owner: 'nushell',
-      versionSpec: ver,
+      versionSpec: version,
       features: features as 'default' | 'full',
       name: version === 'nightly' ? 'nightly' : 'nushell',
     });

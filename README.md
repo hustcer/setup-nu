@@ -144,6 +144,18 @@ They aren't perfect yet, but they do work. By the way, if you discover a better 
 > which may disrupt your workflow. Only the latest nightly version will be downloaded and set up,
 > and the version requirement is `nightly`.
 
+To select an immutable published build, set `version` to the full or abbreviated commit SHA for a
+stable release tag or a nightly release tag. The action downloads the existing binary asset. It
+does not compile Nushell.
+
+```yaml
+- uses: hustcer/setup-nu@v3
+  with:
+    version: 0df4ca2 # Install stable release 0.114.1.
+```
+
+For a nightly release, use its commit SHA in the same way.
+
 #### Others
 
 Or, check the following examples:
@@ -168,7 +180,7 @@ following command installs the latest version:
 
 | Name             | Type   | Description    |
 | ---------------- | ------ | -------------- |
-| `version`        | `string` | Optional. A valid NPM-style semver specification, such as `0.86.0`, etc. and `nightly`. Default: `*`        |
+| `version`        | `string` | Optional. A valid NPM style semantic version specification, `nightly`, or a stable or nightly release commit SHA. Default: `*`        |
 | `check-latest`   | `bool`   | Optional. Set to `true` if you want to use the latest version. Default: `false`   |
 | `enable-plugins` | `bool | string`  | Optional. Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`. Nu v0.86 and above is required. Default: `false` |
 | `features`       | `string` | Optional. Available choices: `default` or `full`. The `full` features will include the commands from `extra` and `dataframe`. `full` can be used for `Nu` from `v0.86` to `v0.93` and was removed after `v0.93.1`. Default: `default` |

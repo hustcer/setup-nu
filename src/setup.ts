@@ -50,6 +50,15 @@ const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
   linux_x64: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
 };
 
+const COMMIT_SHA_PATTERN = /^[0-9a-f]{7,40}$/i;
+
+/**
+ * Tests whether a value is a full or abbreviated Git commit SHA.
+ */
+export function isCommitSha(value: string): boolean {
+  return COMMIT_SHA_PATTERN.test(value);
+}
+
 // Singleton to ensure efficient use of connection pooling, resources, etc.
 const proxyAgent = new EnvHttpProxyAgent();
 
@@ -115,6 +124,25 @@ interface Release {
   version: string;
   /** The asset download URL. */
   downloadUrl: string;
+}
+
+interface GitHubRelease {
+  assets: {
+    browser_download_url: string;
+    name: string;
+  }[];
+  tag_name: string;
+}
+
+interface GitHubReleaseResponse {
+  data: GitHubRelease[];
+}
+
+/**
+ * Tests whether an unknown error has the specified HTTP status.
+ */
+function hasHttpStatus(error: unknown, status: number): boolean {
+  return typeof error === 'object' && error !== null && 'status' in error && error.status === status;
 }
 
 /**
@@ -208,6 +236,110 @@ function filterLatestNightly(response: any, features: 'default' | 'full'): Relea
 }
 
 /**
+ * Filters a nightly release by its Nushell commit SHA.
+ *
+ * @param response The response that contains the releases.
+ * @param commitSha The full or abbreviated commit SHA to match.
+ * @returns A matching GitHub release, if one exists.
+ */
+function filterNightlyByCommit(
+  response: GitHubReleaseResponse,
+  commitSha: string,
+  features: 'default' | 'full'
+): Release[] {
+  const targets = getTargets(features);
+  const release = response.data.find((candidate) => {
+    const releaseCommitSha = candidate.tag_name.match(/(?:\+|nightly-)([0-9a-f]{7,40})$/i)?.[1];
+    if (releaseCommitSha === undefined || !commitSha.toLowerCase().startsWith(releaseCommitSha.toLowerCase())) {
+      return false;
+    }
+    return candidate.assets.some((asset) => targets.some((target) => asset.name.includes(target)));
+  });
+
+  if (!release) {
+    return [];
+  }
+
+  const asset = release.assets.find((candidate) => targets.some((target) => candidate.name.includes(target)));
+  return asset
+    ? [
+        {
+          version: release.tag_name.replace(/^v/, ''),
+          downloadUrl: asset.browser_download_url,
+        },
+      ]
+    : [];
+}
+
+/**
+ * Finds a stable release whose tag points to the specified commit SHA.
+ */
+async function getStableReleaseByCommit(
+  octokit: Octokit,
+  owner: string,
+  commitSha: string,
+  features: 'default' | 'full'
+): Promise<Release | undefined> {
+  const tags = await octokit.paginate(
+    octokit.repos.listTags,
+    { owner, per_page: 100, repo: 'nushell' },
+    (response, done) => {
+      const matchingTags = response.data.filter((tag) =>
+        tag.commit.sha.toLowerCase().startsWith(commitSha.toLowerCase())
+      );
+      if (matchingTags.length > 0) {
+        done();
+      }
+      return matchingTags;
+    }
+  );
+  const tag = tags[0];
+  if (!tag) {
+    return undefined;
+  }
+
+  try {
+    const response = await octokit.repos.getReleaseByTag({ owner, repo: 'nushell', tag: tag.name });
+    const targets = getTargets(features);
+    const asset = response.data.assets.find((candidate) => targets.some((target) => candidate.name.includes(target)));
+    return asset
+      ? {
+          version: response.data.tag_name.replace(/^v/, ''),
+          downloadUrl: asset.browser_download_url,
+        }
+      : undefined;
+  } catch (error) {
+    if (hasHttpStatus(error, 404)) {
+      return undefined;
+    }
+    throw error;
+  }
+}
+
+/**
+ * Finds a nightly release whose tag contains the specified commit SHA.
+ */
+async function getNightlyReleaseByCommit(
+  octokit: Octokit,
+  owner: string,
+  commitSha: string,
+  features: 'default' | 'full'
+): Promise<Release | undefined> {
+  const releases = await octokit.paginate(
+    octokit.repos.listReleases,
+    { owner, per_page: 100, repo: 'nightly' },
+    (response, done) => {
+      const matches = filterNightlyByCommit(response, commitSha, features);
+      if (matches.length > 0) {
+        done();
+      }
+      return matches;
+    }
+  );
+  return releases[0];
+}
+
+/**
  * Fetch the latest matching release for the given tool.
  *
  * @param tool the tool to fetch a release for.
@@ -217,6 +349,7 @@ function filterLatestNightly(response: any, features: 'default' | 'full'): Relea
 async function getRelease(tool: Tool): Promise<Release> {
   const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
   const isNightly = versionSpec === 'nightly';
+  const commitSha = versionSpec && isCommitSha(versionSpec) ? versionSpec : undefined;
 
   const octokit = new Octokit({
     auth: tool.githubToken,
@@ -224,6 +357,15 @@ async function getRelease(tool: Tool): Promise<Release> {
     baseUrl: 'https://api.github.com',
     request: { fetch: proxyFetch },
   });
+
+  if (commitSha) {
+    const stableRelease = await getStableReleaseByCommit(octokit, owner, commitSha, features);
+    const release = stableRelease ?? (await getNightlyReleaseByCommit(octokit, owner, commitSha, features));
+    if (!release) {
+      throw new Error(`No published Nushell release found for commit SHA ${commitSha} with ${features} features.`);
+    }
+    return release;
+  }
 
   return octokit
     .paginate(octokit.repos.listReleases, { owner, repo: name }, (response, done) => {
@@ -233,7 +375,7 @@ async function getRelease(tool: Tool): Promise<Release> {
         : filterMatch(response, versionSpec, features);
       const releases = isNightly ? nightlyReleases : officialReleases;
 
-      if (releases) {
+      if (releases.length > 0) {
         done();
       }
       return releases;
@@ -296,6 +438,11 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
   if (!dir) {
     // find the latest release by querying GitHub API
     const { version, downloadUrl } = await getRelease(tool);
+    dir = tc.find(name, version);
+
+    if (dir) {
+      return { version: path.basename(path.dirname(dir)), dir, ...tool };
+    }
 
     // download, extract, and cache the tool
     const artifact = await tc.downloadTool(downloadUrl);
