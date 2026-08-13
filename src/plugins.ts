@@ -66,14 +66,15 @@ def main [
   let allPlugins = ls $nuDir | where name =~ nu_plugin
   # "split row . | first" used to strip the .exe extension on Windows
   let available = $allPlugins | each {|it| $it.name | path basename | split row . | first }
-  # The action wraps the input in an extra pair of single quotes, strip them before splitting
-  let requested = $enablePlugins | str trim -c "'" | split row , | each { str trim } | where { is-not-empty }
+  # The action wraps the input in an extra pair of single quotes, strip them before splitting.
+  # NOTE: plugin registration supports Nu 0.86+, so "is-not-empty" (Nu 0.91+) must not be used here.
+  let requested = $enablePlugins | str trim -c "'" | split row , | each { str trim } | where {|name| $name != '' }
 
   let filteredPlugins = if $requested == ['true'] {
       $allPlugins
     } else {
       let unknown = $requested | where {|name| $name not-in $available }
-      if ($unknown | is-not-empty) {
+      if ($unknown | length) > 0 {
         # A silently ignored typo used to look exactly like "the plugin was registered"
         print $'::warning::No bundled plugin matches ($unknown | str join ", "). Available plugins: ($available | str join ", ")'
       }
