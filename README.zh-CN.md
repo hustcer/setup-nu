@@ -184,4 +184,4 @@ nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为
 
 Licensed under:
 
-- MIT license ([LICENSE](LICENSE) or http://opensource.org/licenses/MIT)
+- MIT license ([LICENSE](LICENSE) or https://opensource.org/licenses/MIT)

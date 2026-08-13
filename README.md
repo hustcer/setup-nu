@@ -194,4 +194,4 @@ This GitHub Action will install the latest matching release.
 
 Licensed under:
 
-- MIT license ([LICENSE](LICENSE) or http://opensource.org/licenses/MIT)
+- MIT license ([LICENSE](LICENSE) or https://opensource.org/licenses/MIT)
