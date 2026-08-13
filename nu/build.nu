@@ -12,12 +12,23 @@ if ($dist_dir | path exists) {
     print $'Removed ($dist_dir)'
 }
 
-# Step 2: Build with ncc
+# Step 2: Generate src/plugins.ts from the template
+# The register script is embedded into the bundle, so it has to be inlined before ncc runs.
+# Keep this in sync with the `build` recipe of the Justfile.
+let plugins_tpl = $root | path join src plugins-tpl.ts
+let register_script = $root | path join nu register-plugins.nu
+let plugins_ts = $root | path join src plugins.ts
+open --raw $plugins_tpl
+    | str replace __PLUGIN_REGISTER_SCRIPT__ (open --raw $register_script)
+    | save -rf $plugins_ts
+print $'Generated ($plugins_ts)'
+
+# Step 3: Build with ncc
 print 'Building with ncc...'
 cd $root
-^ncc build src/index.ts --minify
+^ncc build src/index.ts --minify --no-cache
 
-# Step 3: Rename exec-child.js to exec-child.cjs
+# Step 4: Rename exec-child.js to exec-child.cjs
 let exec_child_js = $dist_dir | path join exec-child.js
 let exec_child_cjs = $dist_dir | path join exec-child.cjs
 if ($exec_child_js | path exists) {
@@ -25,7 +36,7 @@ if ($exec_child_js | path exists) {
     print $'Renamed exec-child.js to exec-child.cjs'
 }
 
-# Step 4: Replace 'exec-child.js' with 'exec-child.cjs' in index.js
+# Step 5: Replace 'exec-child.js' with 'exec-child.cjs' in index.js
 let index_js = $dist_dir | path join index.js
 if ($index_js | path exists) {
     open --raw $index_js
