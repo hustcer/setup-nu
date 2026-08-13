@@ -213,22 +213,22 @@ function filterMatch(response: any, versionSpec: string | undefined, features: '
 // biome-ignore lint: Ignore
 function filterLatest(response: any, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
-  const versions = response.data.map((r: { tag_name: string }) => r.tag_name);
-  const latest = semver.rsort(versions)[0];
-  return (
-    response.data
-      .filter((rel: { tag_name: string | semver.SemVer | undefined }) => rel && rel.tag_name === latest)
-      // biome-ignore lint: Ignore
-      .map((rel: { assets: any[]; tag_name: string }) => {
-        const asset = findAsset(rel.assets, targets);
-        if (asset) {
-          return {
-            version: rel.tag_name.replace(/^v/, ''),
-            downloadUrl: asset.browser_download_url,
-          };
-        }
-      })
+  // Only releases that carry an asset for the current platform may take part in the `latest`
+  // election. Electing one without a usable asset yields `[undefined]`, which still counts as a
+  // non-empty page, stops the pagination and then fails instead of falling back to an older
+  // release. Tags that are no valid semver are dropped as well, `semver.rsort` throws on those.
+  const candidates = response.data.filter(
+    // biome-ignore lint: Ignore
+    (rel: { assets: any[]; tag_name: string }) => semver.valid(rel.tag_name) && findAsset(rel.assets, targets)
   );
+  if (candidates.length === 0) {
+    return [];
+  }
+
+  const latest = semver.rsort(candidates.map((rel: { tag_name: string }) => rel.tag_name))[0];
+  const release = candidates.find((rel: { tag_name: string }) => rel.tag_name === latest);
+  const asset = findAsset(release.assets, targets);
+  return [{ version: release.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }];
 }
 
 /**
@@ -240,25 +240,24 @@ function filterLatest(response: any, features: 'default' | 'full'): Release[] {
 // biome-ignore lint: Ignore
 function filterLatestNightly(response: any, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
-  const publishedAt = response.data.map((r: { published_at: string }) => r.published_at);
-  const sortedDates = publishedAt.sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime());
-  const latest = sortedDates[0];
-  core.info(`Try to get latest nightly version published at: ${latest}`);
-
-  return (
-    response.data
-      .filter((rel: { published_at: string | Date }) => rel && rel.published_at === latest)
-      // biome-ignore lint: Ignore
-      .map((rel: { assets: any[]; tag_name: string }) => {
-        const asset = findAsset(rel.assets, targets);
-        if (asset) {
-          return {
-            version: rel.tag_name.replace(/^v/, ''),
-            downloadUrl: asset.browser_download_url,
-          };
-        }
-      })
+  // Same reasoning as in `filterLatest`: a nightly release is created before its assets finish
+  // uploading, so the newest one regularly has no asset for some platform yet. Skip those and
+  // take the newest nightly that is actually installable.
+  const candidates = response.data.filter(
+    // biome-ignore lint: Ignore
+    (rel: { assets: any[] }) => findAsset(rel.assets, targets)
   );
+  if (candidates.length === 0) {
+    return [];
+  }
+
+  const latest = candidates.reduce((newest: { published_at: string }, rel: { published_at: string }) =>
+    new Date(rel.published_at).getTime() > new Date(newest.published_at).getTime() ? rel : newest
+  );
+  core.info(`Try to get latest nightly version published at: ${latest.published_at}`);
+
+  const asset = findAsset(latest.assets, targets);
+  return [{ version: latest.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }];
 }
 
 /**
@@ -307,16 +306,11 @@ async function getStableReleaseByCommit(
   commitSha: string,
   features: 'default' | 'full'
 ): Promise<Release | undefined> {
-  const tags = await octokit.paginate(
-    octokit.repos.listTags,
-    { owner, per_page: 100, repo: STABLE_REPO },
-    (response, done) => {
-      const matchingTags = response.data.filter((tag) => matchesSha(tag.commit.sha, commitSha));
-      if (matchingTags.length > 0) {
-        done();
-      }
-      return matchingTags;
-    }
+  // No early `done()` here: the tags of a single commit can land on different pages. `a80dfe8` is
+  // tagged both `v0.96.0` (first entry of page 1) and `0.96.0`, and only the latter has a release,
+  // so stopping on the first matching page would drop the tag that actually resolves.
+  const tags = await octokit.paginate(octokit.repos.listTags, { owner, per_page: 100, repo: STABLE_REPO }, (response) =>
+    response.data.filter((tag) => matchesSha(tag.commit.sha, commitSha))
   );
 
   const targets = getTargets(features);
@@ -457,10 +451,12 @@ async function handleBadBinaryPermissions(tool: Tool, dir: string): Promise<void
  * @returns the directory containing the tool binary.
  */
 export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
-  const { name, versionSpec } = tool;
+  const { name, versionSpec, checkLatest = false } = tool;
 
-  // first check if we have previously downloaded the tool
-  let dir = tc.find(name, versionSpec || '*');
+  // first check if we have previously downloaded the tool, `check-latest` has to skip this lookup:
+  // a cached version always satisfies the `*` spec, so it would shadow the newest release and make
+  // the option a no-op on runners that already carry a Nu in their tool cache.
+  let dir = checkLatest ? '' : tc.find(name, versionSpec || '*');
   // a release resolved by commit SHA may come from the nightly repo, cache it under that name
   let cacheName = name;
 

@@ -15,8 +15,12 @@ defaults:
 jobs:
   basic-usage:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - uses: hustcer/setup-nu@develop
       with:
         version: '*'
@@ -41,8 +45,12 @@ jobs:
 
     runs-on: ubuntu-22.04
     name: test (ubuntu-22.04, nu@${{matrix.ver}})
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Setup nu@${{matrix.ver}}
       uses: hustcer/setup-nu@develop
       with:
@@ -62,8 +70,12 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, setup-nu@latest-dev)
+    permissions:
+      contents: read
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Setup nu@latest
       uses: hustcer/setup-nu@develop
       with:
