@@ -28,6 +28,16 @@ jobs:
         pnpm run lint
         pnpm run build
         npx skills add -y -g hustcer/nushell-pro --agent claude-code
+    # The action runs `dist/index.js`, a stale bundle means the published action does not match
+    # the sources. `src/plugins.ts` is generated from `nu/register-plugins.nu` by the same build.
+    - name: Verify the committed build output is up to date
+      run: |
+        if [ -n "$(git status --porcelain dist src/plugins.ts)" ]; then
+          echo "::error::dist/ or src/plugins.ts is out of date, run 'pnpm run build' and commit the result"
+          git --no-pager diff --stat dist src/plugins.ts
+          exit 1
+        fi
+        echo 'Build output is in sync with the sources.'
 
   test:
     strategy:

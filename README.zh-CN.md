@@ -145,7 +145,7 @@ commit SHA。此时 Action 会直接下载已有的二进制包，而不会去�
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: '0df4ca2' # 安装 stable 版本 0.114.1，加引号是为了避免 YAML 把它解析成数字
+    version: "0df4ca2" # 安装 stable 版本 0.114.1，加引号是为了避免 YAML 把它解析成数字
 ```
 
 nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为 commit SHA 时，`check-latest` 会被忽略。
@@ -170,13 +170,13 @@ nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为
 
 ### 输入
 
-| 名称              | 类型     |                    描述                   |
-| ---------------- | -------- | -------------------------------------------------------------- |
-| `version`        | `string` | 可选, 合法的 NPM 风格的 Semver 版本，比如 `0.86.0`, 也可以为 `nightly`, 或者 stable/nightly 发布的 commit SHA. 默认 `*` |
-| `check-latest`   | `bool`   | 可选, 可以设置为 `true` 如果你想使用最新的 Nushell 版本, 默认 `false` |
-| `enable-plugins` | `bool\|string`   | 可选, 可以设置为 `true` 如果你需要注册二进制包内的插件或者逗号分隔的插件名称字符串：`nu_plugin_polars,nu_plugin_query`, 需要 Nu 版本 >= v0.86, 默认 `false` |
-| `features`       | `string` | 可选, 可选项: `default`/`full`, 设置为 `full` 将包含 `extra` 和 `dataframe` 中的命令, `full` 仅支持 Nu `v0.86` ~ `v0.93`, 之后版本中默认版本将包含所有特性, 默认 `default` |
-| `github-token`   | `string` | 可选, 你的 GitHub Token 或者 PAT Token, 默认为 `${{ github.token }}`  |
+| 名称             | 类型           | 描述                                                                                                                                                                       |
+| ---------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`        | `string`       | 可选, 合法的 NPM 风格的 Semver 版本，比如 `0.86.0`, 也可以为 `nightly`, 或者 stable/nightly 发布的 commit SHA. 默认 `*`                                                    |
+| `check-latest`   | `bool`         | 可选, 可以设置为 `true` 如果你想使用最新的 Nushell 版本, 默认 `false`                                                                                                      |
+| `enable-plugins` | `bool\|string` | 可选, 可以设置为 `true` 如果你需要注册二进制包内的插件或者逗号分隔的插件名称字符串：`nu_plugin_polars,nu_plugin_query`, 需要 Nu 版本 >= v0.86, 默认 `false`                |
+| `features`       | `string`       | 可选, 可选项: `default`/`full`, 设置为 `full` 将包含 `extra` 和 `dataframe` 中的命令, `full` 仅支持 Nu `v0.86` ~ `v0.93`, 之后版本中默认版本将包含所有特性, 默认 `default` |
+| `github-token`   | `string`       | 可选, 你的 GitHub Token 或者 PAT Token, 默认为 `${{ github.token }}`                                                                                                       |
 
 您在 `version` 字段指定的 **semver 版本** 会直接传递给 NPM 的 [semver 包](https://www.npmjs.com/package/semver)。此 GitHub Action 将安装最新的匹配版本。
 
@@ -184,4 +184,4 @@ nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为
 
 Licensed under:
 
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- MIT license ([LICENSE](LICENSE) or http://opensource.org/licenses/MIT)

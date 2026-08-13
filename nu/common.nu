@@ -7,7 +7,7 @@
 # If current host is Windows
 export def windows? [] {
   # Windows / Darwin
-  (sys).host.name == 'Windows'
+  $nu.os-info.name == 'windows'
 }
 
 # Check if a git repo has the specified ref: could be a branch or tag, etc.

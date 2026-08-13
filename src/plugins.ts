@@ -1,5 +1,7 @@
 import shell from 'shelljs';
 import semver from 'semver';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { promises as fs, constants as fs_constants } from 'node:fs';
 
 /**
@@ -59,8 +61,10 @@ def main [
   # print $nu
   # Create Nu config directory if it does not exist
   if not ($nu.default-config-dir | path exists) { mkdir $nu.default-config-dir }
-  config env --default | save -f $nu.env-path
-  config nu --default | save -f $nu.config-path
+  # Only fill in the config files when they are missing. Overwriting them would silently discard a
+  # config that the runner image or an earlier step of the workflow had set up.
+  if not ($nu.env-path | path exists) { config env --default | save -f $nu.env-path }
+  if not ($nu.config-path | path exists) { config nu --default | save -f $nu.config-path }
   # print (ls $nu.default-config-dir)
 
   let allPlugins = ls $nuDir | where name =~ nu_plugin
@@ -95,7 +99,7 @@ def main [
         [$'print ($msg)' $cmd] | str join "\n"
       }
     | str join "\n"
-    | save -rf do-register.nu
+    | save -rf ($env.FILE_PWD | path join do-register.nu)
 }
 
 `;
@@ -110,7 +114,11 @@ export async function registerPlugins(enablePlugins: string, version: string) {
   validateVersion(version);
 
   const LEGACY_VERSION = '0.92.3';
-  const script = 'register-plugins.nu';
+  // Both helper scripts live in the runner temp dir. The workspace is the user's checkout and
+  // leftovers there show up in any `git status` / `git diff --exit-code` check of a later step.
+  const scriptDir = process.env.RUNNER_TEMP || os.tmpdir();
+  const script = path.join(scriptDir, 'register-plugins.nu');
+  const generated = path.join(scriptDir, 'do-register.nu');
   const isLegacyVersion = !version.includes('nightly') && semver.lte(version, LEGACY_VERSION);
   const execOrThrow = (command: string) => {
     const result = shell.exec(command);
@@ -126,13 +134,13 @@ export async function registerPlugins(enablePlugins: string, version: string) {
     console.log(`Fixed file permissions (-> 0o755) for ${script}`);
   }
   const registerCommand = isLegacyVersion
-    ? `nu ${script} "'${enablePlugins}'" ${version} --is-legacy`
-    : `nu ${script} "'${enablePlugins}'" ${version}`;
+    ? `nu "${script}" "'${enablePlugins}'" ${version} --is-legacy`
+    : `nu "${script}" "'${enablePlugins}'" ${version}`;
   execOrThrow(registerCommand);
   // console.log('Contents of `do-register.nu`:\n');
-  // const content = shell.cat('do-register.nu');
+  // const content = shell.cat(generated);
   // console.log(content.toString());
   console.log('\nRegistering plugins...\n');
-  execOrThrow('nu do-register.nu');
+  execOrThrow(`nu "${generated}"`);
   console.log(`Plugins registered successfully for Nu ${version}.`);
 }

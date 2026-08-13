@@ -8,7 +8,7 @@ import * as semver from 'semver';
 import * as path from 'node:path';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
-import { Octokit } from '@octokit/rest';
+import { Octokit, type RestEndpointMethodTypes } from '@octokit/rest';
 import {
   EnvHttpProxyAgent,
   fetch as undiciFetch,
@@ -86,7 +86,6 @@ function getTargets(features: 'default' | 'full'): string[] {
   const { arch, platform } = process;
   const selector = `${platform}_${arch}`;
 
-  core.info(`Try to get assets for Nu: arch = ${arch}, platform = ${platform}, feature = ${features}`);
   const platformMap = features === 'default' ? PLATFORM_DEFAULT_MAP : PLATFORM_FULL_MAP;
   const targets = platformMap[selector as Platform];
   if (!targets) {
@@ -98,9 +97,8 @@ function getTargets(features: 'default' | 'full'): string[] {
 /**
  * @returns the first release asset matching one of the given target specifiers, if any.
  */
-// biome-ignore lint: Ignore
-function findAsset(assets: any[], targets: string[]) {
-  return assets.find((asset: { name: string }) => targets.some((target) => asset.name.includes(target)));
+function findAsset(assets: ReleaseAsset[], targets: string[]): ReleaseAsset | undefined {
+  return assets.find((asset) => targets.some((target) => asset.name.includes(target)));
 }
 
 /**
@@ -153,17 +151,12 @@ interface Release {
   name?: string;
 }
 
-interface GitHubRelease {
-  assets: {
-    browser_download_url: string;
-    name: string;
-  }[];
-  tag_name: string;
-}
-
-interface GitHubReleaseResponse {
-  data: GitHubRelease[];
-}
+/** A single release as returned by the GitHub API. */
+type GitHubReleaseItem = RestEndpointMethodTypes['repos']['listReleases']['response']['data'][number];
+/** A single release asset as returned by the GitHub API. */
+type ReleaseAsset = GitHubReleaseItem['assets'][number];
+/** A page of releases as handed to the `octokit.paginate` map function. */
+type ReleasePage = { data: GitHubReleaseItem[] };
 
 /**
  * Tests whether an unknown error has the specified HTTP status.
@@ -187,24 +180,17 @@ function warnIfFullFeature(features: 'default' | 'full'): void {
  * @param response the response to filter a release from with the given versionSpec.
  * @returns {Release[]} a single GitHub release.
  */
-// biome-ignore lint: Ignore
-function filterMatch(response: any, versionSpec: string | undefined, features: 'default' | 'full'): Release[] {
+function filterMatch(response: ReleasePage, versionSpec: string | undefined, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   return (
     response.data
-      // biome-ignore lint: Ignore
-      .map((rel: { assets: any[]; tag_name: string }) => {
+      .map((rel) => {
         const asset = findAsset(rel.assets, targets);
-        if (asset) {
-          return {
-            version: rel.tag_name.replace(/^v/, ''),
-            downloadUrl: asset.browser_download_url,
-          };
-        }
+        return asset ? { version: rel.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url } : undefined;
       })
       // Releases without a matching asset have to be dropped here, otherwise they keep the
       // result non-empty and stop the pagination before older releases were ever fetched.
-      .filter((rel: Release | undefined) => rel != null && (!versionSpec || semver.satisfies(rel.version, versionSpec)))
+      .filter((rel): rel is Release => rel != null && (!versionSpec || semver.satisfies(rel.version, versionSpec)))
   );
 }
 
@@ -214,24 +200,20 @@ function filterMatch(response: any, versionSpec: string | undefined, features: '
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-// biome-ignore lint: Ignore
-function filterLatest(response: any, features: 'default' | 'full'): Release[] {
+function filterLatest(response: ReleasePage, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   // Only releases that carry an asset for the current platform may take part in the `latest`
   // election. Electing one without a usable asset yields `[undefined]`, which still counts as a
   // non-empty page, stops the pagination and then fails instead of falling back to an older
   // release. Tags that are no valid semver are dropped as well, `semver.rsort` throws on those.
-  const candidates = response.data.filter(
-    // biome-ignore lint: Ignore
-    (rel: { assets: any[]; tag_name: string }) => semver.valid(rel.tag_name) && findAsset(rel.assets, targets)
-  );
+  const candidates = response.data.filter((rel) => semver.valid(rel.tag_name) && findAsset(rel.assets, targets));
   if (candidates.length === 0) {
     return [];
   }
 
-  const latest = semver.rsort(candidates.map((rel: { tag_name: string }) => rel.tag_name))[0];
-  const release = candidates.find((rel: { tag_name: string }) => rel.tag_name === latest);
-  const asset = findAsset(release.assets, targets);
+  const latest = semver.rsort(candidates.map((rel) => rel.tag_name))[0];
+  const release = candidates.find((rel) => rel.tag_name === latest) as GitHubReleaseItem;
+  const asset = findAsset(release.assets, targets) as ReleaseAsset;
   return [{ version: release.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }];
 }
 
@@ -241,26 +223,22 @@ function filterLatest(response: any, features: 'default' | 'full'): Release[] {
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-// biome-ignore lint: Ignore
-function filterLatestNightly(response: any, features: 'default' | 'full'): Release[] {
+function filterLatestNightly(response: ReleasePage, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   // Same reasoning as in `filterLatest`: a nightly release is created before its assets finish
   // uploading, so the newest one regularly has no asset for some platform yet. Skip those and
   // take the newest nightly that is actually installable.
-  const candidates = response.data.filter(
-    // biome-ignore lint: Ignore
-    (rel: { assets: any[] }) => findAsset(rel.assets, targets)
-  );
+  const candidates = response.data.filter((rel) => findAsset(rel.assets, targets));
   if (candidates.length === 0) {
     return [];
   }
 
-  const latest = candidates.reduce((newest: { published_at: string }, rel: { published_at: string }) =>
-    new Date(rel.published_at).getTime() > new Date(newest.published_at).getTime() ? rel : newest
-  );
+  // `published_at` is nullable in the API types, a draft release without one sorts to the epoch.
+  const publishedAt = (rel: GitHubReleaseItem) => new Date(rel.published_at ?? 0).getTime();
+  const latest = candidates.reduce((newest, rel) => (publishedAt(rel) > publishedAt(newest) ? rel : newest));
   core.info(`Try to get latest nightly version published at: ${latest.published_at}`);
 
-  const asset = findAsset(latest.assets, targets);
+  const asset = findAsset(latest.assets, targets) as ReleaseAsset;
   return [{ version: latest.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }];
 }
 
@@ -271,11 +249,7 @@ function filterLatestNightly(response: any, features: 'default' | 'full'): Relea
  * @param commitSha The full or abbreviated commit SHA to match.
  * @returns A matching GitHub release, if one exists.
  */
-function filterNightlyByCommit(
-  response: GitHubReleaseResponse,
-  commitSha: string,
-  features: 'default' | 'full'
-): Release[] {
+function filterNightlyByCommit(response: ReleasePage, commitSha: string, features: 'default' | 'full'): Release[] {
   const targets = getTargets(features);
   const release = response.data.find((candidate) => {
     const releaseCommitSha = candidate.tag_name.match(/(?:\+|nightly-)([0-9a-f]{7,40})$/i)?.[1];
@@ -432,6 +406,9 @@ async function getRelease(tool: Tool): Promise<Release> {
   const isNightly = versionSpec === 'nightly';
   const commitSha = versionSpec && isCommitSha(versionSpec) ? versionSpec : undefined;
 
+  // Logged once here instead of inside `getTargets`, which runs for every page of every query.
+  core.info(`Try to get assets for Nu: arch = ${process.arch}, platform = ${process.platform}, feature = ${features}`);
+
   const octokit = new Octokit({
     auth: await resolveToken(tool.githubToken),
     // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
@@ -444,7 +421,12 @@ async function getRelease(tool: Tool): Promise<Release> {
       core.warning('The "check-latest" input is ignored when the version is a commit SHA.');
     }
     if (!(await commitExists(octokit, owner, commitSha))) {
-      throw new Error(`Commit SHA ${commitSha} does not exist in ${owner}/${STABLE_REPO}.`);
+      // A digit-only input is a valid abbreviated SHA, but it is far more likely to be a version
+      // that lost its dots, so point that out instead of only reporting the missing commit.
+      const hint = /^\d+$/.test(commitSha)
+        ? ' It consists of digits only, if you meant a version use the full form such as "0.112.2".'
+        : '';
+      throw new Error(`Commit SHA ${commitSha} does not exist in ${owner}/${STABLE_REPO}.${hint}`);
     }
     const stableRelease = await getStableReleaseByCommit(octokit, owner, commitSha, features);
     const release = stableRelease ?? (await getNightlyReleaseByCommit(octokit, owner, commitSha, features));
@@ -457,11 +439,12 @@ async function getRelease(tool: Tool): Promise<Release> {
 
   return octokit
     .paginate(octokit.repos.listReleases, { owner, per_page: 100, repo: name }, (response, done) => {
-      const nightlyReleases = isNightly ? filterLatestNightly(response, features) : [];
-      const officialReleases = checkLatest
-        ? filterLatest(response, features)
-        : filterMatch(response, versionSpec, features);
-      const releases = isNightly ? nightlyReleases : officialReleases;
+      // Evaluated lazily, running the unused filter over every page is pure waste.
+      const releases = isNightly
+        ? filterLatestNightly(response, features)
+        : checkLatest
+          ? filterLatest(response, features)
+          : filterMatch(response, versionSpec, features);
 
       if (releases.length > 0) {
         done();

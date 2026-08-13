@@ -151,7 +151,7 @@ does not compile Nushell.
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: '0df4ca2' # Install stable release 0.114.1, quote it to keep YAML from parsing it as a number.
+    version: "0df4ca2" # Install stable release 0.114.1, quote it to keep YAML from parsing it as a number.
 ```
 
 For a nightly release, use its commit SHA in the same way. Note that `check-latest` is ignored
@@ -179,13 +179,13 @@ following command installs the latest version:
 
 ### Inputs
 
-| Name             | Type   | Description    |
-| ---------------- | ------ | -------------- |
-| `version`        | `string` | Optional. A valid NPM style semantic version specification, `nightly`, or a stable or nightly release commit SHA. Default: `*`        |
-| `check-latest`   | `bool`   | Optional. Set to `true` if you want to use the latest version. Default: `false`   |
-| `enable-plugins` | `bool | string`  | Optional. Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`. Nu v0.86 and above is required. Default: `false` |
-| `features`       | `string` | Optional. Available choices: `default` or `full`. The `full` features will include the commands from `extra` and `dataframe`. `full` can be used for `Nu` from `v0.86` to `v0.93` and was removed after `v0.93.1`. Default: `default` |
-| `github-token`   | `string` | Optional. Your GitHub token or PAT token. Default: `${{ github.token }}`   |
+| Name             | Type             | Description                                                                                                                                                                                                                           |
+| ---------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`        | `string`         | Optional. A valid NPM style semantic version specification, `nightly`, or a stable or nightly release commit SHA. Default: `*`                                                                                                        |
+| `check-latest`   | `bool`           | Optional. Set to `true` if you want to use the latest version. Default: `false`                                                                                                                                                       |
+| `enable-plugins` | `bool \| string` | Optional. Set to `true` if you want to register the bundled plugins or a comma-separated string of plugin names like `nu_plugin_polars,nu_plugin_query`. Nu v0.86 and above is required. Default: `false`                             |
+| `features`       | `string`         | Optional. Available choices: `default` or `full`. The `full` features will include the commands from `extra` and `dataframe`. `full` can be used for `Nu` from `v0.86` to `v0.93` and was removed after `v0.93.1`. Default: `default` |
+| `github-token`   | `string`         | Optional. Your GitHub token or PAT token. Default: `${{ github.token }}`                                                                                                                                                              |
 
 The semver specification is passed directly to NPM's [semver package](https://www.npmjs.com/package/semver).
 This GitHub Action will install the latest matching release.
@@ -194,4 +194,4 @@ This GitHub Action will install the latest matching release.
 
 Licensed under:
 
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- MIT license ([LICENSE](LICENSE) or http://opensource.org/licenses/MIT)
