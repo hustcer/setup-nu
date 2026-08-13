@@ -5,8 +5,10 @@ import { promises as fs, constants as fs_constants } from 'node:fs';
 /**
  * Validates enablePlugins input to prevent command injection.
  * Allows: 'true', 'false', or comma-separated plugin names (alphanumeric, underscore only).
+ *
+ * Exported so the entry point can reject a bad value before anything is downloaded.
  */
-function validatePluginInput(input: string): void {
+export function validatePluginInput(input: string): void {
   // Allow 'true', 'false', or comma-separated identifiers (word characters only)
   if (!/^(true|false|[\w]+(,[\w]+)*)$/i.test(input)) {
     throw new Error(
@@ -62,17 +64,21 @@ def main [
   # print (ls $nu.default-config-dir)
 
   let allPlugins = ls $nuDir | where name =~ nu_plugin
-  let filteredPlugins = if $enablePlugins == "'true'" or $enablePlugins == 'true' {
+  # "split row . | first" used to strip the .exe extension on Windows
+  let available = $allPlugins | each {|it| $it.name | path basename | split row . | first }
+  # The action wraps the input in an extra pair of single quotes, strip them before splitting.
+  # NOTE: plugin registration supports Nu 0.86+, so "is-not-empty" (Nu 0.91+) must not be used here.
+  let requested = $enablePlugins | str trim -c "'" | split row , | each { str trim } | where {|name| $name != '' }
+
+  let filteredPlugins = if $requested == ['true'] {
       $allPlugins
     } else {
-      $allPlugins | reduce -f [] {|it, acc|
-        # "split row . | first" used to handle binary with .exe extension
-        if $enablePlugins =~ ($it.name | path basename | split row . | first) {
-          $acc | append $it
-        } else {
-          $acc
-        }
+      let unknown = $requested | where {|name| $name not-in $available }
+      if ($unknown | length) > 0 {
+        # A silently ignored typo used to look exactly like "the plugin was registered"
+        print $'::warning::No bundled plugin matches ($unknown | str join ", "). Available plugins: ($available | str join ", ")'
       }
+      $allPlugins | where {|it| ($it.name | path basename | split row . | first) in $requested }
     }
 
   if $debug {
@@ -80,12 +86,13 @@ def main [
   }
 
   $filteredPlugins | each {|plugin|
-        let p = $plugin.name | str replace -a \ /
-        if $useRegister {
-          echo ([('print "' + $'Registering ($p)' + '"') $'register ($p)'] | str join "\n")
-        } else {
-          echo ([('print "' + $'Registering ($p)' + '"') $'plugin add ($p)'] | str join "\n")
-        }
+        # "to nuon" quotes and escapes the values, a plugin dir may contain spaces on self-hosted
+        # runners and an unquoted path would break the generated script.
+        # NOTE: this file is inlined into a JS template literal, so it must not contain backticks.
+        let p = $plugin.name | str replace -a \ / | to nuon
+        let msg = $'Registering ($plugin.name)' | to nuon
+        let cmd = if $useRegister { $'register ($p)' } else { $'plugin add ($p)' }
+        [$'print ($msg)' $cmd] | str join "\n"
       }
     | str join "\n"
     | save -rf do-register.nu
