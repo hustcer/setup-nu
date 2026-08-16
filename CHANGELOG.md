@@ -1,6 +1,27 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.27] - 2026-08-16
+
+### Bug Fixes
+
+- Correct commit SHA pinning and release pagination (#220)
+- Correct version range handling, check-latest and release fallback (#221)
+- Harden plugin registration, token handling and API pagination (#222)
+- Stop polluting the workspace and the user's Nu config (#223)
+
+### Features
+
+- Support pinned commit sha (#219)
+
+### Testing
+
+- Add a regression suite for release resolution and plugin registration (#224)
+
+### Deps
+
+- Upgrade @vercel/ncc,globby and fix all pnpm audit warnings
+
 ## [3.26] - 2026-08-05
 
 ### Miscellaneous Tasks
