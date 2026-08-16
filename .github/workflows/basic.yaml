@@ -38,8 +38,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - ver: '0df4ca2'  # Commit SHA of the 0.114.1 stable release
-            expected: '0.114.1'
+          - ver: '00c9ee0'  # Commit SHA of the 0.115.0 stable release
+            expected: '0.115.0'
           - ver: '0.86.0'
             expected: '0.86.0'
 

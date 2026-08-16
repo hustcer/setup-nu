@@ -145,7 +145,7 @@ commit SHA。此时 Action 会直接下载已有的二进制包，而不会去�
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: "0df4ca2" # 安装 stable 版本 0.114.1，加引号是为了避免 YAML 把它解析成数字
+    version: "00c9ee0" # 安装 stable 版本 0.115.0，加引号是为了避免 YAML 把它解析成数字
 ```
 
 nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为 commit SHA 时，`check-latest` 会被忽略。

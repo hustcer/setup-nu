@@ -75,7 +75,7 @@ describe('resolveVersionSpec', () => {
 
 describe('isCommitSha', () => {
   test('accepts abbreviated and full SHAs', () => {
-    assert.equal(isCommitSha('0df4ca2'), true);
+    assert.equal(isCommitSha('00c9ee0'), true);
     assert.equal(isCommitSha('a80dfe8'), true);
     assert.equal(isCommitSha('a'.repeat(40)), true);
   });
@@ -91,8 +91,8 @@ describe('isCommitSha', () => {
 
 describe('matchesSha', () => {
   test('compares on the shorter side so any abbreviation length matches', () => {
-    assert.equal(matchesSha('0df4ca2abcdef', '0df4ca2'), true);
-    assert.equal(matchesSha('0df4ca2', '0df4ca2abcdef'), true);
+    assert.equal(matchesSha('00c9ee0abcdef', '00c9ee0'), true);
+    assert.equal(matchesSha('00c9ee0', '00c9ee0abcdef'), true);
   });
 
   test('ignores case', () => {
@@ -100,7 +100,7 @@ describe('matchesSha', () => {
   });
 
   test('rejects a different commit', () => {
-    assert.equal(matchesSha('0df4ca2', 'deadbee'), false);
+    assert.equal(matchesSha('00c9ee0', 'deadbee'), false);
   });
 });
 
