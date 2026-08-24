@@ -1,1 +1,3 @@
+allowBuilds:
+  lefthook: true
 enableGlobalVirtualStore: true
