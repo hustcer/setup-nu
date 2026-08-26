@@ -27,17 +27,17 @@
     "@actions/core": "^3.0.1",
     "@actions/tool-cache": "^4.0.0",
     "@octokit/rest": "^22.0.1",
-    "globby": "^16.2.3",
+    "globby": "^16.2.4",
     "shelljs": "^0.10.0",
     "undici": "^8.10.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.8",
-    "@types/node": "^26.2.0",
+    "@biomejs/biome": "^2.5.10",
+    "@types/node": "^26.3.0",
     "@types/semver": "^7.8.0",
     "@types/shelljs": "^0.10.0",
     "@vercel/ncc": "^0.45.0",
-    "cspell": "^10.0.1",
+    "cspell": "^10.1.1",
     "lefthook": "^2.1.10",
     "semver": "^7.8.5",
     "typescript": "^6.0.3"
