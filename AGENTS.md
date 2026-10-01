@@ -8,14 +8,14 @@ This is `setup-nu`, a GitHub Action that sets up a Nushell environment in GitHub
 
 ## Common Commands
 
-- **Build**: `pnpm run build` - Compiles TypeScript and bundles with ncc into `dist/index.js`
+- **Build**: `pnpm run build` - Bundles TypeScript with esbuild into `dist/index.js`
 - **Format**: `pnpm run fmt` - Formats code using Biome
 - **Lint**: `pnpm lint` - Lints TypeScript files using Biome
 - **Local test**: `pnpm run run` - Builds and runs locally with test environment variables
 
 ## Architecture
 
-The action is a single-entry TypeScript application bundled with `@vercel/ncc`:
+The action is a single-entry TypeScript application bundled with `esbuild`:
 
 - `src/index.ts` - Entry point; parses inputs, calls setup, registers plugins
 - `src/setup.ts` - Core logic for downloading/caching Nushell releases from GitHub API

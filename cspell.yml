@@ -16,6 +16,7 @@ words:
 - dotenv
 - undici
 - biomejs
+- esbuild
 - nushell
 - hustcer
 - rsbuild
@@ -30,4 +31,3 @@ words:
 ignorePaths:
 - dist
 - pnpm-lock.yaml
-

@@ -67,15 +67,7 @@ lint:
 
 # Build dist/index.js
 build:
-  @$'(ansi g)Start `build` task...(ansi reset)'; \
-  $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  cd {{SETUP_NU_PATH}}; \
-  rm -rf dist/*; \
-  open src/plugins-tpl.ts | str replace __PLUGIN_REGISTER_SCRIPT__ (open nu/register-plugins.nu) | save -rf src/plugins.ts; \
-  npx ncc build src/index.ts --minify --no-cache; \
-  mv dist/exec-child.js dist/exec-child.cjs; \
-  ^sed -i '' 's/exec-child.js/exec-child.cjs/g' dist/index.js; \
-  $'(ansi g)The `build` task finished!(ansi reset)(char nl)';
+  cd {{SETUP_NU_PATH}}; pnpm run build
 
 # Test action locally
 run: build

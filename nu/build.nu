@@ -5,16 +5,9 @@
 # Get the project root directory
 let root = $env.FILE_PWD | path dirname
 
-# Step 1: Remove dist directory
-let dist_dir = $root | path join dist
-if ($dist_dir | path exists) {
-    rm -rf $dist_dir
-    print $'Removed ($dist_dir)'
-}
-
-# Step 2: Generate src/plugins.ts from the template
-# The register script is embedded into the bundle, so it has to be inlined before ncc runs.
-# Keep this in sync with the `build` recipe of the Justfile.
+# Step 1: Generate src/plugins.ts from the template
+# The register script is embedded into the bundle, so it has to be inlined before esbuild runs.
+# The Justfile delegates to this script for the build.
 let plugins_tpl = $root | path join src plugins-tpl.ts
 let register_script = $root | path join nu register-plugins.nu
 let plugins_ts = $root | path join src plugins.ts
@@ -23,26 +16,19 @@ open --raw $plugins_tpl
     | save -rf $plugins_ts
 print $'Generated ($plugins_ts)'
 
-# Step 3: Build with ncc
-print 'Building with ncc...'
+# Step 2: Bundle the Node 24 action as CommonJS. This keeps bundled CommonJS
+# dependencies compatible with the ESM source package.
+print 'Building with esbuild...'
 cd $root
-^ncc build src/index.ts --minify --no-cache
-
-# Step 4: Rename exec-child.js to exec-child.cjs
-let exec_child_js = $dist_dir | path join exec-child.js
-let exec_child_cjs = $dist_dir | path join exec-child.cjs
-if ($exec_child_js | path exists) {
-    mv $exec_child_js $exec_child_cjs
-    print $'Renamed exec-child.js to exec-child.cjs'
-}
-
-# Step 5: Replace 'exec-child.js' with 'exec-child.cjs' in index.js
+let dist_dir = $root | path join dist
 let index_js = $dist_dir | path join index.js
-if ($index_js | path exists) {
-    open --raw $index_js
-        | str replace -a 'exec-child.js' 'exec-child.cjs'
-        | save -f $index_js
-    print $'Updated references in index.js'
+let result = (^esbuild src/index.ts --bundle --platform=node --target=node24 --format=cjs --minify $'--outfile=($index_js)' | complete)
+if $result.exit_code != 0 {
+    error make { msg: $'esbuild failed: ($result.stderr)' }
 }
+print $result.stderr
+
+# Node treats .js in this directory as CommonJS independently of the ESM source package.
+'{"type":"commonjs"}' | save -f ($dist_dir | path join package.json)
 
 print 'Build completed!'

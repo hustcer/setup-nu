@@ -1,8 +1,8 @@
-import shell from 'shelljs';
-import semver from 'semver';
+import { execFileSync } from 'node:child_process';
+import { promises as fs, constants as fs_constants } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { promises as fs, constants as fs_constants } from 'node:fs';
+import semver from 'semver';
 
 /**
  * Validates enablePlugins input to prevent command injection.
@@ -53,12 +53,7 @@ export async function registerPlugins(enablePlugins: string, version: string) {
   const script = path.join(scriptDir, 'register-plugins.nu');
   const generated = path.join(scriptDir, 'do-register.nu');
   const isLegacyVersion = !version.includes('nightly') && semver.lte(version, LEGACY_VERSION);
-  const execOrThrow = (command: string) => {
-    const result = shell.exec(command);
-    if (result.code !== 0) {
-      throw new Error(`Command failed (${command}): ${result.stderr || result.stdout}`);
-    }
-  };
+  const execOrThrow = (args: string[]) => execFileSync('nu', args, { stdio: 'inherit' });
   await fs.writeFile(script, pluginRegisterScript);
   try {
     await fs.access(script, fs_constants.X_OK);
@@ -66,14 +61,10 @@ export async function registerPlugins(enablePlugins: string, version: string) {
     await fs.chmod(script, '755');
     console.log(`Fixed file permissions (-> 0o755) for ${script}`);
   }
-  const registerCommand = isLegacyVersion
-    ? `nu "${script}" "'${enablePlugins}'" ${version} --is-legacy`
-    : `nu "${script}" "'${enablePlugins}'" ${version}`;
-  execOrThrow(registerCommand);
-  // console.log('Contents of `do-register.nu`:\n');
-  // const content = shell.cat(generated);
-  // console.log(content.toString());
+  const registerArgs = [script, `'${enablePlugins}'`, version];
+  if (isLegacyVersion) registerArgs.push('--is-legacy');
+  execOrThrow(registerArgs);
   console.log('\nRegistering plugins...\n');
-  execOrThrow(`nu "${generated}"`);
+  execOrThrow([generated]);
   console.log(`Plugins registered successfully for Nu ${version}.`);
 }

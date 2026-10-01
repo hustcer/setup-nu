@@ -3,11 +3,9 @@
  * Created: 2022/04/28 18:50:20
  */
 
-import shell from 'shelljs';
 import * as core from '@actions/core';
-
-import * as setup from './setup.js';
 import { registerPlugins, validatePluginInput } from './plugins.js';
+import * as setup from './setup.js';
 
 async function main() {
   try {
@@ -49,7 +47,7 @@ async function main() {
 
     // Change to workspace directory (fallback to current dir for local runs).
     const workspaceDir = process.env.GITHUB_WORKSPACE || process.cwd();
-    shell.cd(workspaceDir);
+    process.chdir(workspaceDir);
     console.log(`Current directory: ${process.cwd()}`);
     await registerPlugins(enablePlugins, tool.version);
   } catch (err) {
