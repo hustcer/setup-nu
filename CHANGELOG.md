@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.28] - 2026-10-03
+
+### Miscellaneous Tasks
+
+- Bundle the action with esbuild for Node 24
+
+### Deps
+
+- Upgrade pnpm to v12
+- Upgrade globby,cspell & @biomejs/biome
+- Upgrade undici,@biomejs/biome,cspell & lefthook
+
 ## [3.27] - 2026-08-16
 
 ### Bug Fixes
