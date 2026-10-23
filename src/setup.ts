@@ -221,7 +221,7 @@ export function filterMatch(
       // result non-empty and stop the pagination before older releases were ever fetched.
       .filter(
         (rel): rel is Release =>
-          rel != null && (!versionSpec || semver.satisfies(rel.version, versionSpec)),
+          rel !== undefined && (!versionSpec || semver.satisfies(rel.version, versionSpec)),
       )
   )
 }
@@ -621,7 +621,7 @@ async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release
       return matches
     },
   )
-  const release = releases.find((release) => release != null)
+  const release = releases[0]
   if (release === undefined) {
     throw new MissingReleaseError(tool)
   }
