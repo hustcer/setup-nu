@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "import"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/no-direct-mutation-state": "error",
+    "react/jsx-no-duplicate-props": "error",
+    "react/jsx-no-undef": "error",
+    "react/jsx-key": "warn",
+    "react/no-children-prop": "error",
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "eqeqeq": "warn"
+  },
+  "ignorePatterns": ["dist", "node_modules"]
+}

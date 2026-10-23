@@ -24,29 +24,29 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
     steps:
-    - uses: actions/checkout@v7
-    - name: Setup nu@${{matrix.ver}}
-      uses: hustcer/setup-nu@v3
-      with:
-        version: ${{matrix.ver}}
-        enable-plugins: nu_plugin_polars,nu_plugin_query,nu_plugin_inc,nu_plugin_gstat,nu_plugin_formats
-      env:
-        ACTIONS_STEP_DEBUG: true
-    - name: Show Nu Version
-      run: print $'Nu version info:(char nl)'; print (version)
-    - name: Show Nu Binary Path
-      run: print $'Nu path:(which nu)(char nl)'
-    - name: Show Nu Package Contents
-      run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))
+      - uses: actions/checkout@v7
+      - name: Setup nu@${{matrix.ver}}
+        uses: hustcer/setup-nu@v3
+        with:
+          version: ${{matrix.ver}}
+          enable-plugins: nu_plugin_polars,nu_plugin_query,nu_plugin_inc,nu_plugin_gstat,nu_plugin_formats
+        env:
+          ACTIONS_STEP_DEBUG: true
+      - name: Show Nu Version
+        run: print $'Nu version info:(char nl)'; print (version)
+      - name: Show Nu Binary Path
+        run: print $'Nu path:(which nu)(char nl)'
+      - name: Show Nu Package Contents
+        run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))
 
   test-arm64:
     runs-on: windows-11-arm
     name: Test Nu on Windows 11 ARM64
     steps:
-    - name: Setup Nu
-      uses: hustcer/setup-nu@v3
-      with:
-        version: nightly
-        enable-plugins: nu_plugin_polars,nu_plugin_query
-    - name: Show Nu Version
-      run: print $'Nu version info:(char nl)'; print (version); $nu | table -e | print
+      - name: Setup Nu
+        uses: hustcer/setup-nu@v3
+        with:
+          version: nightly
+          enable-plugins: nu_plugin_polars,nu_plugin_query
+      - name: Show Nu Version
+        run: print $'Nu version info:(char nl)'; print (version); $nu | table -e | print

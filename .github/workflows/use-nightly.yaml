@@ -15,19 +15,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v7
-    - uses: actions/setup-node@v6
-      with:
-        node-version: '24'
-    - name: Setup nu
-      uses: hustcer/setup-nu@v3
-    - name: Build Setup Script
-      run: |
-        npm i -g pnpm@next-12
-        pnpm i
-        pnpm run lint
-        pnpm run build
-        npx skills add -y -g hustcer/nushell-pro --agent claude-code
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Setup nu
+        uses: hustcer/setup-nu@v3
+      - name: Build Setup Script
+        run: |
+          npm i -g pnpm@next-12
+          pnpm i
+          pnpm run lint
+          pnpm run build
+          npx skills add -y -g hustcer/nushell-pro --agent claude-code
 
   test:
     strategy:
@@ -39,23 +39,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, ${{ matrix.crate.owner }}/${{ matrix.crate.name }})
     steps:
-    - uses: actions/checkout@v7
-    - name: Setup ${{ matrix.crate.owner }}/${{ matrix.crate.name }}
-      uses: ./
-      with:
-        version: nightly
-        enable-plugins: true
-      env:
-        ACTIONS_STEP_DEBUG: true
-    - name: Show Nu Path and Related Assets
-      run: which $(printf nu | tr '[:upper:]' '[:lower:]') && echo "Dir contents --->:" && ls -la "$(dirname `which nu`)"
-      shell: bash
-    - name: Spawn a Nu Session and Display Version Info
-      run: nu -c 'print (version); print $"(char nl)Dir contents:(char nl)"; ls ($nu.current-exe | path dirname)'
-      shell: bash
-    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#custom-shell
-    - name: Use Nu as Default Shell
-      shell: nu {0}
-      run: |
-        print $'Current env:(char nl)'
-        print $env
+      - uses: actions/checkout@v7
+      - name: Setup ${{ matrix.crate.owner }}/${{ matrix.crate.name }}
+        uses: ./
+        with:
+          version: nightly
+          enable-plugins: true
+        env:
+          ACTIONS_STEP_DEBUG: true
+      - name: Show Nu Path and Related Assets
+        run: which $(printf nu | tr '[:upper:]' '[:lower:]') && echo "Dir contents --->:" && ls -la "$(dirname `which nu`)"
+        shell: bash
+      - name: Spawn a Nu Session and Display Version Info
+        run: nu -c 'print (version); print $"(char nl)Dir contents:(char nl)"; ls ($nu.current-exe | path dirname)'
+        shell: bash
+      # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#custom-shell
+      - name: Use Nu as Default Shell
+        shell: nu {0}
+        run: |
+          print $'Current env:(char nl)'
+          print $env

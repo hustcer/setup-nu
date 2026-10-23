@@ -3,20 +3,20 @@
  * Created: 2022/04/28 18:50:20
  */
 
-import { globby } from 'globby';
-import * as semver from 'semver';
-import * as path from 'node:path';
-import { scheduler } from 'node:timers/promises';
-import * as core from '@actions/core';
-import * as tc from '@actions/tool-cache';
-import { Octokit, type RestEndpointMethodTypes } from '@octokit/rest';
+import { globby } from 'globby'
+import * as semver from 'semver'
+import * as path from 'node:path'
+import { scheduler } from 'node:timers/promises'
+import * as core from '@actions/core'
+import * as tc from '@actions/tool-cache'
+import { Octokit, type RestEndpointMethodTypes } from '@octokit/rest'
 import {
   EnvHttpProxyAgent,
   fetch as undiciFetch,
   type RequestInit as UndiciRequestInit,
   type Response as UndiciResponse,
-} from 'undici';
-import { promises as fs, constants as fs_constants } from 'node:fs';
+} from 'undici'
+import { promises as fs, constants as fs_constants } from 'node:fs'
 
 // REF: https://nodejs.org/api/process.html#processarch
 type Platform =
@@ -27,7 +27,7 @@ type Platform =
   | 'linux_x64'
   | 'linux_arm64'
   | 'linux_loong64'
-  | 'linux_riscv64';
+  | 'linux_riscv64'
 
 const PLATFORM_DEFAULT_MAP: Record<Platform, string[]> = {
   darwin_x64: ['x86_64-apple-darwin', 'macOS.zip'],
@@ -38,7 +38,7 @@ const PLATFORM_DEFAULT_MAP: Record<Platform, string[]> = {
   linux_loong64: ['loongarch64-unknown-linux-gnu'],
   linux_arm64: ['aarch64-unknown-linux-musl', 'aarch64-unknown-linux-gnu'],
   linux_x64: ['x86_64-unknown-linux-musl', 'x86_64-unknown-linux-gnu', 'linux.tar.gz'],
-};
+}
 
 const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
   darwin_x64: ['x86_64-darwin-full'],
@@ -49,24 +49,24 @@ const PLATFORM_FULL_MAP: Record<Platform, string[]> = {
   linux_riscv64: ['riscv64gc-unknown-linux-gnu-full'],
   linux_loong64: ['loongarch64-unknown-linux-gnu-full'],
   linux_x64: ['x86_64-linux-musl-full', 'x86_64-linux-gnu-full'],
-};
+}
 
-const COMMIT_SHA_PATTERN = /^[0-9a-f]{7,40}$/i;
+const COMMIT_SHA_PATTERN = /^[0-9a-f]{7,40}$/i
 
 // The repos that publish Nushell binaries, they are also used as tool cache names.
-const STABLE_REPO = 'nushell';
-const NIGHTLY_REPO = 'nightly';
+const STABLE_REPO = 'nushell'
+const NIGHTLY_REPO = 'nightly'
 
 // Nushell binaries are always published on public GitHub, even when the workflow itself runs on
 // GitHub Enterprise Server, so every API request goes to this host.
-const PUBLIC_GITHUB_API = 'https://api.github.com';
-const MAX_RELEASE_RETRIES = 2;
+const PUBLIC_GITHUB_API = 'https://api.github.com'
+const MAX_RELEASE_RETRIES = 2
 
 /**
  * Tests whether a value is a full or abbreviated Git commit SHA.
  */
 export function isCommitSha(value: string): boolean {
-  return COMMIT_SHA_PATTERN.test(value);
+  return COMMIT_SHA_PATTERN.test(value)
 }
 
 /**
@@ -80,9 +80,9 @@ export function isCommitSha(value: string): boolean {
  */
 export function resolveVersionSpec(versionSpec: string): string | null {
   if (['*', 'nightly'].includes(versionSpec)) {
-    return versionSpec;
+    return versionSpec
   }
-  return semver.validRange(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec));
+  return semver.validRange(versionSpec) ? versionSpec : semver.valid(semver.coerce(versionSpec))
 }
 
 /**
@@ -90,33 +90,35 @@ export function resolveVersionSpec(versionSpec: string): string | null {
  * prefix so that abbreviated SHAs of any length match on both sides.
  */
 export function matchesSha(candidate: string, commitSha: string): boolean {
-  const length = Math.min(candidate.length, commitSha.length);
-  return candidate.slice(0, length).toLowerCase() === commitSha.slice(0, length).toLowerCase();
+  const length = Math.min(candidate.length, commitSha.length)
+  return candidate.slice(0, length).toLowerCase() === commitSha.slice(0, length).toLowerCase()
 }
 
 // Singleton to ensure efficient use of connection pooling, resources, etc.
-const proxyAgent = new EnvHttpProxyAgent();
+const proxyAgent = new EnvHttpProxyAgent()
 
 /**
  * @returns {string[]} possible nushell target specifiers for the current platform.
  */
 export function getTargets(features: 'default' | 'full'): string[] {
-  const { arch, platform } = process;
-  const selector = `${platform}_${arch}`;
+  const { arch, platform } = process
+  const selector = `${platform}_${arch}`
 
-  const platformMap = features === 'default' ? PLATFORM_DEFAULT_MAP : PLATFORM_FULL_MAP;
-  const targets = platformMap[selector as Platform];
+  const platformMap = features === 'default' ? PLATFORM_DEFAULT_MAP : PLATFORM_FULL_MAP
+  const targets = platformMap[selector as Platform]
   if (!targets) {
-    throw new Error(`Unsupported Nu target combination: arch = ${arch}, platform = ${platform}, feature = ${features}`);
+    throw new Error(
+      `Unsupported Nu target combination: arch = ${arch}, platform = ${platform}, feature = ${features}`,
+    )
   }
-  return targets;
+  return targets
 }
 
 /**
  * @returns the first release asset matching one of the given target specifiers, if any.
  */
 export function findAsset(assets: ReleaseAsset[], targets: string[]): ReleaseAsset | undefined {
-  return assets.find((asset) => targets.some((target) => asset.name.includes(target)));
+  return assets.find((asset) => targets.some((target) => asset.name.includes(target)))
 }
 
 /**
@@ -124,21 +126,21 @@ export function findAsset(assets: ReleaseAsset[], targets: string[]): ReleaseAss
  */
 export interface Tool {
   /** The GitHub owner (username or organization). */
-  owner: string;
+  owner: string
   /** The GitHub repo name. */
-  name: string;
+  name: string
   /** The GitHub token to use for API requests. */
-  githubToken: string;
+  githubToken: string
   /** Set this option to `true` if you want to check for the latest version. */
-  checkLatest: boolean;
+  checkLatest: boolean
   /** Set this option to `true` if you want to register plugins. */
-  enablePlugins: string;
+  enablePlugins: string
   /** A valid semantic version specifier for the tool. */
-  versionSpec?: string;
+  versionSpec?: string
   /** Feature set: default or full. */
-  features: 'default' | 'full';
+  features: 'default' | 'full'
   /** The name of the tool binary (defaults to the repo name) */
-  bin?: string;
+  bin?: string
 }
 
 /**
@@ -146,15 +148,15 @@ export interface Tool {
  */
 export interface InstalledTool {
   /** The GitHub owner (username or organization). */
-  owner: string;
+  owner: string
   /** The GitHub repo name. */
-  name: string;
+  name: string
   /** The version of the tool. */
-  version: string;
+  version: string
   /** The directory containing the tool binary. */
-  dir: string;
+  dir: string
   /** The name of the tool binary (defaults to the repo name) */
-  bin?: string;
+  bin?: string
 }
 
 /**
@@ -162,25 +164,26 @@ export interface InstalledTool {
  */
 interface Release {
   /** The exact release tag. */
-  version: string;
+  version: string
   /** The asset download URL. */
-  downloadUrl: string;
+  downloadUrl: string
   /** The tool cache name to store the release under, defaults to {@link Tool.name}. */
-  name?: string;
+  name?: string
 }
 
 /** A single release as returned by the GitHub API. */
-type GitHubReleaseItem = RestEndpointMethodTypes['repos']['listReleases']['response']['data'][number];
+type GitHubReleaseItem =
+  RestEndpointMethodTypes['repos']['listReleases']['response']['data'][number]
 /** A single release asset as returned by the GitHub API. */
-type ReleaseAsset = GitHubReleaseItem['assets'][number];
+type ReleaseAsset = GitHubReleaseItem['assets'][number]
 /** A page of releases as handed to the `octokit.paginate` map function. */
-type ReleasePage = { data: GitHubReleaseItem[] };
+type ReleasePage = { data: GitHubReleaseItem[] }
 
 /**
  * Tests whether an unknown error has the specified HTTP status.
  */
 function hasHttpStatus(error: unknown, status: number): boolean {
-  return typeof error === 'object' && error !== null && 'status' in error && error.status === status;
+  return typeof error === 'object' && error !== null && 'status' in error && error.status === status
 }
 
 /**
@@ -188,7 +191,9 @@ function hasHttpStatus(error: unknown, status: number): boolean {
  */
 function warnIfFullFeature(features: 'default' | 'full'): void {
   if (features === 'full') {
-    core.warning('The "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.');
+    core.warning(
+      'The "full" feature was removed for Nu after v0.93.1, try to use "default" feature instead.',
+    )
   }
 }
 
@@ -201,19 +206,24 @@ function warnIfFullFeature(features: 'default' | 'full'): void {
 export function filterMatch(
   response: ReleasePage,
   versionSpec: string | undefined,
-  features: 'default' | 'full'
+  features: 'default' | 'full',
 ): Release[] {
-  const targets = getTargets(features);
+  const targets = getTargets(features)
   return (
     response.data
       .map((rel) => {
-        const asset = findAsset(rel.assets, targets);
-        return asset ? { version: rel.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url } : undefined;
+        const asset = findAsset(rel.assets, targets)
+        return asset
+          ? { version: rel.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }
+          : undefined
       })
       // Releases without a matching asset have to be dropped here, otherwise they keep the
       // result non-empty and stop the pagination before older releases were ever fetched.
-      .filter((rel): rel is Release => rel != null && (!versionSpec || semver.satisfies(rel.version, versionSpec)))
-  );
+      .filter(
+        (rel): rel is Release =>
+          rel != null && (!versionSpec || semver.satisfies(rel.version, versionSpec)),
+      )
+  )
 }
 
 /**
@@ -223,20 +233,22 @@ export function filterMatch(
  * @returns {Release[]} a single GitHub release.
  */
 export function filterLatest(response: ReleasePage, features: 'default' | 'full'): Release[] {
-  const targets = getTargets(features);
+  const targets = getTargets(features)
   // Only releases that carry an asset for the current platform may take part in the `latest`
   // election. Electing one without a usable asset yields `[undefined]`, which still counts as a
   // non-empty page, stops the pagination and then fails instead of falling back to an older
   // release. Tags that are no valid semver are dropped as well, `semver.rsort` throws on those.
-  const candidates = response.data.filter((rel) => semver.valid(rel.tag_name) && findAsset(rel.assets, targets));
+  const candidates = response.data.filter(
+    (rel) => semver.valid(rel.tag_name) && findAsset(rel.assets, targets),
+  )
   if (candidates.length === 0) {
-    return [];
+    return []
   }
 
-  const latest = semver.rsort(candidates.map((rel) => rel.tag_name))[0];
-  const release = candidates.find((rel) => rel.tag_name === latest) as GitHubReleaseItem;
-  const asset = findAsset(release.assets, targets) as ReleaseAsset;
-  return [{ version: release.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }];
+  const latest = semver.rsort(candidates.map((rel) => rel.tag_name))[0]
+  const release = candidates.find((rel) => rel.tag_name === latest) as GitHubReleaseItem
+  const asset = findAsset(release.assets, targets) as ReleaseAsset
+  return [{ version: release.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }]
 }
 
 /**
@@ -245,23 +257,28 @@ export function filterLatest(response: ReleasePage, features: 'default' | 'full'
  * @param response the response to filter a latest release from.
  * @returns {Release[]} a single GitHub release.
  */
-export function filterLatestNightly(response: ReleasePage, features: 'default' | 'full'): Release[] {
-  const targets = getTargets(features);
+export function filterLatestNightly(
+  response: ReleasePage,
+  features: 'default' | 'full',
+): Release[] {
+  const targets = getTargets(features)
   // Same reasoning as in `filterLatest`: a nightly release is created before its assets finish
   // uploading, so the newest one regularly has no asset for some platform yet. Skip those and
   // take the newest nightly that is actually installable.
-  const candidates = response.data.filter((rel) => findAsset(rel.assets, targets));
+  const candidates = response.data.filter((rel) => findAsset(rel.assets, targets))
   if (candidates.length === 0) {
-    return [];
+    return []
   }
 
   // `published_at` is nullable in the API types, a draft release without one sorts to the epoch.
-  const publishedAt = (rel: GitHubReleaseItem) => new Date(rel.published_at ?? 0).getTime();
-  const latest = candidates.reduce((newest, rel) => (publishedAt(rel) > publishedAt(newest) ? rel : newest));
-  core.info(`Try to get latest nightly version published at: ${latest.published_at}`);
+  const publishedAt = (rel: GitHubReleaseItem) => new Date(rel.published_at ?? 0).getTime()
+  const latest = candidates.reduce((newest, rel) =>
+    publishedAt(rel) > publishedAt(newest) ? rel : newest,
+  )
+  core.info(`Try to get latest nightly version published at: ${latest.published_at}`)
 
-  const asset = findAsset(latest.assets, targets) as ReleaseAsset;
-  return [{ version: latest.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }];
+  const asset = findAsset(latest.assets, targets) as ReleaseAsset
+  return [{ version: latest.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url }]
 }
 
 /**
@@ -274,22 +291,22 @@ export function filterLatestNightly(response: ReleasePage, features: 'default' |
 export function filterNightlyByCommit(
   response: ReleasePage,
   commitSha: string,
-  features: 'default' | 'full'
+  features: 'default' | 'full',
 ): Release[] {
-  const targets = getTargets(features);
+  const targets = getTargets(features)
   const release = response.data.find((candidate) => {
-    const releaseCommitSha = candidate.tag_name.match(/(?:\+|nightly-)([0-9a-f]{7,40})$/i)?.[1];
+    const releaseCommitSha = candidate.tag_name.match(/(?:\+|nightly-)([0-9a-f]{7,40})$/i)?.[1]
     if (releaseCommitSha === undefined || !matchesSha(releaseCommitSha, commitSha)) {
-      return false;
+      return false
     }
-    return findAsset(candidate.assets, targets) !== undefined;
-  });
+    return findAsset(candidate.assets, targets) !== undefined
+  })
 
   if (!release) {
-    return [];
+    return []
   }
 
-  const asset = findAsset(release.assets, targets);
+  const asset = findAsset(release.assets, targets)
   return asset
     ? [
         {
@@ -298,7 +315,7 @@ export function filterNightlyByCommit(
           name: NIGHTLY_REPO,
         },
       ]
-    : [];
+    : []
 }
 
 /**
@@ -311,28 +328,32 @@ export function filterNightlyByCommit(
  */
 async function resolveToken(githubToken: string | undefined): Promise<string | undefined> {
   if (!githubToken) {
-    return undefined;
+    return undefined
   }
 
-  const probe = new Octokit({ auth: githubToken, baseUrl: PUBLIC_GITHUB_API, request: { fetch: proxyFetch } });
+  const probe = new Octokit({
+    auth: githubToken,
+    baseUrl: PUBLIC_GITHUB_API,
+    request: { fetch: proxyFetch },
+  })
   try {
-    await probe.rateLimit.get();
-    return githubToken;
+    await probe.rateLimit.get()
+    return githubToken
   } catch (error) {
     if (hasHttpStatus(error, 401)) {
       core.warning(
         'The provided GitHub token was rejected by github.com and is ignored, continuing without ' +
           'authentication. On GitHub Enterprise Server the default `github.token` is only valid for ' +
           'your own instance, pass a public GitHub PAT via the `github-token` input to avoid the ' +
-          'much lower anonymous rate limit.'
-      );
-      return undefined;
+          'much lower anonymous rate limit.',
+      )
+      return undefined
     }
     // Anything else (a network hiccup, a 403 while rate limited, ...) is no verdict on the token.
     // Keep it and let the actual release request surface the problem, a failing probe must never
     // be the reason the whole action fails.
-    core.debug(`Could not verify the GitHub token, using it anyway: ${error}`);
-    return githubToken;
+    core.debug(`Could not verify the GitHub token, using it anyway: ${error}`)
+    return githubToken
   }
 }
 
@@ -348,14 +369,14 @@ async function commitExists(octokit: Octokit, owner: string, commitSha: string):
       owner,
       repo: STABLE_REPO,
       ref: commitSha,
-    });
-    return true;
+    })
+    return true
   } catch (error) {
     // 404 for an unknown commit, 422 for a SHA that cannot be resolved at all.
     if (hasHttpStatus(error, 404) || hasHttpStatus(error, 422)) {
-      return false;
+      return false
     }
-    throw error;
+    throw error
   }
 }
 
@@ -366,35 +387,41 @@ async function getStableReleaseByCommit(
   octokit: Octokit,
   owner: string,
   commitSha: string,
-  features: 'default' | 'full'
+  features: 'default' | 'full',
 ): Promise<Release | undefined> {
   // No early `done()` here: the tags of a single commit can land on different pages. `a80dfe8` is
   // tagged both `v0.96.0` (first entry of page 1) and `0.96.0`, and only the latter has a release,
   // so stopping on the first matching page would drop the tag that actually resolves.
-  const tags = await octokit.paginate(octokit.repos.listTags, { owner, per_page: 100, repo: STABLE_REPO }, (response) =>
-    response.data.filter((tag) => matchesSha(tag.commit.sha, commitSha))
-  );
+  const tags = await octokit.paginate(
+    octokit.repos.listTags,
+    { owner, per_page: 100, repo: STABLE_REPO },
+    (response) => response.data.filter((tag) => matchesSha(tag.commit.sha, commitSha)),
+  )
 
-  const targets = getTargets(features);
+  const targets = getTargets(features)
   // A commit may carry more than one tag, e.g. `a80dfe8` is tagged both `v0.96.0` and `0.96.0`
   // while only the latter has a release, so every matching tag has to be tried.
   for (const tag of tags) {
     try {
-      const response = await octokit.repos.getReleaseByTag({ owner, repo: STABLE_REPO, tag: tag.name });
-      const asset = findAsset(response.data.assets, targets);
+      const response = await octokit.repos.getReleaseByTag({
+        owner,
+        repo: STABLE_REPO,
+        tag: tag.name,
+      })
+      const asset = findAsset(response.data.assets, targets)
       if (asset) {
         return {
           version: response.data.tag_name.replace(/^v/, ''),
           downloadUrl: asset.browser_download_url,
-        };
+        }
       }
     } catch (error) {
       if (!hasHttpStatus(error, 404)) {
-        throw error;
+        throw error
       }
     }
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -404,20 +431,20 @@ async function getNightlyReleaseByCommit(
   octokit: Octokit,
   owner: string,
   commitSha: string,
-  features: 'default' | 'full'
+  features: 'default' | 'full',
 ): Promise<Release | undefined> {
   const releases = await octokit.paginate(
     octokit.repos.listReleases,
     { owner, per_page: 100, repo: NIGHTLY_REPO },
     (response, done) => {
-      const matches = filterNightlyByCommit(response, commitSha, features);
+      const matches = filterNightlyByCommit(response, commitSha, features)
       if (matches.length > 0) {
-        done();
+        done()
       }
-      return matches;
-    }
-  );
-  return releases[0];
+      return matches
+    },
+  )
+  return releases[0]
 }
 
 /**
@@ -428,138 +455,150 @@ async function getNightlyReleaseByCommit(
  * @returns {Promise<Release>} a single GitHub release.
  */
 async function getRelease(tool: Tool): Promise<Release> {
-  const { features } = tool;
+  const { features } = tool
 
   // Logged once here instead of inside `getTargets`, which runs for every page of every query.
-  core.info(`Try to get assets for Nu: arch = ${process.arch}, platform = ${process.platform}, feature = ${features}`);
+  core.info(
+    `Try to get assets for Nu: arch = ${process.arch}, platform = ${process.platform}, feature = ${features}`,
+  )
 
   const octokit = new Octokit({
     auth: await resolveToken(tool.githubToken),
     // Use public GitHub API for Nushell assets query, make it work for GitHub Enterprise
     baseUrl: PUBLIC_GITHUB_API,
     request: { fetch: proxyFetch },
-  });
-  return resolveRelease(tool, octokit);
+  })
+  return resolveRelease(tool, octokit)
 }
 
 /** No release currently provides the requested version and platform asset. */
 export class MissingReleaseError extends Error {
   constructor({ versionSpec, features }: Tool) {
-    super(`No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`);
-    this.name = 'MissingReleaseError';
+    super(
+      `No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`,
+    )
+    this.name = 'MissingReleaseError'
   }
 }
 
 /** Return the retry delay, or undefined for permanent lookup failures. */
 function releaseRetryDelay(error: unknown, attempt: number): number | undefined {
-  const headers = (error as { response?: { headers?: Record<string, string> } })?.response?.headers;
+  const headers = (error as { response?: { headers?: Record<string, string> } })?.response?.headers
   const rateLimited =
     hasHttpStatus(error, 429) ||
     (hasHttpStatus(error, 403) &&
-      (headers?.['x-ratelimit-remaining'] === '0' || headers?.['retry-after'] !== undefined));
+      (headers?.['x-ratelimit-remaining'] === '0' || headers?.['retry-after'] !== undefined))
   const transient =
     rateLimited ||
     error instanceof MissingReleaseError ||
-    [408, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status));
+    [408, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status))
   if (!transient) {
-    return undefined;
+    return undefined
   }
 
-  const backoffMs = 1000 * 2 ** attempt;
-  const now = Date.now();
-  let serverDelayMs: number | undefined;
-  const retryAfter = headers?.['retry-after']?.trim();
+  const backoffMs = 1000 * 2 ** attempt
+  const now = Date.now()
+  let serverDelayMs: number | undefined
+  const retryAfter = headers?.['retry-after']?.trim()
   if (retryAfter) {
-    const retryAfterMs = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - now;
+    const retryAfterMs = /^\d+$/.test(retryAfter)
+      ? Number(retryAfter) * 1000
+      : Date.parse(retryAfter) - now
     if (Number.isFinite(retryAfterMs) && retryAfterMs >= 0) {
-      serverDelayMs = retryAfterMs;
+      serverDelayMs = retryAfterMs
     }
   }
 
   if (rateLimited && headers?.['x-ratelimit-remaining'] === '0') {
-    const resetDelayMs = Number(headers['x-ratelimit-reset']) * 1000 - now;
+    const resetDelayMs = Number(headers['x-ratelimit-reset']) * 1000 - now
     if (Number.isFinite(resetDelayMs) && resetDelayMs > 0) {
-      serverDelayMs = Math.max(serverDelayMs ?? 0, resetDelayMs);
+      serverDelayMs = Math.max(serverDelayMs ?? 0, resetDelayMs)
     }
   }
 
   if (serverDelayMs !== undefined) {
-    return Math.max(backoffMs, serverDelayMs);
+    return Math.max(backoffMs, serverDelayMs)
   }
   // GitHub requires at least one minute when a rate limit has no retry time.
-  return rateLimited ? 60_000 * 2 ** attempt : backoffMs;
+  return rateLimited ? 60_000 * 2 ** attempt : backoffMs
 }
 
 /** Retry transient API failures and empty release results before failing the action. */
 export async function resolveRelease(tool: Tool, octokit: Octokit): Promise<Release> {
   for (let attempt = 0; ; attempt++) {
     try {
-      return await resolveReleaseOnce(tool, octokit);
+      return await resolveReleaseOnce(tool, octokit)
     } catch (error) {
-      const waitMs = releaseRetryDelay(error, attempt);
+      const waitMs = releaseRetryDelay(error, attempt)
       if (waitMs === undefined || attempt === MAX_RELEASE_RETRIES) {
         if (error instanceof MissingReleaseError) {
-          warnIfFullFeature(tool.features);
+          warnIfFullFeature(tool.features)
         }
-        throw error;
+        throw error
       }
-      core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/${MAX_RELEASE_RETRIES}) in ${waitMs}ms.`);
-      await scheduler.wait(waitMs);
+      core.warning(
+        `Nushell release lookup failed; retrying (${attempt + 1}/${MAX_RELEASE_RETRIES}) in ${waitMs}ms.`,
+      )
+      await scheduler.wait(waitMs)
     }
   }
 }
 
 /** Resolve a release once, leaving retry policy to the caller. */
 async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release> {
-  const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
-  const isNightly = versionSpec === 'nightly';
-  const commitSha = versionSpec && isCommitSha(versionSpec) ? versionSpec : undefined;
+  const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool
+  const isNightly = versionSpec === 'nightly'
+  const commitSha = versionSpec && isCommitSha(versionSpec) ? versionSpec : undefined
 
   // A fixed version does not need release-list pagination. Support both tag spellings used
   // by Nushell, and preserve check-latest's existing latest-release selection.
-  const exactVersion = versionSpec && semver.valid(versionSpec);
+  const exactVersion = versionSpec && semver.valid(versionSpec)
   if (exactVersion && !checkLatest) {
     for (const tag of new Set([versionSpec, exactVersion, `v${exactVersion}`])) {
       try {
-        const { data } = await octokit.repos.getReleaseByTag({ owner, repo: name, tag });
-        const asset = findAsset(data.assets, getTargets(features));
+        const { data } = await octokit.repos.getReleaseByTag({ owner, repo: name, tag })
+        const asset = findAsset(data.assets, getTargets(features))
         if (asset) {
-          return { version: data.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url };
+          return {
+            version: data.tag_name.replace(/^v/, ''),
+            downloadUrl: asset.browser_download_url,
+          }
         }
       } catch (error) {
         if (!hasHttpStatus(error, 404)) {
-          throw error;
+          throw error
         }
       }
     }
-    throw new MissingReleaseError(tool);
+    throw new MissingReleaseError(tool)
   }
 
   if (commitSha) {
     if (checkLatest) {
-      core.warning('The "check-latest" input is ignored when the version is a commit SHA.');
+      core.warning('The "check-latest" input is ignored when the version is a commit SHA.')
     }
     if (!(await commitExists(octokit, owner, commitSha))) {
       // A digit-only input is a valid abbreviated SHA, but it is far more likely to be a version
       // that lost its dots, so point that out instead of only reporting the missing commit.
       const hint = /^\d+$/.test(commitSha)
         ? ' It consists of digits only, if you meant a version use the full form such as "0.112.2".'
-        : '';
-      throw new Error(`Commit SHA ${commitSha} does not exist in ${owner}/${STABLE_REPO}.${hint}`);
+        : ''
+      throw new Error(`Commit SHA ${commitSha} does not exist in ${owner}/${STABLE_REPO}.${hint}`)
     }
-    const stableRelease = await getStableReleaseByCommit(octokit, owner, commitSha, features);
-    const release = stableRelease ?? (await getNightlyReleaseByCommit(octokit, owner, commitSha, features));
+    const stableRelease = await getStableReleaseByCommit(octokit, owner, commitSha, features)
+    const release =
+      stableRelease ?? (await getNightlyReleaseByCommit(octokit, owner, commitSha, features))
     if (!release) {
-      warnIfFullFeature(features);
+      warnIfFullFeature(features)
       // The commit itself exists, `commitExists` above made sure of that, so it is simply not the
       // target of any installable release. A pruned nightly is the most common reason.
       throw new Error(
         `No published Nushell release found for commit SHA ${commitSha} with ${features} features. ` +
           'Only a commit that a stable tag or a nightly release points at can be installed, and ' +
-          `${owner}/${NIGHTLY_REPO} keeps just its most recent builds, so older nightly SHAs stop resolving.`
-      );
+          `${owner}/${NIGHTLY_REPO} keeps just its most recent builds, so older nightly SHAs stop resolving.`,
+      )
     }
-    return release;
+    return release
   }
 
   const releases = await octokit.paginate(
@@ -567,57 +606,57 @@ async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release
     { owner, per_page: 100, repo: name },
     (response, done) => {
       // Evaluated lazily, running the unused filter over every page is pure waste.
-      let matches: Release[];
+      let matches: Release[]
       if (isNightly) {
-        matches = filterLatestNightly(response, features);
+        matches = filterLatestNightly(response, features)
       } else if (checkLatest) {
-        matches = filterLatest(response, features);
+        matches = filterLatest(response, features)
       } else {
-        matches = filterMatch(response, versionSpec, features);
+        matches = filterMatch(response, versionSpec, features)
       }
 
       if (matches.length > 0) {
-        done();
+        done()
       }
-      return matches;
-    }
-  );
-  const release = releases.find((release) => release != null);
+      return matches
+    },
+  )
+  const release = releases.find((release) => release != null)
   if (release === undefined) {
-    throw new MissingReleaseError(tool);
+    throw new MissingReleaseError(tool)
   }
-  return release;
+  return release
 }
 
 function proxyFetch(url: string | URL, opts?: UndiciRequestInit): Promise<UndiciResponse> {
   return undiciFetch(url, {
     ...opts,
     dispatcher: proxyAgent,
-  });
+  })
 }
 
 async function handleBadBinaryPermissions(tool: Tool, dir: string): Promise<void> {
-  const { name, bin } = tool;
+  const { name, bin } = tool
   if (process.platform === 'win32') {
-    return;
+    return
   }
 
-  const files = await fs.readdir(dir);
-  const mainBinary = bin ?? files.find((file) => file.toLowerCase() === name.toLowerCase());
+  const files = await fs.readdir(dir)
+  const mainBinary = bin ?? files.find((file) => file.toLowerCase() === name.toLowerCase())
   // The plugin binaries need the executable bit just as much as `nu` itself, `plugin add` fails
   // with a permission error otherwise.
   const binaries = new Set([
     ...(mainBinary && files.includes(mainBinary) ? [mainBinary] : []),
     ...files.filter((file) => file.startsWith('nu_plugin_')),
-  ]);
+  ])
 
   for (const binary of binaries) {
-    const binaryPath = path.join(dir, binary);
+    const binaryPath = path.join(dir, binary)
     try {
-      await fs.access(binaryPath, fs_constants.X_OK);
+      await fs.access(binaryPath, fs_constants.X_OK)
     } catch {
-      await fs.chmod(binaryPath, '755');
-      core.debug(`Fixed file permissions (-> 0o755) for ${binaryPath}`);
+      await fs.chmod(binaryPath, '755')
+      core.debug(`Fixed file permissions (-> 0o755) for ${binaryPath}`)
     }
   }
 }
@@ -631,37 +670,37 @@ async function handleBadBinaryPermissions(tool: Tool, dir: string): Promise<void
  * @returns the directory containing the tool binary.
  */
 export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
-  const { name, versionSpec, checkLatest = false } = tool;
+  const { name, versionSpec, checkLatest = false } = tool
 
   // first check if we have previously downloaded the tool, `check-latest` has to skip this lookup:
   // a cached version always satisfies the `*` spec, so it would shadow the newest release and make
   // the option a no-op on runners that already carry a Nu in their tool cache.
-  let dir = checkLatest ? '' : tc.find(name, versionSpec || '*');
+  let dir = checkLatest ? '' : tc.find(name, versionSpec || '*')
   // a release resolved by commit SHA may come from the nightly repo, cache it under that name
-  let cacheName = name;
+  let cacheName = name
 
   if (!dir) {
     // find the latest release by querying GitHub API
-    const release = await getRelease(tool);
-    const { version, downloadUrl } = release;
-    cacheName = release.name ?? name;
-    dir = tc.find(cacheName, version);
+    const release = await getRelease(tool)
+    const { version, downloadUrl } = release
+    cacheName = release.name ?? name
+    dir = tc.find(cacheName, version)
 
     if (dir) {
-      return { ...tool, name: cacheName, version: path.basename(path.dirname(dir)), dir };
+      return { ...tool, name: cacheName, version: path.basename(path.dirname(dir)), dir }
     }
 
     // download, extract, and cache the tool
-    const artifact = await tc.downloadTool(downloadUrl);
-    core.debug(`Successfully downloaded ${name} v${version}`);
+    const artifact = await tc.downloadTool(downloadUrl)
+    core.debug(`Successfully downloaded ${name} v${version}`)
 
-    let extractDir: string;
+    let extractDir: string
     if (downloadUrl.endsWith('.zip')) {
-      extractDir = await tc.extractZip(artifact);
+      extractDir = await tc.extractZip(artifact)
     } else {
-      extractDir = await tc.extractTar(artifact);
+      extractDir = await tc.extractTar(artifact)
     }
-    core.debug(`Successfully extracted archive for ${name} v${version}`);
+    core.debug(`Successfully extracted archive for ${name} v${version}`)
 
     const paths = await globby(
       [
@@ -672,20 +711,20 @@ export async function checkOrInstallTool(tool: Tool): Promise<InstalledTool> {
       {
         unique: true,
         absolute: true,
-      }
-    );
-    const cacheSource = paths.length > 0 ? path.dirname(paths[0]) : extractDir;
+      },
+    )
+    const cacheSource = paths.length > 0 ? path.dirname(paths[0]) : extractDir
     if (paths.length === 0) {
-      core.warning('No nu_plugin_* binaries found; caching extracted directory instead.');
+      core.warning('No nu_plugin_* binaries found; caching extracted directory instead.')
     }
-    dir = await tc.cacheDir(cacheSource, cacheName, version);
+    dir = await tc.cacheDir(cacheSource, cacheName, version)
 
     // handle bad binary permissions, the binary needs to be executable!
-    await handleBadBinaryPermissions(tool, dir);
+    await handleBadBinaryPermissions(tool, dir)
   }
 
   // is there a better way to get the version?
-  const version = path.basename(path.dirname(dir));
+  const version = path.basename(path.dirname(dir))
 
-  return { ...tool, name: cacheName, version, dir };
+  return { ...tool, name: cacheName, version, dir }
 }

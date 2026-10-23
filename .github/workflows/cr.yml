@@ -5,8 +5,8 @@ name: Code Review
 on:
   pull_request_target:
     types:
-      - opened      # Triggers when a PR is opened
-      - reopened    # Triggers when a PR is reopened
+      - opened # Triggers when a PR is opened
+      - reopened # Triggers when a PR is reopened
       - synchronize # Triggers when a commit is pushed to the PR
       # - labeled     # Triggers when a label is added to the PR
 

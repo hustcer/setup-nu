@@ -16,24 +16,37 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-22.04, ubuntu-22.04-arm, macos-latest]
-        ver: [0.113.1, 0.111.0, 0.108.0, 0.106.0, 0.105.1, 0.103.0, 0.101.0, 0.98.0, 0.97.1, 0.96.1, 0.95.0]
+        ver:
+          [
+            0.113.1,
+            0.111.0,
+            0.108.0,
+            0.106.0,
+            0.105.1,
+            0.103.0,
+            0.101.0,
+            0.98.0,
+            0.97.1,
+            0.96.1,
+            0.95.0,
+          ]
 
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
     steps:
-    - uses: actions/checkout@v7
-    - name: Setup nu@${{matrix.ver}}
-      uses: hustcer/setup-nu@v3
-      with:
-        enable-plugins: false
-        version: ${{matrix.ver}}
-      env:
-        ACTIONS_STEP_DEBUG: true
-    - name: Show Nu Version
-      run: print $'Nu version info:(char nl)'; print (version)
-    - name: Show env Variables
-      run: print $'Current env:(char nl)'; print $env
-    - name: Show Nu Binary Path
-      run: print $'Nu path:(which nu)(char nl)'
-    - name: Show Nu Package Contents
-      run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))
+      - uses: actions/checkout@v7
+      - name: Setup nu@${{matrix.ver}}
+        uses: hustcer/setup-nu@v3
+        with:
+          enable-plugins: false
+          version: ${{matrix.ver}}
+        env:
+          ACTIONS_STEP_DEBUG: true
+      - name: Show Nu Version
+        run: print $'Nu version info:(char nl)'; print (version)
+      - name: Show env Variables
+        run: print $'Current env:(char nl)'; print $env
+      - name: Show Nu Binary Path
+        run: print $'Nu path:(which nu)(char nl)'
+      - name: Show Nu Package Contents
+        run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))

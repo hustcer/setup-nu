@@ -19,7 +19,7 @@ After that, you can define the commands to be executed in subsequent steps. Reme
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: "0.90" # Don't use 0.90 here, as it would be a float number and would be converted to 0.9, you can use v0.90/0.90.0 or '0.90'
+    version: '0.90' # Don't use 0.90 here, as it would be a float number and would be converted to 0.9, you can use v0.90/0.90.0 or '0.90'
 - run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -51,7 +51,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: hustcer/setup-nu@main
         with:
-          version: "*"
+          version: '*'
       - run: version; print $"(char nl)Dir contents:(char nl)"; ls ($nu.current-exe | path dirname)
       - run: |
           print $'Current env:(char nl)'
@@ -64,6 +64,7 @@ jobs:
 #### Use Nu Modules
 
 To use modules in `Nu`, please refer to the following examples:
+
 1. Use Nu modules by setting `NU_LIB_DIRS` constant:
 
 ```yaml
@@ -95,8 +96,7 @@ To use modules in `Nu`, please refer to the following examples:
     nu -c "use nu/module.nu *; print (get-env-abc 'DEFAULT-ABC')"
 ```
 
-You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal to or above `0.69`.
-3. Use modules from absolute path
+You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal to or above `0.69`. 3. Use modules from absolute path
 
 ```yaml
 - name: Setup nu
@@ -149,7 +149,7 @@ does not compile Nushell.
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: "00c9ee0" # Install stable release 0.115.0, quote it to keep YAML from parsing it as a number.
+    version: '00c9ee0' # Install stable release 0.115.0, quote it to keep YAML from parsing it as a number.
 ```
 
 For a nightly release, use its commit SHA in the same way. Note that `check-latest` is ignored
@@ -163,6 +163,7 @@ when the version is a commit SHA.
 #### Others
 
 Or, check the following examples:
+
 1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
 2. Advanced example: How Does Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
@@ -195,4 +196,5 @@ This GitHub Action will install the latest matching release.
 ## License
 
 Licensed under:
+
 - MIT license ([LICENSE](LICENSE) or https://opensource.org/licenses/MIT)

@@ -24,23 +24,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
     steps:
-    - uses: actions/checkout@v7
-    - name: Setup nu@${{matrix.ver}}
-      uses: hustcer/setup-nu@develop
-      with:
-        features: full
-        version: ${{matrix.ver}}
-        # Set to `true` will register all plugins
-        # enable-plugins: true
-        # You can also set to a comma-separated string of plugin names to register them
-        enable-plugins: nu_plugin_inc,nu_plugin_query
-      env:
-        ACTIONS_STEP_DEBUG: true
-    - name: Show Nu Version
-      run: print $'Nu version info:(char nl)'; print (version)
-    - name: Show env Variables
-      run: print $'Current env:(char nl)'; print $env
-    - name: Show Nu Binary Path
-      run: print $'Nu path:(which nu)(char nl)'
-    - name: Show Nu Package Contents
-      run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))
+      - uses: actions/checkout@v7
+      - name: Setup nu@${{matrix.ver}}
+        uses: hustcer/setup-nu@develop
+        with:
+          features: full
+          version: ${{matrix.ver}}
+          # Set to `true` will register all plugins
+          # enable-plugins: true
+          # You can also set to a comma-separated string of plugin names to register them
+          enable-plugins: nu_plugin_inc,nu_plugin_query
+        env:
+          ACTIONS_STEP_DEBUG: true
+      - name: Show Nu Version
+        run: print $'Nu version info:(char nl)'; print (version)
+      - name: Show env Variables
+        run: print $'Current env:(char nl)'; print $env
+      - name: Show Nu Binary Path
+        run: print $'Nu path:(which nu)(char nl)'
+      - name: Show Nu Package Contents
+        run: print $"(char nl)Dir contents:(char nl)"; print (ls ($nu.current-exe | path dirname))

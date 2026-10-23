@@ -23,27 +23,27 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: test (${{matrix.os}}, nu@${{matrix.ver}})
     steps:
-    - uses: actions/checkout@v7
-    - name: Setup nu@latest
-      uses: hustcer/setup-nu@develop
-      with:
-        enable-plugins: true
-        version: ${{matrix.ver}}
-      env:
-        ACTIONS_STEP_DEBUG: true
-    - name: Show Nu Version
-      run: print $'Nu version info:(char nl)'; print (version)
-    - name: Use Your Nu Modules by NU_LIB_DIRS Constant
-      run: |
-        const NU_LIB_DIRS = [ ${{ github.workspace }}/nu ]
-        use module.nu *
-        print 'Use module by NU_LIB_DIRS Constant'
-        print (get-env-abc 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
-    - name: Use Your Nu Modules
-      run: |
-        nu -c "use nu/module.nu *; print (get-env-abc 'DEFAULT-ABC-XYZ')"
-    - name: Use Your Nu Modules by Absolute Path
-      run: |
-        use ${{ github.workspace }}/nu/module.nu *
-        print 'Use module from: ${{ github.workspace }}/nu/module.nu'
-        print (get-env-abc 'DEFAULT-ABC-ABSOLUTE-PATH')
+      - uses: actions/checkout@v7
+      - name: Setup nu@latest
+        uses: hustcer/setup-nu@develop
+        with:
+          enable-plugins: true
+          version: ${{matrix.ver}}
+        env:
+          ACTIONS_STEP_DEBUG: true
+      - name: Show Nu Version
+        run: print $'Nu version info:(char nl)'; print (version)
+      - name: Use Your Nu Modules by NU_LIB_DIRS Constant
+        run: |
+          const NU_LIB_DIRS = [ ${{ github.workspace }}/nu ]
+          use module.nu *
+          print 'Use module by NU_LIB_DIRS Constant'
+          print (get-env-abc 'DEFAULT-FROM-NU-LIB-DIRS-CONSTANT')
+      - name: Use Your Nu Modules
+        run: |
+          nu -c "use nu/module.nu *; print (get-env-abc 'DEFAULT-ABC-XYZ')"
+      - name: Use Your Nu Modules by Absolute Path
+        run: |
+          use ${{ github.workspace }}/nu/module.nu *
+          print 'Use module from: ${{ github.workspace }}/nu/module.nu'
+          print (get-env-abc 'DEFAULT-ABC-ABSOLUTE-PATH')

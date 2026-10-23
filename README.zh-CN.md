@@ -15,7 +15,7 @@
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: "0.90" # 不要使用 0.90, 它会被认为是一个浮点数并转换为 0.9, 你可以使用 v0.90/0.90.0 或者 '0.90'(加了引号变成字符串)
+    version: '0.90' # 不要使用 0.90, 它会被认为是一个浮点数并转换为 0.9, 你可以使用 v0.90/0.90.0 或者 '0.90'(加了引号变成字符串)
 - run: print $'Nu version info:(char nl)'; version
   shell: nu {0}
 - name: Default shell will be `nu`
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: hustcer/setup-nu@main
         with:
-          version: "*"
+          version: '*'
       - run: version; print $"(char nl)Dir contents:(char nl)"; ls ($nu.current-exe | path dirname)
       - run: |
           print $'Current env:(char nl)'
@@ -60,6 +60,7 @@ jobs:
 #### 使用模块
 
 若想在 `Nu` 中使用模块, 可以参考如下示例：
+
 1. 通过设置 `NU_LIB_DIRS` 常量使用 Nu 模块:
 
 ```yaml
@@ -91,8 +92,7 @@ jobs:
     nu -c "use nu/module.nu *; print (get-env-abc 'DEFAULT-ABC')"
 ```
 
-你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.69` 及以上。
-3. 通过绝对路径使用模块
+你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.69` 及以上。 3. 通过绝对路径使用模块
 
 ```yaml
 - name: Setup nu
@@ -143,7 +143,7 @@ commit SHA。此时 Action 会直接下载已有的二进制包，而不会去�
 ```yaml
 - uses: hustcer/setup-nu@v3
   with:
-    version: "00c9ee0" # 安装 stable 版本 0.115.0，加引号是为了避免 YAML 把它解析成数字
+    version: '00c9ee0' # 安装 stable 版本 0.115.0，加引号是为了避免 YAML 把它解析成数字
 ```
 
 nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为 commit SHA 时，`check-latest` 会被忽略。
@@ -156,6 +156,7 @@ nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为
 #### 其它
 
 或者你也可以查看下面几个例子：
+
 1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
 2. 进阶使用: 看看 Nushell 是如何发版的吧 [工作流](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [脚本](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
@@ -185,4 +186,5 @@ nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为
 ## 许可
 
 Licensed under:
+
 - MIT license ([LICENSE](LICENSE) or https://opensource.org/licenses/MIT)

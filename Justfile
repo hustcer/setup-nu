@@ -55,14 +55,14 @@ test:
 fmt:
   @$'(ansi g)Start `fmt` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  pnpm biome format . --write; \
+  pnpm oxfmt --write .; \
   $'(ansi g)The `fmt` task finished!(ansi reset)(char nl)';
 
 # Code linting
 lint:
   @$'(ansi g)Start `lint` task...(ansi reset)'; \
   $'(ansi p)───────────────────────────────────────(ansi reset)'; \
-  pnpm biome lint src/**/*.ts; \
+  pnpm oxlint --fix .; \
   $'(ansi g)The `lint` task finished!(ansi reset)(char nl)';
 
 # Build dist/index.js
