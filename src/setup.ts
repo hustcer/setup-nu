@@ -450,10 +450,22 @@ export class MissingReleaseError extends Error {
   }
 }
 
-/** Respect server retry guidance, with a longer fallback for secondary rate limits. */
-function releaseRetryDelay(error: unknown, attempt: number): number {
-  const backoffMs = 1000 * 2 ** attempt;
+/** Return the retry delay, or undefined for permanent lookup failures. */
+function releaseRetryDelay(error: unknown, attempt: number): number | undefined {
   const headers = (error as { response?: { headers?: Record<string, string> } })?.response?.headers;
+  const rateLimited =
+    hasHttpStatus(error, 429) ||
+    (hasHttpStatus(error, 403) &&
+      (headers?.['x-ratelimit-remaining'] === '0' || headers?.['retry-after'] !== undefined));
+  const transient =
+    rateLimited ||
+    error instanceof MissingReleaseError ||
+    [408, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status));
+  if (!transient) {
+    return undefined;
+  }
+
+  const backoffMs = 1000 * 2 ** attempt;
   const retryAfter = headers?.['retry-after']?.trim();
   if (retryAfter) {
     const retryAfterMs = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now();
@@ -462,7 +474,7 @@ function releaseRetryDelay(error: unknown, attempt: number): number {
     }
   }
 
-  if (!hasHttpStatus(error, 429)) {
+  if (!rateLimited) {
     return backoffMs;
   }
 
@@ -480,16 +492,13 @@ export async function resolveRelease(tool: Tool, octokit: Octokit): Promise<Rele
     try {
       return await resolveReleaseOnce(tool, octokit);
     } catch (error) {
-      const transient =
-        error instanceof MissingReleaseError ||
-        [408, 429, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status));
-      if (!transient || attempt === MAX_RELEASE_RETRIES) {
+      const waitMs = releaseRetryDelay(error, attempt);
+      if (waitMs === undefined || attempt === MAX_RELEASE_RETRIES) {
         if (error instanceof MissingReleaseError) {
           warnIfFullFeature(tool.features);
         }
         throw error;
       }
-      const waitMs = releaseRetryDelay(error, attempt);
       core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/${MAX_RELEASE_RETRIES}) in ${waitMs}ms.`);
       await scheduler.wait(waitMs);
     }
