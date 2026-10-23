@@ -6,7 +6,7 @@
 import { globby } from 'globby';
 import * as semver from 'semver';
 import * as path from 'node:path';
-import timers from 'node:timers/promises';
+import { scheduler } from 'node:timers/promises';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import { Octokit, type RestEndpointMethodTypes } from '@octokit/rest';
@@ -491,7 +491,7 @@ export async function resolveRelease(tool: Tool, octokit: Octokit): Promise<Rele
       }
       const waitMs = releaseRetryDelay(error, attempt);
       core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/${MAX_RELEASE_RETRIES}) in ${waitMs}ms.`);
-      await timers.setTimeout(waitMs);
+      await scheduler.wait(waitMs);
     }
   }
 }

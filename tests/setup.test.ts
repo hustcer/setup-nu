@@ -9,9 +9,9 @@
  * cover for the resolution rules rather than coverage for its own sake.
  */
 
-import { test, describe } from 'node:test';
+import { test, describe, type TestContext } from 'node:test';
 import assert from 'node:assert/strict';
-import { setImmediate } from 'node:timers/promises';
+import timers, { scheduler, setImmediate } from 'node:timers/promises';
 import { Octokit } from '@octokit/rest';
 
 import {
@@ -294,6 +294,12 @@ describe('release API recovery', () => {
     });
   }
 
+  /** Node's mock timers do not intercept scheduler.wait, so route it through the mocked timer. */
+  function mockRetryTimers(t: TestContext, now = Date.now()): void {
+    t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now });
+    t.mock.method(scheduler, 'wait', (delay, options) => timers.setTimeout(delay, undefined, options));
+  }
+
   test('retries an empty wildcard lookup', async () => {
     let requests = 0;
     const octokit = client(() => ({ body: ++requests === 1 ? [] : [release('0.116.1', [localAsset])] }));
@@ -337,7 +343,7 @@ describe('release API recovery', () => {
   for (const status of [429, 503]) {
     for (const retryAfter of ['5', 'Fri, 23 Oct 2026 00:00:05 GMT']) {
       test(`honors Retry-After ${retryAfter} for HTTP ${status}`, async (t) => {
-        t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: Date.parse('2026-10-23T00:00:00Z') });
+        mockRetryTimers(t, Date.parse('2026-10-23T00:00:00Z'));
         let requests = 0;
         const octokit = client(() =>
           ++requests === 1
@@ -358,7 +364,7 @@ describe('release API recovery', () => {
 
   test('honors the rate limit reset time when Retry-After is absent', async (t) => {
     const now = Date.parse('2026-10-23T00:00:00Z');
-    t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now });
+    mockRetryTimers(t, now);
     let requests = 0;
     const octokit = client(() =>
       ++requests === 1
@@ -381,7 +387,7 @@ describe('release API recovery', () => {
 
   for (const retryAfter of [undefined, 'invalid']) {
     test(`bounds rate limit retries with ${retryAfter === undefined ? 'no' : 'invalid'} Retry-After`, async (t) => {
-      t.mock.timers.enable({ apis: ['setTimeout'] });
+      mockRetryTimers(t);
       let requests = 0;
       const octokit = client(() => {
         requests++;
