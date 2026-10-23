@@ -64,7 +64,6 @@ jobs:
 #### Use Nu Modules
 
 To use modules in `Nu`, please refer to the following examples:
-
 1. Use Nu modules by setting `NU_LIB_DIRS` constant:
 
 ```yaml
@@ -97,7 +96,6 @@ To use modules in `Nu`, please refer to the following examples:
 ```
 
 You have to wrap the `nu` code in `nu -c ""`, and the nu version should be equal to or above `0.69`.
-
 3. Use modules from absolute path
 
 ```yaml
@@ -165,7 +163,6 @@ when the version is a commit SHA.
 #### Others
 
 Or, check the following examples:
-
 1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
 2. Advanced example: How Does Nushell Make a Release? [Workflow](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [Script](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
@@ -198,5 +195,4 @@ This GitHub Action will install the latest matching release.
 ## License
 
 Licensed under:
-
 - MIT license ([LICENSE](LICENSE) or https://opensource.org/licenses/MIT)

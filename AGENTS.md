@@ -16,7 +16,6 @@ This is `setup-nu`, a GitHub Action that sets up a Nushell environment in GitHub
 ## Architecture
 
 The action is a single-entry TypeScript application bundled with `esbuild`:
-
 - `src/index.ts` - Entry point; parses inputs, calls setup, registers plugins
 - `src/setup.ts` - Core logic for downloading/caching Nushell releases from GitHub API
 - `src/plugins.ts` - Plugin registration logic; generates and executes Nushell scripts

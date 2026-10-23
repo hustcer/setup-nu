@@ -60,7 +60,6 @@ jobs:
 #### 使用模块
 
 若想在 `Nu` 中使用模块, 可以参考如下示例：
-
 1. 通过设置 `NU_LIB_DIRS` 常量使用 Nu 模块:
 
 ```yaml
@@ -93,7 +92,6 @@ jobs:
 ```
 
 你需要将 `nu` 代码包裹在 `nu -c ""` 中并执行, 而且要求你使用的 Nu 版本在 `0.69` 及以上。
-
 3. 通过绝对路径使用模块
 
 ```yaml
@@ -158,7 +156,6 @@ nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为
 #### 其它
 
 或者你也可以查看下面几个例子：
-
 1. [run-matrix.yaml](https://github.com/hustcer/setup-nu/blob/main/.github/workflows/release-matrix.yaml)
 2. 进阶使用: 看看 Nushell 是如何发版的吧 [工作流](https://github.com/nushell/nushell/blob/main/.github/workflows/release.yml), [脚本](https://github.com/nushell/nushell/blob/main/.github/workflows/release-pkg.nu)
 
@@ -188,5 +185,4 @@ nightly 版本同理，填它的 commit SHA 即可。注意：当版本指定为
 ## 许可
 
 Licensed under:
-
 - MIT license ([LICENSE](LICENSE) or https://opensource.org/licenses/MIT)

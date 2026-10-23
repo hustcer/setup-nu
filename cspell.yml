@@ -4,30 +4,30 @@
 #   npx cspell --no-progress .
 
 words:
-- msvc
-- nuon
-- GHES
-- gstat
-- rsort
-- ECODE
-- riscv
-- loong
-- endfor
-- dotenv
-- undici
-- biomejs
-- esbuild
-- nushell
-- hustcer
-- rsbuild
-- justfile
-- lefthook
-- linewise
-- DeepSeek
-- dataframe
-- loongarch
-- noreferrer
-- Unsanitized
+  - msvc
+  - nuon
+  - GHES
+  - gstat
+  - rsort
+  - ECODE
+  - riscv
+  - loong
+  - endfor
+  - dotenv
+  - undici
+  - biomejs
+  - esbuild
+  - nushell
+  - hustcer
+  - rsbuild
+  - justfile
+  - lefthook
+  - linewise
+  - DeepSeek
+  - dataframe
+  - loongarch
+  - noreferrer
+  - Unsanitized
 ignorePaths:
-- dist
-- pnpm-lock.yaml
+  - dist
+  - pnpm-lock.yaml

@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 ## [3.28] - 2026-10-03
@@ -519,4 +520,3 @@ May prosperity glow brighter and workflows soar higher! 🎇
 - Update readme.md
 - Set default version to latest
 - Upgrade checkout and setup-node actions to v3
-
