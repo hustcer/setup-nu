@@ -278,7 +278,9 @@ describe('release API recovery', () => {
   };
 
   /** Exercise Octokit's request and error handling with local responses. */
-  function client(reply: (url: string) => { status?: number; body: unknown; headers?: Record<string, string> }) {
+  function client(
+    reply: (url: string) => { status?: number; body: unknown; headers?: Record<string, string> }
+  ): Octokit {
     return new Octokit({
       request: {
         fetch: async (url: string | URL | Request) => {
@@ -404,14 +406,14 @@ describe('release API recovery', () => {
   }
 
   test('resolves exact versions by tag without listing releases', async () => {
-    const urls: string[] = [];
+    let requests = 0;
     const octokit = client((url) => {
-      urls.push(url);
+      requests++;
       assert.ok(url.endsWith('/releases/tags/0.116.1'));
       return { body: release('0.116.1', [localAsset]) };
     });
     assert.equal((await resolveRelease({ ...tool, versionSpec: '0.116.1' }, octokit)).version, '0.116.1');
-    assert.equal(urls.length, 1);
+    assert.equal(requests, 1);
   });
 
   test('supports a v-prefixed release tag for an exact version', async () => {

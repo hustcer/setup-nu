@@ -60,6 +60,7 @@ const NIGHTLY_REPO = 'nightly';
 // Nushell binaries are always published on public GitHub, even when the workflow itself runs on
 // GitHub Enterprise Server, so every API request goes to this host.
 const PUBLIC_GITHUB_API = 'https://api.github.com';
+const MAX_RELEASE_RETRIES = 2;
 
 /**
  * Tests whether a value is a full or abbreviated Git commit SHA.
@@ -451,25 +452,26 @@ export class MissingReleaseError extends Error {
 
 /** Respect server retry guidance, with a longer fallback for secondary rate limits. */
 function releaseRetryDelay(error: unknown, attempt: number): number {
-  const backoff = 1000 * 2 ** attempt;
+  const backoffMs = 1000 * 2 ** attempt;
   const headers = (error as { response?: { headers?: Record<string, string> } })?.response?.headers;
   const retryAfter = headers?.['retry-after']?.trim();
   if (retryAfter) {
-    const wait = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now();
-    if (Number.isFinite(wait) && wait >= 0) {
-      return Math.max(backoff, wait);
+    const retryAfterMs = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now();
+    if (Number.isFinite(retryAfterMs) && retryAfterMs >= 0) {
+      return Math.max(backoffMs, retryAfterMs);
     }
   }
 
-  if (hasHttpStatus(error, 429)) {
-    const reset = Number(headers?.['x-ratelimit-reset']) * 1000;
-    if (headers?.['x-ratelimit-remaining'] === '0' && Number.isFinite(reset) && reset > Date.now()) {
-      return Math.max(backoff, reset - Date.now());
-    }
-    // GitHub requires at least one minute when a rate limit has no retry time.
-    return 60_000 * 2 ** attempt;
+  if (!hasHttpStatus(error, 429)) {
+    return backoffMs;
   }
-  return backoff;
+
+  const resetTime = Number(headers?.['x-ratelimit-reset']) * 1000;
+  if (headers?.['x-ratelimit-remaining'] === '0' && Number.isFinite(resetTime) && resetTime > Date.now()) {
+    return Math.max(backoffMs, resetTime - Date.now());
+  }
+  // GitHub requires at least one minute when a rate limit has no retry time.
+  return 60_000 * 2 ** attempt;
 }
 
 /** Retry transient API failures and empty release results before failing the action. */
@@ -481,15 +483,15 @@ export async function resolveRelease(tool: Tool, octokit: Octokit): Promise<Rele
       const transient =
         error instanceof MissingReleaseError ||
         [408, 429, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status));
-      if (!transient || attempt === 2) {
+      if (!transient || attempt === MAX_RELEASE_RETRIES) {
         if (error instanceof MissingReleaseError) {
           warnIfFullFeature(tool.features);
         }
         throw error;
       }
-      const wait = releaseRetryDelay(error, attempt);
-      core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/2) in ${wait}ms.`);
-      await timers.setTimeout(wait);
+      const waitMs = releaseRetryDelay(error, attempt);
+      core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/${MAX_RELEASE_RETRIES}) in ${waitMs}ms.`);
+      await timers.setTimeout(waitMs);
     }
   }
 }
@@ -547,27 +549,31 @@ async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release
     return release;
   }
 
-  return octokit
-    .paginate(octokit.repos.listReleases, { owner, per_page: 100, repo: name }, (response, done) => {
+  const releases = await octokit.paginate(
+    octokit.repos.listReleases,
+    { owner, per_page: 100, repo: name },
+    (response, done) => {
       // Evaluated lazily, running the unused filter over every page is pure waste.
-      const releases = isNightly
-        ? filterLatestNightly(response, features)
-        : checkLatest
-          ? filterLatest(response, features)
-          : filterMatch(response, versionSpec, features);
+      let matches: Release[];
+      if (isNightly) {
+        matches = filterLatestNightly(response, features);
+      } else if (checkLatest) {
+        matches = filterLatest(response, features);
+      } else {
+        matches = filterMatch(response, versionSpec, features);
+      }
 
-      if (releases.length > 0) {
+      if (matches.length > 0) {
         done();
       }
-      return releases;
-    })
-    .then((releases) => {
-      const release = releases.find((release) => release != null);
-      if (release === undefined) {
-        throw new MissingReleaseError(tool);
-      }
-      return release;
-    });
+      return matches;
+    }
+  );
+  const release = releases.find((release) => release != null);
+  if (release === undefined) {
+    throw new MissingReleaseError(tool);
+  }
+  return release;
 }
 
 function proxyFetch(url: string | URL, opts?: UndiciRequestInit): Promise<UndiciResponse> {
