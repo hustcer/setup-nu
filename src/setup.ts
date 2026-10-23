@@ -6,6 +6,7 @@
 import { globby } from 'globby';
 import * as semver from 'semver';
 import * as path from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import { Octokit, type RestEndpointMethodTypes } from '@octokit/rest';
@@ -426,9 +427,7 @@ async function getNightlyReleaseByCommit(
  * @returns {Promise<Release>} a single GitHub release.
  */
 async function getRelease(tool: Tool): Promise<Release> {
-  const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
-  const isNightly = versionSpec === 'nightly';
-  const commitSha = versionSpec && isCommitSha(versionSpec) ? versionSpec : undefined;
+  const { features } = tool;
 
   // Logged once here instead of inside `getTargets`, which runs for every page of every query.
   core.info(`Try to get assets for Nu: arch = ${process.arch}, platform = ${process.platform}, feature = ${features}`);
@@ -439,6 +438,58 @@ async function getRelease(tool: Tool): Promise<Release> {
     baseUrl: PUBLIC_GITHUB_API,
     request: { fetch: proxyFetch },
   });
+  return resolveRelease(tool, octokit);
+}
+
+class MissingReleaseError extends Error {}
+
+/** Retry transient API failures and empty release results before failing the action. */
+export async function resolveRelease(tool: Tool, octokit: Octokit): Promise<Release> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await resolveReleaseOnce(tool, octokit);
+    } catch (error) {
+      const transient =
+        error instanceof MissingReleaseError ||
+        [408, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status));
+      if (!transient || attempt === 2) {
+        if (error instanceof MissingReleaseError) {
+          warnIfFullFeature(tool.features);
+        }
+        throw error;
+      }
+      core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/2).`);
+      await delay(1000 * 2 ** attempt);
+    }
+  }
+}
+
+async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release> {
+  const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
+  const isNightly = versionSpec === 'nightly';
+  const commitSha = versionSpec && isCommitSha(versionSpec) ? versionSpec : undefined;
+
+  // A fixed version does not need release-list pagination. Support both tag spellings used
+  // by Nushell, and preserve check-latest's existing latest-release selection.
+  const exactVersion = versionSpec && semver.valid(versionSpec);
+  if (exactVersion && !checkLatest) {
+    for (const tag of new Set([versionSpec, exactVersion, `v${exactVersion}`])) {
+      try {
+        const { data } = await octokit.repos.getReleaseByTag({ owner, repo: name, tag });
+        const asset = findAsset(data.assets, getTargets(features));
+        if (asset) {
+          return { version: data.tag_name.replace(/^v/, ''), downloadUrl: asset.browser_download_url };
+        }
+      } catch (error) {
+        if (!hasHttpStatus(error, 404)) {
+          throw error;
+        }
+      }
+    }
+    throw new MissingReleaseError(
+      `No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`
+    );
+  }
 
   if (commitSha) {
     if (checkLatest) {
@@ -484,8 +535,9 @@ async function getRelease(tool: Tool): Promise<Release> {
     .then((releases) => {
       const release = releases.find((release) => release != null);
       if (release === undefined) {
-        warnIfFullFeature(features);
-        throw new Error(`No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`);
+        throw new MissingReleaseError(
+          `No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`
+        );
       }
       return release;
     });

@@ -11,6 +11,7 @@
 
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import { Octokit } from '@octokit/rest';
 
 import {
   filterLatest,
@@ -22,6 +23,8 @@ import {
   isCommitSha,
   matchesSha,
   resolveVersionSpec,
+  resolveRelease,
+  type Tool,
 } from '../src/setup.ts';
 
 /** Builds the smallest release shape the filters actually read. */
@@ -258,5 +261,102 @@ describe('filterNightlyByCommit', () => {
       filterNightlyByCommit(page(release('0.114.2-nightly.33+2b9ac16', [localAsset])), 'deadbee', 'default'),
       []
     );
+  });
+});
+
+describe('release API recovery', () => {
+  const tool: Tool = {
+    owner: 'nushell',
+    name: 'nushell',
+    githubToken: '',
+    checkLatest: false,
+    enablePlugins: 'false',
+    versionSpec: '*',
+    features: 'default',
+  };
+
+  function client(reply: (url: string) => { status?: number; body: unknown }) {
+    return new Octokit({
+      request: {
+        fetch: async (url: string | URL | Request) => {
+          const result = reply(String(url));
+          return new Response(JSON.stringify(result.body), {
+            status: result.status ?? 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        },
+      },
+    });
+  }
+
+  test('retries an empty wildcard lookup', async () => {
+    let requests = 0;
+    const octokit = client(() => ({ body: ++requests === 1 ? [] : [release('0.116.1', [localAsset])] }));
+    assert.equal((await resolveRelease(tool, octokit)).version, '0.116.1');
+    assert.equal(requests, 2);
+  });
+
+  test('retries a transient API failure', async () => {
+    let requests = 0;
+    const octokit = client(() =>
+      ++requests === 1
+        ? { status: 503, body: { message: 'temporarily unavailable' } }
+        : { body: [release('0.116.1', [localAsset])] }
+    );
+    assert.equal((await resolveRelease(tool, octokit)).version, '0.116.1');
+    assert.equal(requests, 2);
+  });
+
+  test('bounds retries when no matching release is available', async () => {
+    let requests = 0;
+    const octokit = client(() => {
+      requests++;
+      return { body: [] };
+    });
+    await assert.rejects(resolveRelease(tool, octokit), /No release for Nushell matching version specifier \*/);
+    assert.equal(requests, 3);
+  });
+
+  test('does not retry authentication failures', async () => {
+    let requests = 0;
+    const octokit = client(() => {
+      requests++;
+      return { status: 401, body: { message: 'Bad credentials' } };
+    });
+    await assert.rejects(resolveRelease(tool, octokit), { status: 401 });
+    assert.equal(requests, 1);
+  });
+
+  test('resolves exact versions by tag without listing releases', async () => {
+    const urls: string[] = [];
+    const octokit = client((url) => {
+      urls.push(url);
+      assert.ok(url.endsWith('/releases/tags/0.116.1'));
+      return { body: release('0.116.1', [localAsset]) };
+    });
+    assert.equal((await resolveRelease({ ...tool, versionSpec: '0.116.1' }, octokit)).version, '0.116.1');
+    assert.equal(urls.length, 1);
+  });
+
+  test('supports a v-prefixed release tag for an exact version', async () => {
+    const urls: string[] = [];
+    const octokit = client((url) => {
+      urls.push(url);
+      if (url.endsWith('/releases/tags/0.116.1')) return { status: 404, body: { message: 'Not Found' } };
+      assert.ok(url.endsWith('/releases/tags/v0.116.1'));
+      return { body: release('v0.116.1', [localAsset]) };
+    });
+    assert.equal((await resolveRelease({ ...tool, versionSpec: '0.116.1' }, octokit)).version, '0.116.1');
+    assert.equal(urls.length, 2);
+  });
+
+  test('keeps range and check-latest lookups on the release list', async () => {
+    for (const input of [{ versionSpec: '^0.116' }, { versionSpec: '0.115.0', checkLatest: true }]) {
+      const octokit = client((url) => {
+        assert.ok(url.endsWith('/releases?per_page=100'));
+        return { body: [release('0.116.1', [localAsset])] };
+      });
+      assert.equal((await resolveRelease({ ...tool, ...input }, octokit)).version, '0.116.1');
+    }
   });
 });
