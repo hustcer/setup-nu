@@ -16,10 +16,6 @@ All notable changes to this project will be documented in this file.
 
 - Upgrade undici, cspell, lefthook & @biomejs/biome
 
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
 ## [3.28] - 2026-10-03
 
 ### Miscellaneous Tasks
