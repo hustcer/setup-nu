@@ -6,7 +6,7 @@
 import { globby } from 'globby';
 import * as semver from 'semver';
 import * as path from 'node:path';
-import { setTimeout as delay } from 'node:timers/promises';
+import timers from 'node:timers/promises';
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import { Octokit, type RestEndpointMethodTypes } from '@octokit/rest';
@@ -441,7 +441,36 @@ async function getRelease(tool: Tool): Promise<Release> {
   return resolveRelease(tool, octokit);
 }
 
-class MissingReleaseError extends Error {}
+/** No release currently provides the requested version and platform asset. */
+export class MissingReleaseError extends Error {
+  constructor({ versionSpec, features }: Tool) {
+    super(`No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`);
+    this.name = 'MissingReleaseError';
+  }
+}
+
+/** Respect server retry guidance, with a longer fallback for secondary rate limits. */
+function releaseRetryDelay(error: unknown, attempt: number): number {
+  const backoff = 1000 * 2 ** attempt;
+  const headers = (error as { response?: { headers?: Record<string, string> } })?.response?.headers;
+  const retryAfter = headers?.['retry-after']?.trim();
+  if (retryAfter) {
+    const wait = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now();
+    if (Number.isFinite(wait) && wait >= 0) {
+      return Math.max(backoff, wait);
+    }
+  }
+
+  if (hasHttpStatus(error, 429)) {
+    const reset = Number(headers?.['x-ratelimit-reset']) * 1000;
+    if (headers?.['x-ratelimit-remaining'] === '0' && Number.isFinite(reset) && reset > Date.now()) {
+      return Math.max(backoff, reset - Date.now());
+    }
+    // GitHub requires at least one minute when a rate limit has no retry time.
+    return 60_000 * 2 ** attempt;
+  }
+  return backoff;
+}
 
 /** Retry transient API failures and empty release results before failing the action. */
 export async function resolveRelease(tool: Tool, octokit: Octokit): Promise<Release> {
@@ -451,19 +480,21 @@ export async function resolveRelease(tool: Tool, octokit: Octokit): Promise<Rele
     } catch (error) {
       const transient =
         error instanceof MissingReleaseError ||
-        [408, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status));
+        [408, 429, 500, 502, 503, 504].some((status) => hasHttpStatus(error, status));
       if (!transient || attempt === 2) {
         if (error instanceof MissingReleaseError) {
           warnIfFullFeature(tool.features);
         }
         throw error;
       }
-      core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/2).`);
-      await delay(1000 * 2 ** attempt);
+      const wait = releaseRetryDelay(error, attempt);
+      core.warning(`Nushell release lookup failed; retrying (${attempt + 1}/2) in ${wait}ms.`);
+      await timers.setTimeout(wait);
     }
   }
 }
 
+/** Resolve a release once, leaving retry policy to the caller. */
 async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release> {
   const { owner, name, versionSpec, checkLatest = false, features = 'default' } = tool;
   const isNightly = versionSpec === 'nightly';
@@ -486,9 +517,7 @@ async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release
         }
       }
     }
-    throw new MissingReleaseError(
-      `No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`
-    );
+    throw new MissingReleaseError(tool);
   }
 
   if (commitSha) {
@@ -535,9 +564,7 @@ async function resolveReleaseOnce(tool: Tool, octokit: Octokit): Promise<Release
     .then((releases) => {
       const release = releases.find((release) => release != null);
       if (release === undefined) {
-        throw new MissingReleaseError(
-          `No release for Nushell matching version specifier ${versionSpec} of ${features} feature.`
-        );
+        throw new MissingReleaseError(tool);
       }
       return release;
     });

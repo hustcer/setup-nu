@@ -11,6 +11,7 @@
 
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import { setImmediate } from 'node:timers/promises';
 import { Octokit } from '@octokit/rest';
 
 import {
@@ -24,6 +25,7 @@ import {
   matchesSha,
   resolveVersionSpec,
   resolveRelease,
+  MissingReleaseError,
   type Tool,
 } from '../src/setup.ts';
 
@@ -275,14 +277,15 @@ describe('release API recovery', () => {
     features: 'default',
   };
 
-  function client(reply: (url: string) => { status?: number; body: unknown }) {
+  /** Exercise Octokit's request and error handling with local responses. */
+  function client(reply: (url: string) => { status?: number; body: unknown; headers?: Record<string, string> }) {
     return new Octokit({
       request: {
         fetch: async (url: string | URL | Request) => {
           const result = reply(String(url));
           return new Response(JSON.stringify(result.body), {
             status: result.status ?? 200,
-            headers: { 'content-type': 'application/json' },
+            headers: { 'content-type': 'application/json', ...result.headers },
           });
         },
       },
@@ -313,19 +316,92 @@ describe('release API recovery', () => {
       requests++;
       return { body: [] };
     });
-    await assert.rejects(resolveRelease(tool, octokit), /No release for Nushell matching version specifier \*/);
+    await assert.rejects(resolveRelease(tool, octokit), MissingReleaseError);
     assert.equal(requests, 3);
   });
 
-  test('does not retry authentication failures', async () => {
-    let requests = 0;
-    const octokit = client(() => {
-      requests++;
-      return { status: 401, body: { message: 'Bad credentials' } };
-    });
-    await assert.rejects(resolveRelease(tool, octokit), { status: 401 });
-    assert.equal(requests, 1);
+  test('does not retry authentication or permission failures', async () => {
+    for (const status of [401, 403]) {
+      let requests = 0;
+      const octokit = client(() => {
+        requests++;
+        return { status, body: { message: 'Access denied' } };
+      });
+      await assert.rejects(resolveRelease(tool, octokit), { status });
+      assert.equal(requests, 1);
+    }
   });
+
+  for (const status of [429, 503]) {
+    for (const retryAfter of ['5', 'Fri, 23 Oct 2026 00:00:05 GMT']) {
+      test(`honors Retry-After ${retryAfter} for HTTP ${status}`, async (t) => {
+        t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: Date.parse('2026-10-23T00:00:00Z') });
+        let requests = 0;
+        const octokit = client(() =>
+          ++requests === 1
+            ? { status, body: { message: 'Try later' }, headers: { 'retry-after': retryAfter } }
+            : { body: [release('0.116.1', [localAsset])] }
+        );
+        const result = resolveRelease(tool, octokit);
+        await setImmediate();
+        t.mock.timers.tick(4999);
+        await setImmediate();
+        assert.equal(requests, 1);
+        t.mock.timers.tick(1);
+        assert.equal((await result).version, '0.116.1');
+        assert.equal(requests, 2);
+      });
+    }
+  }
+
+  test('honors the rate limit reset time when Retry-After is absent', async (t) => {
+    const now = Date.parse('2026-10-23T00:00:00Z');
+    t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now });
+    let requests = 0;
+    const octokit = client(() =>
+      ++requests === 1
+        ? {
+            status: 429,
+            body: { message: 'Rate limit exceeded' },
+            headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': String(now / 1000 + 90) },
+          }
+        : { body: [release('0.116.1', [localAsset])] }
+    );
+    const result = resolveRelease(tool, octokit);
+    await setImmediate();
+    t.mock.timers.tick(89_999);
+    await setImmediate();
+    assert.equal(requests, 1);
+    t.mock.timers.tick(1);
+    assert.equal((await result).version, '0.116.1');
+    assert.equal(requests, 2);
+  });
+
+  for (const retryAfter of [undefined, 'invalid']) {
+    test(`bounds rate limit retries with ${retryAfter === undefined ? 'no' : 'invalid'} Retry-After`, async (t) => {
+      t.mock.timers.enable({ apis: ['setTimeout'] });
+      let requests = 0;
+      const octokit = client(() => {
+        requests++;
+        return {
+          status: 429,
+          body: { message: 'Rate limit exceeded' },
+          headers: retryAfter === undefined ? {} : { 'retry-after': retryAfter },
+        };
+      });
+      const result = assert.rejects(resolveRelease(tool, octokit), { status: 429 });
+      await setImmediate();
+      for (const [attempt, wait] of [60_000, 120_000].entries()) {
+        t.mock.timers.tick(wait - 1);
+        await setImmediate();
+        assert.equal(requests, attempt + 1);
+        t.mock.timers.tick(1);
+        await setImmediate();
+        assert.equal(requests, attempt + 2);
+      }
+      await result;
+    });
+  }
 
   test('resolves exact versions by tag without listing releases', async () => {
     const urls: string[] = [];
