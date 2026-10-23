@@ -365,28 +365,35 @@ describe('release API recovery', () => {
   }
 
   for (const status of [403, 429]) {
-    test(`honors the rate limit reset time for HTTP ${status} when Retry-After is absent`, async (t) => {
-      const now = Date.parse('2026-10-23T00:00:00Z');
-      mockRetryTimers(t, now);
-      let requests = 0;
-      const octokit = client(() =>
-        ++requests === 1
-          ? {
-              status,
-              body: { message: 'Rate limit exceeded' },
-              headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': String(now / 1000 + 90) },
-            }
-          : { body: [release('0.116.1', [localAsset])] }
-      );
-      const result = resolveRelease(tool, octokit);
-      await setImmediate();
-      t.mock.timers.tick(89_999);
-      await setImmediate();
-      assert.equal(requests, 1);
-      t.mock.timers.tick(1);
-      assert.equal((await result).version, '0.116.1');
-      assert.equal(requests, 2);
-    });
+    for (const [retryAfter, waitMs] of [
+      [undefined, 90_000],
+      ['5', 90_000],
+      ['120', 120_000],
+    ] as const) {
+      test(`honors the reset time and Retry-After ${retryAfter ?? 'absent'} for HTTP ${status}`, async (t) => {
+        const now = Date.parse('2026-10-23T00:00:00Z');
+        mockRetryTimers(t, now);
+        let requests = 0;
+        const headers: Record<string, string> = {
+          'x-ratelimit-remaining': '0',
+          'x-ratelimit-reset': String(now / 1000 + 90),
+        };
+        if (retryAfter !== undefined) headers['retry-after'] = retryAfter;
+        const octokit = client(() =>
+          ++requests === 1
+            ? { status, headers, body: { message: 'Rate limit exceeded' } }
+            : { body: [release('0.116.1', [localAsset])] }
+        );
+        const result = resolveRelease(tool, octokit);
+        await setImmediate();
+        t.mock.timers.tick(waitMs - 1);
+        await setImmediate();
+        assert.equal(requests, 1);
+        t.mock.timers.tick(1);
+        assert.equal((await result).version, '0.116.1');
+        assert.equal(requests, 2);
+      });
+    }
 
     for (const retryAfter of [undefined, 'invalid']) {
       test(`bounds HTTP ${status} retries with ${retryAfter === undefined ? 'no' : 'invalid'} Retry-After`, async (t) => {

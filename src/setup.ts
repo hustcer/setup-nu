@@ -466,24 +466,28 @@ function releaseRetryDelay(error: unknown, attempt: number): number | undefined 
   }
 
   const backoffMs = 1000 * 2 ** attempt;
+  const now = Date.now();
+  let serverDelayMs: number | undefined;
   const retryAfter = headers?.['retry-after']?.trim();
   if (retryAfter) {
-    const retryAfterMs = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now();
+    const retryAfterMs = /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - now;
     if (Number.isFinite(retryAfterMs) && retryAfterMs >= 0) {
-      return Math.max(backoffMs, retryAfterMs);
+      serverDelayMs = retryAfterMs;
     }
   }
 
-  if (!rateLimited) {
-    return backoffMs;
+  if (rateLimited && headers?.['x-ratelimit-remaining'] === '0') {
+    const resetDelayMs = Number(headers['x-ratelimit-reset']) * 1000 - now;
+    if (Number.isFinite(resetDelayMs) && resetDelayMs > 0) {
+      serverDelayMs = Math.max(serverDelayMs ?? 0, resetDelayMs);
+    }
   }
 
-  const resetTime = Number(headers?.['x-ratelimit-reset']) * 1000;
-  if (headers?.['x-ratelimit-remaining'] === '0' && Number.isFinite(resetTime) && resetTime > Date.now()) {
-    return Math.max(backoffMs, resetTime - Date.now());
+  if (serverDelayMs !== undefined) {
+    return Math.max(backoffMs, serverDelayMs);
   }
   // GitHub requires at least one minute when a rate limit has no retry time.
-  return 60_000 * 2 ** attempt;
+  return rateLimited ? 60_000 * 2 ** attempt : backoffMs;
 }
 
 /** Retry transient API failures and empty release results before failing the action. */
