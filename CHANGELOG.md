@@ -1,4 +1,21 @@
 # Changelog
+All notable changes to this project will be documented in this file.
+
+## [3.29] - 2026-10-23
+
+### Bug Fixes
+
+- Retry transient release discovery failures (#225)
+
+### Miscellaneous Tasks
+
+- Migrate formatting and lint tooling to Oxc
+
+### Deps
+
+- Upgrade undici, cspell, lefthook & @biomejs/biome
+
+# Changelog
 
 All notable changes to this project will be documented in this file.
 

@@ -1,6 +1,6 @@
 {
   "name": "setup-nu",
-  "version": "3.28.0",
+  "version": "3.29.0",
   "private": true,
   "description": "A Github Action to Setup a Nushell Environment to Run Nu Scripts or Commands",
   "homepage": "https://github.com/hustcer/setup-nu#readme",
@@ -44,5 +44,5 @@
     "node": ">=22.0.0",
     "pnpm": ">=12"
   },
-  "actionVer": "v3.28"
+  "actionVer": "v3.29"
 }
