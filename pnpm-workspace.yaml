@@ -14,3 +14,4 @@ minimumReleaseAgeExclude:
   - '@biomejs/cli-win32-x64@2.5.15'
 overrides:
   undici@<6.28.1: ^6.28.1
+  undici@>=4.0.0 <6.29.1: ^6.29.1
