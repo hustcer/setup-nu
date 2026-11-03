@@ -12,5 +12,6 @@ minimumReleaseAgeExclude:
   - '@biomejs/cli-linux-x64@2.5.15'
   - '@biomejs/cli-win32-arm64@2.5.15'
   - '@biomejs/cli-win32-x64@2.5.15'
+  - semver@7.8.6
 overrides:
   undici@>=4.0.0 <6.29.1: ^6.29.1
