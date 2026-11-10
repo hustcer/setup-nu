@@ -1,4 +1,26 @@
 # Changelog
+All notable changes to this project will be documented in this file.
+
+## [3.30] - 2026-11-10
+
+### Bug Fixes
+
+- Update vulnerable undici dependency
+
+### Miscellaneous Tasks
+
+- Bump actions/setup-node from 6 to 7 (#227)
+- Bump typescript from 6.0.3 to 7.0.2 (#226)
+- Bump oxfmt from 0.75.0 to 0.77.0 (#229)
+- Bump oxlint from 1.90.0 to 1.92.0 (#228)
+
+### Deps
+
+- Upgrade oxfmt & oxlint
+- Upgrade semver to ^7.8.6
+- Upgrade undici, cspell, oxfmt & oxlint
+
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
