@@ -32,7 +32,7 @@
   "devDependencies": {
     "@types/node": "^26.6.6",
     "@types/semver": "^7.8.0",
-    "cspell": "^10.4.1",
+    "cspell": "^10.5.0",
     "esbuild": "^0.28.2",
     "lefthook": "^2.2.2",
     "oxfmt": "0.78.0",
